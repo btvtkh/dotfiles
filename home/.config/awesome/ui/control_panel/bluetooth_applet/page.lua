@@ -12,102 +12,57 @@ local function create_dev_widget(path)
 	local dev_widget = wibox.widget {
 		path = path,
 		widget = wibox.container.background,
+		shape = beautiful.rrect(dpi(10)),
 		forced_height = dpi(40),
 		{
-			layout = wibox.layout.fixed.vertical,
+			widget = wibox.container.margin,
+			margins = { left = dpi(15), right = dpi(15) },
 			{
-				id = "header",
-				widget = wibox.container.background,
-				forced_height = dpi(40),
-				shape = beautiful.rrect(dpi(10)),
+				layout = wibox.layout.align.horizontal,
 				{
-					widget = wibox.container.margin,
-					margins = { left = dpi(15), right = dpi(15) },
+					widget = wibox.container.constraint,
+					width = dpi(220),
 					{
-						layout = wibox.layout.align.horizontal,
-						{
-							widget = wibox.container.constraint,
-							width = dpi(220),
-							{
-								id = "name",
-								widget = wibox.widget.textbox
-							}
-						},
-						nil,
-						{
-							widget = wibox.container.constraint,
-							width = dpi(130),
-							{
-								id = "percentage",
-								widget = wibox.widget.textbox
-							}
-						}
+						id = "name",
+						widget = wibox.widget.textbox
 					}
-				}
-			},
-			{
-				id = "buttons",
-				widget = wibox.container.background,
-				forced_height = dpi(50),
+				},
+				nil,
 				{
-					widget = wibox.container.margin,
-					margins = { top = dpi(5) },
+					widget = wibox.container.constraint,
+					width = dpi(130),
 					{
-						layout = wibox.layout.flex.horizontal,
-						spacing = dpi(5),
-						{
-							id = "connect-button",
-							widget = common.hover_button {
-								margins = { left = dpi(15), right = dpi(15) },
-								shape = beautiful.rrect(dpi(10))
-							}
-						},
-						{
-							id = "pair-button",
-							widget = common.hover_button {
-								margins = { left = dpi(15), right = dpi(15) },
-								shape = beautiful.rrect(dpi(10))
-							}
-						},
-						{
-							id = "trust-button",
-							widget = common.hover_button {
-								margins = { left = dpi(15), right = dpi(15) },
-								shape = beautiful.rrect(dpi(10))
-							}
-						}
+						id = "percentage",
+						widget = wibox.widget.textbox
 					}
 				}
 			}
 		}
 	}
 
-	local header = dev_widget:get_children_by_id("header")[1]
-	header:connect_signal("mouse::enter", function(w)
+	local name = dev_widget:get_children_by_id("name")[1]
+	dev:connect_signal("property::connected", function(_, cnd)
+		name:set_markup((cnd and text_icons.check .. " " or "") .. (dev:get_name() or dev:get_address()))
+	end)
+
+	name:set_markup((dev:get_connected() and text_icons.check .. " " or "") .. (dev:get_name() or dev:get_address()))
+
+	local percentage = dev_widget:get_children_by_id("percentage")[1]
+	dev:connect_signal("property::percentage", function(_, perc)
+		percentage:set_markup(perc ~= nil and string.format("%.0f%%", perc) or "")
+	end)
+
+	percentage:set_markup(dev:get_percentage() and string.format("%.0f%%", dev:get_percentage()) or "")
+
+	dev_widget:connect_signal("mouse::enter", function(w)
 		w:set_bg(beautiful.bg_urg)
 	end)
 
-	header:connect_signal("mouse::leave", function(w)
+	dev_widget:connect_signal("mouse::leave", function(w)
 		w:set_bg(nil)
 	end)
 
-	local dev_buttons = dev_widget:get_children_by_id("buttons")
-
-	local buttons_visible = false
-	local function toggle_buttons()
-		buttons_visible = not buttons_visible
-		dev_widget:set_forced_height(buttons_visible and dpi(80) or dpi(40))
-		dev_buttons.visible = buttons_visible
-	end
-
-	header:buttons {
-		awful.button({}, 1, function()
-			toggle_buttons()
-		end)
-	}
-
-	local connect_button = dev_widget:get_children_by_id("connect-button")[1]
-	connect_button:buttons {
+	dev_widget:buttons {
 		awful.button({}, 1, function()
 			if not dev:get_connected() then
 				dev:connect()
@@ -116,49 +71,6 @@ local function create_dev_widget(path)
 			end
 		end)
 	}
-
-	local pair_button = dev_widget:get_children_by_id("pair-button")[1]
-	pair_button:buttons {
-		awful.button({}, 1, function()
-			if not dev:get_paired() then
-				dev:pair()
-			else
-				dev:cancel_pairing()
-			end
-		end)
-	}
-
-	local trust_button = dev_widget:get_children_by_id("trust-button")[1]
-	trust_button:buttons {
-		awful.button({}, 1, function()
-			dev:set_trusted(not dev:get_trusted())
-		end)
-	}
-
-	local percentage = dev_widget:get_children_by_id("percentage")[1]
-	dev:connect_signal("property::percentage", function(_, perc)
-		percentage:set_markup(perc ~= nil and string.format("%.0f%%", perc) or "")
-	end)
-
-	local name = dev_widget:get_children_by_id("name")[1]
-	dev:connect_signal("property::connected", function(_, cnd)
-		name:set_markup((cnd and text_icons.check .. " " or "") .. (dev:get_name() or dev:get_address()))
-		connect_button:set_label(cnd and "Disconnect" or "Connect")
-	end)
-
-	dev:connect_signal("property::paired", function(_, prd)
-		pair_button:set_label(prd and "Unpair" or "Pair")
-	end)
-
-	dev:connect_signal("property::trusted", function(_, trd)
-		trust_button:set_label(trd and "Untrust" or "Trust")
-	end)
-
-	name:set_markup((dev:get_connected() and text_icons.check .. " " or "") .. (dev:get_name() or dev:get_address()))
-	percentage:set_markup(dev:get_percentage() and string.format("%.0f%%", dev:get_percentage()) or "")
-	connect_button:set_label(dev:get_connected() and "Disconnect" or "Connect")
-	pair_button:set_label(dev:get_paired() and "Unpair" or "Pair")
-	trust_button:set_label(dev:get_trusted() and "Untrust" or "Trust")
 
 	return dev_widget
 end
@@ -176,7 +88,12 @@ local function on_device_added(self, path)
 			end
 		end
 	end
-	devs_layout:add(dev_widget)
+
+	if adapter:get_device(path):get_connected() then
+		devs_layout:insert(1, dev_widget)
+	else
+		devs_layout:add(dev_widget)
+	end
 end
 
 local function on_device_removed(self, path)
