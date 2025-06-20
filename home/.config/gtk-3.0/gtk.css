@@ -1,0 +1,19 @@
+.window-frame {
+  box-shadow: 0 0 0 0;
+  margin: 0;
+}
+
+window decoration {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/*
+menu,
+.csd .menu,
+.csd .dropdown,
+.csd .context-menu {
+    border-radius: 0;
+}
+*/

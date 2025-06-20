@@ -1,0 +1,28 @@
+[ColorEffects:Inactive]
+ChangeSelectionColor = true
+
+
+[Colors:Button]
+BackgroundNormal     = #171719
+ForegroundNormal     = #E5E7ED
+
+
+[Colors:Selection]
+BackgroundNormal     = #A8C7FA
+ForegroundNormal     = 0
+
+
+[Colors:View]
+BackgroundAlternate  = #171719
+BackgroundNormal     = #252628
+ForegroundLink       = #A8C7FA
+ForegroundNormal     = #E5E7ED
+
+
+[Colors:Window]
+BackgroundNormal     = #171719
+ForegroundNormal     = #E5E7ED
+
+
+[General]
+Name                 = Astel

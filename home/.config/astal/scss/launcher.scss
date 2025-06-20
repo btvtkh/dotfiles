@@ -1,0 +1,60 @@
+@use 'sass:string';
+@use "sass:color";
+@import "themes/astel";
+
+@function gtkalpha($c, $a) {
+  @return string.unquote('alpha(#{$c},#{$a})');
+}
+
+window.launcher {
+  all: unset;
+
+  .mainbox {
+    background-color: $bg;
+    border: 2px solid $bg-urg;
+    border-radius: 18px;
+    padding: 10px;
+    margin: 0 0 7px 7px;
+
+    scrollable > viewport {
+      all: unset;
+    }
+
+    entry {
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .app-button {
+      all: unset;
+      color: $fg;
+      min-width: 0;
+      min-height: 0;
+      padding: 15px;
+      border-radius: 8px;
+      transition: 200ms;
+
+      label.name {
+        font-size: 13pt;
+        font-weight: bold;
+      }
+
+      &:focus {
+        color: $bg;
+        background-color: $ac;
+      }
+
+      &:hover {
+        color: $fg;
+        background-color: $bg-urg;
+      }
+    }
+
+    box.not-found {
+      label {
+        color: color.adjust($fg, $alpha: -0.5);
+        font-size: 17pt;
+      }
+    }
+  }
+}

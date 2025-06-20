@@ -1,0 +1,109 @@
+@use "sass:string";
+@import "themes/astel";
+
+@function gtkalpha($c, $a) {
+  @return string.unquote("alpha(#{$c},#{$a})");
+}
+
+$error: red;
+
+window.notifications {
+  all: unset;
+
+  .notification {
+    min-width: 400px;
+    background-color: $bg;
+    border: 2px solid $bg-urg;
+    border-radius: 18px;
+    padding: 10px;
+    margin-right: 25px;
+    margin-top: 10px;
+
+    &:first-child {
+      margin-top: 25px;
+    }
+
+    &.critical {
+      .header .app-name {
+        color: $ac-red;
+      }
+    }
+
+    .header {
+      color: gtkalpha($fg, 0.5);
+      margin: 5px;
+
+      .app-name {
+        font-weight: bold;
+      }
+
+      .time {
+        margin-right: 5px;
+      }
+
+      .dismiss-button {
+        all: unset;
+        min-width: 0;
+        min-height: 0;
+        color: $ac-red;
+        background-color: transparent;
+        padding: 3px;
+        border-radius: 6px;
+        transition: 200ms;
+
+        &:hover {
+          color: $bg;
+          background-color: $ac-red;
+        }
+      }
+    }
+
+    .content {
+      margin: 5px;
+
+      .summary {
+        color: $fg;
+        font-size: 13pt;
+      }
+
+      .body {
+        color: gtkalpha($fg, 0.8);
+      }
+
+      .image {
+        min-width: 80px;
+        min-height: 80px;
+        background-size: cover;
+        background-position: center;
+        margin-right: 5px;
+      }
+    }
+
+    .actions {
+      margin: 5px;
+
+      .action-button {
+        all: unset;
+        color: $fg;
+        background-color: $bg-alt;
+        margin: 0 3px;
+        padding: 5px;
+        border-radius: 8px;
+        transition: 200ms;
+
+        &:hover {
+          color: $bg;
+          background-color: $ac;
+        }
+
+        &:first-child {
+          margin-left: 0;
+        }
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,238 @@
+@use 'sass:string';
+@use "sass:color";
+@import "themes/astel";
+
+@function gtkalpha($c, $a) {
+  @return string.unquote('alpha(#{$c},#{$a})');
+}
+
+window.control-panel {
+  .mainbox {
+    background-color: $bg;
+    margin: 0 7px 7px 0;
+    border: 2px solid $bg-urg;
+    border-radius: 25px;
+    padding: 15px;
+
+    .notification-list {
+      scrollable > viewport {
+        all: unset;
+      }
+
+      .header {
+        .title {
+          font-weight: bold;
+          color: $fg;
+          padding-left: 8px;
+          font-size: 13pt;
+        }
+
+        .clear-button {
+          all: unset;
+          color: $ac-red;
+          background-color: transparent;
+          padding: 10px;
+          border-radius: 10px;
+          transition: 200ms;
+
+          &:hover {
+            color: $bg;
+            background-color: $ac-red;
+          }
+
+          &:active {
+            color: $bg;
+            background-color: color.adjust($ac-red, $alpha: -0.4);
+          }
+        }
+      }
+
+      .empty-massage {
+        label {
+          font-size: 17pt;
+          color: color.adjust($fg, $alpha: -0.5);
+        }
+      }
+
+      .notification {
+        background-color: $bg-alt;
+        border-radius: 10px;
+        padding: 10px;
+
+        &.critical {
+          .header .app-name {
+            color: $ac-red;
+          }
+        }
+
+        .header {
+          color: gtkalpha($fg, 0.5);
+          margin: 5px;
+
+          .app-name {
+            font-weight: bold;
+          }
+
+          .time {
+            margin-right: 8px;
+          }
+
+          .dismiss-button {
+            all: unset;
+            color: $ac-red;
+            background-color: transparent;
+            min-width: 0;
+            min-height: 0;
+            padding: 3px;
+            border-radius: 6px;
+            transition: 200ms;
+
+            &:hover {
+              color: $bg;
+              background-color: $ac-red;
+            }
+          }
+        }
+
+        .content {
+          margin: 5px;
+
+          .summary {
+            font-size: 1.2em;
+            color: $fg;
+          }
+
+          .body {
+            color: gtkalpha($fg, 0.8);
+          }
+
+          .image {
+            min-width: 80px;
+            min-height: 80px;
+            background-size: cover;
+            background-position: center;
+            margin-right: 5px;
+          }
+        }
+
+        .actions {
+          margin: 5px;
+
+          .action-button {
+            all: unset;
+            color: $fg;
+            background-color: $bg-urg;
+            margin: 0 3px;
+            padding: 5px;
+            border-radius: 8px;
+            transition: 200ms;
+
+            &:hover {
+              color: $bg;
+              background-color: $ac;
+            }
+
+            &:first-child {
+              margin-left: 0;
+            }
+
+            &:last-child {
+              margin-right: 0;
+            }
+          }
+        }
+      }
+    }
+
+    .audio-sliders {
+      background-color: $bg-alt;
+      padding: 15px;
+      border-radius: 10px;
+      
+      .speaker, .microphone {
+        .volume-slider {
+          trough {
+            background-color: $bg-urg;
+          }
+
+          highlight {
+            background-image: none;
+            background-color: $ac;
+          }
+
+          slider {
+            background-color: $bg-alt;
+            box-shadow: inset 0 0 0 2px $ac;
+          }
+
+          &.muted {
+            highlight {
+              background-color: $fg-alt;
+            }
+
+            slider {
+              box-shadow: inset 0 0 0 2px $fg-alt;
+            }
+          }
+        }
+
+        .mute-button {
+          all: unset;
+          color: $fg;
+          background-color: transparent;
+          padding: 5px;
+          border-radius: 8px;
+          transition: 200ms;
+          margin-right: 5px;
+
+          label {
+            transition: 200ms;
+          }
+
+          &:hover {
+            color: $fg;
+            background-color: color.adjust($fg, $alpha: -0.8);
+          }
+
+          &:active {
+            color: $fg;
+            background-color: color.adjust($fg, $alpha: -0.7);
+          }
+
+          &.muted > label {
+            color: color.adjust($fg, $alpha: -0.5);
+          }
+        }
+
+        .volume-value {
+          color: $fg;
+          margin-left: 10px;
+        }
+      }
+    }
+
+    .wifi-button, .bluetooth-button {
+      border-radius: 8px;
+
+      .toggle-button {
+        margin: 0;
+        border-radius: 8px 0 0 8px;
+        padding: 10px;
+
+        label {
+          margin-left: 10px;
+        }
+      }
+
+      .arrow-button {
+        margin: 0;
+        border-radius: 0 8px 8px 0;
+        padding: 10px 0 10px 0;
+
+        icon {
+          min-width: 40px;
+        }
+      }
+    }
+  }
+}

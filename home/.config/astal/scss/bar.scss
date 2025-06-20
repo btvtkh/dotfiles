@@ -1,0 +1,135 @@
+@use "sass:color";
+@import "themes/astel";
+
+@function gtkalpha($c, $a) {
+  @return string.unquote('alpha(#{$c}, #{$a})');
+}
+
+window.bar {
+  min-height: 30px;
+
+  button {
+    all: unset;
+    padding: 0 8px;
+    border-radius: 8px;
+    color: $fg;
+    background-color: $bg-alt;
+
+    &:hover {
+      color: $fg;
+      background-color: color.adjust($fg, $alpha: -0.8);
+    }
+
+    &:active {
+      color: $fg;
+      background-color: color.adjust($fg, $alpha: -0.7)
+    }
+  }
+
+  .mainbox {
+    border-top: 2px solid $bg-urg;
+    background-color: $bg;
+    color: $fg;
+    font-size: 12pt;
+    font-weight: bold;
+    padding: 8px;
+  }
+
+  .workspaces  {
+    background-color: $bg-alt;
+    padding: 4px;
+    border-radius: 8px;
+
+    .workspace {
+      all: unset;
+      background-color: transparent;
+      padding: 0 7px;
+      border-radius: 5px;
+      transition: 200ms;
+
+      &:hover {
+        color: $fg;
+        background-color: color.adjust($fg, $alpha: -0.84);
+      }
+
+      &:active {
+        color: $fg;
+        background-color: color.adjust($fg, $alpha: -0.8)
+      }
+
+      &.focused {
+        color: $bg;
+        background-color: $ac;
+      }
+    }
+  }
+
+  .clients {
+    .client {
+      all: unset;
+      background-color: $bg-alt;
+      padding: 0 8px;
+      border-radius: 8px;
+      transition: 200ms;
+
+      &:hover {
+        color: $fg;
+        background-color: color.adjust($fg, $alpha: -0.84);
+      }
+
+      &:active {
+        color: $fg;
+        background-color: color.adjust($fg, $alpha: -0.8)
+      }
+
+      &.focused {
+        color: $fg;
+        border-bottom: 2px solid $ac;
+      }
+    }
+  }
+
+  .systray {
+    background-color: $bg-alt;
+    border-radius: 8px;
+
+    .reveal-button, .item {
+      all: unset;
+      background-color: transparent;
+      padding: 0 6px;
+      border-radius: 8px;
+      transition: 200ms;
+
+      &:hover {
+        color: $fg;
+        background-color: color.adjust($fg, $alpha: -0.84);
+      }
+
+      &:active {
+        color: $fg;
+        background-color: color.adjust($fg, $alpha: -0.8)
+      }
+    }
+  }
+
+  .kblayout {
+    background-color: $bg-alt;
+    padding: 0 8px;
+    border-radius: 8px;
+  }
+
+  .time {
+    background-color: $bg-alt;
+    padding: 0 8px;
+    border-radius: 8px;
+  }
+
+  .launcher-button, .control-panel-button {
+    padding: 0 7px;
+    transition: 200ms;
+
+    label {
+      all: unset;
+    }
+  }
+}
