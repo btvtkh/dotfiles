@@ -2,12 +2,11 @@ local Gio = require("lgi").require("Gio")
 local awful = require("awful")
 local beautiful = require("beautiful")
 local gtable = require("gears.table")
-local gtimer = require("gears.timer")
 local gfs = require("gears.filesystem")
 local common = require("common")
 local user = require("user")
-local is_supported = require("lib").is_supported
-local table_to_file = require("lib").table_to_file
+local is_supported = require("lib.file").is_supported
+local table_to_file = require("lib.file").table_to_file
 local capi = { awesome = awesome, screen = screen, client = client }
 local screenshot = require("service.screenshot").get_default()
 local powermenu = require("ui.powermenu").get_default()

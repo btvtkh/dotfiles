@@ -7,7 +7,7 @@ local common = require("common")
 local text_icons = beautiful.text_icons
 local ncr = naughty.notification_closed_reason
 local dpi = beautiful.xresources.apply_dpi
-local create_markup = require("lib").create_markup
+local create_markup = require("lib.string").create_markup
 
 local notification_list = {}
 

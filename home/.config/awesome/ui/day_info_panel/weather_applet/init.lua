@@ -3,7 +3,7 @@ local beautiful = require("beautiful")
 local gtable = require("gears.table")
 local text_icons = require("beautiful").text_icons
 local dpi = beautiful.xresources.apply_dpi
-local create_markup = require("lib").create_markup
+local create_markup = require("lib.string").create_markup
 local weather = require("service.weather").get_default()
 
 local weather_applet = {}

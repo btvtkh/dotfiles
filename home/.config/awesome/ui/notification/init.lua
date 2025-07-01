@@ -8,8 +8,8 @@ local beautiful = require("beautiful")
 local ncr = naughty.notification_closed_reason
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
-local create_markup = require("lib").create_markup
-local remove_nonindex = require("lib").remove_nonindex
+local create_markup = require("lib.string").create_markup
+local remove_nonindex = require("lib.table").remove_nonindex
 
 local notifications = {}
 

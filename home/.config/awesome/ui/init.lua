@@ -3,7 +3,7 @@ local naughty = require("naughty")
 local gtimer = require("gears.timer")
 local beautiful = require("beautiful")
 local user = require("user")
-local has_common = require("lib").has_common
+local has_common = require("lib.table").has_common
 local capi = { screen = screen, client = client }
 local titlebar = require("ui.titlebar")
 local wallpaper = require("ui.wallpaper")
