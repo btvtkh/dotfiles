@@ -7,7 +7,7 @@ local AstalTray = astal.require("AstalTray")
 local App = require("astal.gtk3").App
 local Widget = require("astal.gtk3").Widget
 local Astal = require("astal.gtk3").Astal
-local map = require("lib").map
+local map = require("lib.table").map
 
 local function LauncherButton()
 	return Widget.Button {
@@ -110,8 +110,9 @@ local function KbLayout()
 		class_name = "kblayout",
 		setup = function(self)
 			self:hook(hyprland, "keyboard-layout", function(_, _, lt)
-				local lt_name = (lt:match("English") and "En") or
-					(lt:match("Russian") and "Ru") or "??"
+				local lt_name = (lt:match("English") and "En")
+					or (lt:match("Russian") and "Ru")
+					or "??"
 				layout_name:set(lt_name)
 			end)
 		end,

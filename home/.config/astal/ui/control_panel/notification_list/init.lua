@@ -1,28 +1,33 @@
 local astal = require("astal")
 local AstalNotifd = astal.require("AstalNotifd")
 local Widget = require("astal.gtk3").Widget
-local varlist = require("lib").varlist
-local Notification = require("ui.notifications.notification")
+local varlist = require("lib.table").varlist
+local NotifWidget = require("ui.notifications.widget")
 
 return function()
 	local notifd = AstalNotifd.get_default()
 	local notif_list = varlist({})
 
 	for _, n in ipairs(notifd:get_notifications()) do
-		notif_list.insert(Notification(n, function(self)
-			self:hook(n, "resolved", function()
-				notif_list.remove(self)
-			end)
-		end))
+		notif_list.insert(NotifWidget(n, {
+			setup = function(self)
+				self:hook(n, "resolved", function()
+					notif_list.remove(self)
+				end)
+			end
+		}))
 	end
 
 	notifd.on_notified = function(_, id)
 		local n = notifd:get_notification(id)
-		notif_list.insert(1, Notification(n, function(self)
-			self:hook(n, "resolved", function()
-				notif_list.remove(self)
-			end)
-		end))
+
+		notif_list.insert(1, NotifWidget(n, {
+			setup = function(self)
+				self:hook(n, "resolved", function()
+					notif_list.remove(self)
+				end)
+			end
+		}))
 	end
 
 	return Widget.Box {

@@ -20,10 +20,10 @@ local function hide()
 end
 
 return function()
-	local current_page = Variable("main")
+	local current_page = Variable("Main-page")
 
 	local main_page = Widget.Box {
-		name = "main",
+		name = "Main-page",
 		width_request = 450,
 		height_request = 750,
 		vertical = true,
@@ -36,33 +36,43 @@ return function()
 		Widget.Box {
 			spacing = 8,
 			hexpand = true,
-			WifiButton(function()
-				current_page:set("wifi")
-			end),
-			BluetoothButton(function()
-				current_page:set("bluetooth")
-			end)
+			WifiButton {
+				on_arrow_button_clicked = function()
+					current_page:set("Wifi-page")
+				end
+			},
+			BluetoothButton {
+				on_arrow_button_clicked = function()
+					current_page:set("Bluetooth-page")
+				end
+			}
 		}
 	}
 
-	local main_widget = Widget.Revealer {
-		transition_type = "SLIDE_UP",
-		Widget.Box {
-			class_name = "mainbox",
-			vexpand = false,
-			Widget.Stack {
-				transition_type = "SLIDE_LEFT_RIGHT",
-				homogeneous = false,
-				shown = bind(current_page),
-				main_page,
-				WifiPage(function()
-					current_page:set("main")
-				end),
-				BluetoothPage(function()
-					current_page:set("main")
-				end)
+	local mainbox = Widget.Box {
+		class_name = "mainbox",
+		vexpand = false,
+		Widget.Stack {
+			transition_type = "SLIDE_LEFT_RIGHT",
+			homogeneous = false,
+			shown = bind(current_page),
+			main_page,
+			WifiPage {
+				on_close_button_clicked = function()
+					current_page:set("Main-page")
+				end
+			},
+			BluetoothPage {
+				on_close_button_clicked = function()
+					current_page:set("Main-page")
+				end
 			}
 		}
+	}
+
+	local revealer = Widget.Revealer {
+		transition_type = "SLIDE_UP",
+		mainbox
 	}
 
 	return Widget.Window {
@@ -79,11 +89,18 @@ return function()
 			end
 		end,
 		on_show = function()
-			current_page:set("main")
-			main_widget:set_reveal_child(true)
+			current_page:set("Main-page")
+			revealer:set_reveal_child(true)
 		end,
 		on_hide = function ()
-			main_widget:set_reveal_child(false)
+			revealer:set_reveal_child(false)
+		end,
+		setup = function(self)
+			self:hook(App, "window-toggled", function(_, w)
+				if w:get_visible() and w:get_name() == "Powermenu" then
+					hide()
+				end
+			end)
 		end,
 		Widget.Box {
 			Widget.EventBox {
@@ -97,7 +114,7 @@ return function()
 					vexpand = true,
 					on_click = hide,
 				},
-				main_widget
+				revealer
 			}
 		}
 	}

@@ -1,8 +1,10 @@
 local Widget = require("astal.gtk3").Widget
 
-return function(on_clicked)
+return function(args)
+	args = args or {}
+
 	return Widget.Box {
-		name = "bluetooth",
+		name = "Bluetooth-page",
 		width_request = 400,
 		height_request = 450,
 		vertical = true,
@@ -17,7 +19,7 @@ return function(on_clicked)
 		Widget.Box {
 			class_name = "bottombar",
 			Widget.Button {
-				on_clicked = on_clicked,
+				on_clicked = args.on_close_button_clicked,
 				Widget.Icon {
 					icon = "arrow-left",
 				}

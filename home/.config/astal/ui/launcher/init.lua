@@ -9,8 +9,8 @@ local Widget = require("astal.gtk3").Widget
 local Astal = require("astal.gtk3").Astal
 local Anchor = Astal.WindowAnchor
 local Gdk = require("astal.gtk3").Gdk
-local map = require("lib").map
-local lua_escape = require("lib").lua_escape
+local map = require("lib.table").map
+local lua_escape = require("lib.string").lua_escape
 
 local function launch_app(app)
 	if not app then return end
@@ -87,7 +87,7 @@ local function AppButton(app)
 end
 
 return function()
-	local apps
+	local apps = {}
 	local app_list = Variable({})
 
 	local on_enter = function()
@@ -108,6 +108,7 @@ return function()
 
 	local scrollable = Widget.Scrollable {
 		vexpand = true,
+		height_request = 390,
 		Widget.Box {
 			vertical = true,
 			spacing = 3,
@@ -131,17 +132,18 @@ return function()
 		}
 	}
 
-	local main_widget = Widget.Revealer {
+	local mainbox = Widget.Box {
+		class_name = "mainbox",
+		vertical = true,
+		vexpand = false,
+		width_request = 400,
+		entry,
+		scrollable
+	}
+
+	local revealer = Widget.Revealer {
 		transition_type = "SLIDE_UP",
-		Widget.Box {
-			class_name = "mainbox",
-			vertical = true,
-			vexpand = false,
-			width_request = 400,
-			height_request = 470,
-			entry,
-			scrollable
-		}
+		mainbox
 	}
 
 	return Widget.Window {
@@ -165,10 +167,17 @@ return function()
 			entry:select_region(0, -1)
 			entry:grab_focus()
 			scrollable:get_vadjustment():set_value(scrollable:get_vadjustment():get_lower())
-			main_widget:set_reveal_child(true)
+			revealer:set_reveal_child(true)
 		end,
 		on_hide = function()
-			main_widget:set_reveal_child(false)
+			revealer:set_reveal_child(false)
+		end,
+		setup = function(self)
+			self:hook(App, "window-toggled", function(_, w)
+				if w:get_visible() and w:get_name() == "Powermenu" then
+					hide()
+				end
+			end)
 		end,
 		Widget.Box {
 			Widget.Box {
@@ -178,7 +187,7 @@ return function()
 					vexpand = true,
 					on_click = hide,
 				},
-				main_widget
+				revealer
 			},
 			Widget.EventBox {
 				expand = true,

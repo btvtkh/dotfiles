@@ -1,7 +1,9 @@
 local Widget = require("astal.gtk3").Widget
 local Gtk = require("astal.gtk3").Gtk
 
-return function(on_clicked)
+return function(args)
+	args = args or {}
+
 	return Widget.Box {
 		class_name = "wifi-button",
 		hexpand = true,
@@ -23,7 +25,7 @@ return function(on_clicked)
 		},
 		Widget.Button {
 			class_name = "arrow-button",
-			on_clicked = on_clicked,
+			on_clicked = args.on_arrow_button_clicked,
 			Widget.Box {
 				Gtk.Separator {
 					visible = true

@@ -1,15 +1,17 @@
 local Widget = require("astal.gtk3").Widget
 local Gtk = require("astal.gtk3").Gtk
 local Astal = require("astal.gtk3").Astal
-local map = require("lib").map
-local time = require("lib").time
-local file_exists = require("lib").file_exists
+local map = require("lib.table").map
+local time = require("lib.util").time
+local file_exists = require("lib.file").exists
 
 local function is_icon(icon)
 	return Astal.Icon.lookup_icon(icon) ~= nil
 end
 
-return function(n, setup)
+return function(n, args)
+	args = args or {}
+
 	local header = Widget.Box {
 		class_name = "header",
 		Widget.Label {
@@ -79,7 +81,7 @@ return function(n, setup)
 
 	return Widget.Box {
 		class_name = string.format("notification %s", string.lower(n.urgency)),
-		setup = setup,
+		setup = args.setup,
 		vertical = true,
 		header,
 		Gtk.Separator {
