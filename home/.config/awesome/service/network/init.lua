@@ -144,8 +144,8 @@ local function create_connection_object(path)
 	connection_object._private.connection_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.freedesktop.NetworkManager",
+		path = path,
 		interface = "org.freedesktop.NetworkManager.Settings.Connection",
-		path = path
 	}
 
 	return connection_object
@@ -159,8 +159,8 @@ local function create_access_point_object(path)
 	access_point_object._private.access_point_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.freedesktop.NetworkManager",
+		path = path,
 		interface = "org.freedesktop.NetworkManager.AccessPoint",
-		path = path
 	}
 
 	return access_point_object
@@ -340,29 +340,29 @@ local function new()
 	ret._private.client_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.freedesktop.NetworkManager",
-		interface = "org.freedesktop.NetworkManager",
-		path = "/org/freedesktop/NetworkManager"
+		path = "/org/freedesktop/NetworkManager",
+		interface = "org.freedesktop.NetworkManager"
 	}
 
 	ret._private.client_properties_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.freedesktop.NetworkManager",
-		interface = "org.freedesktop.DBus.Properties",
-		path = "/org/freedesktop/NetworkManager"
+		path = "/org/freedesktop/NetworkManager",
+		interface = "org.freedesktop.DBus.Properties"
 	}
 
 	ret._private.settings_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.freedesktop.NetworkManager",
-		interface = "org.freedesktop.NetworkManager.Settings",
-		path = "/org/freedesktop/NetworkManager/Settings"
+		path = "/org/freedesktop/NetworkManager/Settings",
+		interface = "org.freedesktop.NetworkManager.Settings"
 	}
 
 	ret._private.settings_properties_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.freedesktop.NetworkManager",
-		interface = "org.freedesktop.DBus.Properties",
-		path = "/org/freedesktop/NetworkManager/Settings"
+		path = "/org/freedesktop/NetworkManager/Settings",
+		interface = "org.freedesktop.DBus.Properties"
 	}
 
 	ret._private.client_proxy:connect_signal("StateChanged", function(_, state)
@@ -386,8 +386,8 @@ local function new()
 	end)
 
 	ret._private.settings_proxy:connect_signal("ConnectionRemoved", function(_, path)
-		ret.connections[path] = nil
 		ret:emit_signal("connection-removed", path)
+		ret.connections[path] = nil
 	end)
 
 	local connection_paths = ret._private.settings_proxy:ListConnections()
@@ -415,8 +415,8 @@ local function new()
 		local device_proxy = dbus_proxy.Proxy:new {
 			bus = dbus_proxy.Bus.SYSTEM,
 			name = "org.freedesktop.NetworkManager",
-			interface = "org.freedesktop.NetworkManager.Device",
-			path = device_path
+			path = device_path,
+			interface = "org.freedesktop.NetworkManager.Device"
 		}
 
 		if device_proxy then
@@ -425,23 +425,23 @@ local function new()
 				ret.wired._private.wired_proxy = dbus_proxy.Proxy:new {
 					bus = dbus_proxy.Bus.SYSTEM,
 					name = "org.freedesktop.NetworkManager",
-					interface = "org.freedesktop.NetworkManager.Device.Wired",
 					path = device_path,
+					interface = "org.freedesktop.NetworkManager.Device.Wired"
 				}
 			elseif device_proxy.DeviceType == network.DeviceType.WIFI then
 				ret.wireless._private.device_proxy = device_proxy
 				ret.wireless._private.wireless_proxy = dbus_proxy.Proxy:new {
 					bus = dbus_proxy.Bus.SYSTEM,
 					name = "org.freedesktop.NetworkManager",
-					interface = "org.freedesktop.NetworkManager.Device.Wireless",
 					path = device_path,
+					interface = "org.freedesktop.NetworkManager.Device.Wireless"
 				}
 
 				ret.wireless._private.properties_proxy = dbus_proxy.Proxy:new {
 					bus = dbus_proxy.Bus.SYSTEM,
 					name = "org.freedesktop.NetworkManager",
-					interface = "org.freedesktop.DBus.Properties",
-					path = device_path
+					path = device_path,
+					interface = "org.freedesktop.DBus.Properties"
 				}
 			end
 		end
@@ -468,8 +468,8 @@ local function new()
 		end)
 
 		ret.wireless._private.wireless_proxy:connect_signal("AccessPointRemoved", function(_, path)
-			ret.wireless.access_points[path] = nil
 			ret.wireless:emit_signal("access-point-removed", path)
+			ret.wireless.access_points[path] = nil
 		end)
 
 		local access_point_paths = ret.wireless._private.wireless_proxy:GetAccessPoints()

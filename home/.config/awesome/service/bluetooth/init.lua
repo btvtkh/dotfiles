@@ -15,22 +15,22 @@ local function create_device_object(path)
 	device_object._private.device_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.bluez",
-		interface = "org.bluez.Device1",
-		path = path
+		path = path,
+		interface = "org.bluez.Device1"
 	}
 
 	device_object._private.battery_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.bluez",
-		interface = "org.bluez.Battery1",
-		path = path
+		path = path,
+		interface = "org.bluez.Battery1"
 	}
 
 	device_object._private.properties_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.bluez",
-		interface = "org.freedesktop.DBus.Properties",
-		path = path
+		path = path,
+		interface = "org.freedesktop.DBus.Properties"
 	}
 
 	device_object._private.properties_proxy:connect_signal("PropertiesChanged", function(_, _, props)
@@ -175,23 +175,23 @@ local function new()
 	ret._private.object_manager_proxy = dbus_proxy.Proxy:new {
 		bus = dbus_proxy.Bus.SYSTEM,
 		name = "org.bluez",
-		interface = "org.freedesktop.DBus.ObjectManager",
-		path = "/"
+		path = "/",
+		interface = "org.freedesktop.DBus.ObjectManager"
 	}
 
 	if ret._private.object_manager_proxy then
 		ret._private.adapter_proxy = dbus_proxy.Proxy:new {
 			bus = dbus_proxy.Bus.SYSTEM,
 			name = "org.bluez",
-			interface = "org.bluez.Adapter1",
-			path = "/org/bluez/hci0"
+			path = "/org/bluez/hci0",
+			interface = "org.bluez.Adapter1"
 		}
 
 		ret._private.properties_proxy = dbus_proxy.Proxy:new {
 			bus = dbus_proxy.Bus.SYSTEM,
 			name = "org.bluez",
-			interface = "org.freedesktop.DBus.Properties",
-			path = "/org/bluez/hci0"
+			path = "/org/bluez/hci0",
+			interface = "org.freedesktop.DBus.Properties"
 		}
 
 		ret._private.properties_proxy:connect_signal("PropertiesChanged", function(_, _, props)
@@ -213,8 +213,8 @@ local function new()
 
 		ret._private.object_manager_proxy:connect_signal("InterfacesRemoved", function(_, path)
 			if path:match("^/org/bluez/hci0/dev_%w%w_%w%w_%w%w_%w%w_%w%w_%w%w$")then
-				ret.devices[path] = nil
 				ret:emit_signal("device-removed", path)
+				ret.devices[path] = nil
 			end
 		end)
 
