@@ -43,39 +43,43 @@ local function remove_popup(popup, screen)
 end
 
 local function create_actions_widget(n)
-	if #n.actions == 0 then return nil end
+	if #n.actions == 0 then return end
 
 	local actions_widget = wibox.widget {
 		widget = wibox.container.margin,
 		margins = { top = dpi(5) },
 		{
-			id = "main-layout",
+			id = "buttons-layout",
 			layout = wibox.layout.flex.horizontal,
 			spacing = dpi(5)
 		}
 	}
 
-	local main_layout = actions_widget:get_children_by_id("main-layout")[1]
+	local main_layout = actions_widget:get_children_by_id("buttons-layout")[1]
 	for _, action in ipairs(n.actions) do
+		local action_hover_button = common.hover_button {
+			label = action.name,
+			margins = {
+				left = dpi(10), right = dpi(10),
+				top = dpi(5), bottom = dpi(5)
+			},
+			shape = beautiful.rrect(dpi(8)),
+			buttons = {
+				awful.button({}, 1, function()
+					action:invoke()
+				end)
+			}
+		}
+
+		n:connect_signal("destroyed", function()
+			action_hover_button:clear_mouse_signals()
+		end)
+
 		main_layout:add(wibox.widget {
 			widget = wibox.container.constraint,
 			strategy = "max",
 			height = dpi(40),
-			{
-				widget = common.hover_button {
-					label = action.name,
-					margins = {
-						left = dpi(10), right = dpi(10),
-						top = dpi(5), bottom = dpi(5)
-					},
-					shape = beautiful.rrect(dpi(8)),
-					buttons = {
-						awful.button({}, 1, function()
-							action:invoke()
-						end)
-					}
-				}
-			}
+			action_hover_button
 		})
 	end
 

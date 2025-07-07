@@ -144,10 +144,14 @@ local function click_hideaway()
 	day_info_panel:hide()
 end
 
-awful.mouse.append_global_mousebinding(
-	awful.button({}, 1, click_hideaway)
-)
-
 capi.client.connect_signal("request::manage", function(c)
 	c:connect_signal("button::press", click_hideaway)
 end)
+
+capi.client.connect_signal("request::unmanage", function(c)
+	c:disconnect_signal("button::press", click_hideaway)
+end)
+
+awful.mouse.append_global_mousebinding(
+	awful.button({}, 1, click_hideaway)
+)

@@ -13,10 +13,9 @@ local wifi_page = {}
 local function create_ap_widget(self, ap)
 	local ap_ssid = ap:get_ssid()
 	local ap_strength = ap:get_strength()
-	local ap_is_active = ap == nm_client.wireless:get_active_access_point()
+	local is_active = ap == nm_client.wireless:get_active_access_point()
 
 	local ap_widget = wibox.widget {
-		active = ap_is_active,
 		widget = wibox.container.background,
 		shape = beautiful.rrect(dpi(10)),
 		{
@@ -43,23 +42,29 @@ local function create_ap_widget(self, ap)
 	}
 
 	local name = ap_widget:get_children_by_id("name")[1]
-	name:set_markup(ap_is_active and text_icons.check .. " " .. ap_ssid or ap_ssid)
-
 	local strength = ap_widget:get_children_by_id("strength")[1]
+
+	ap_widget._private.is_active = is_active
+
+	ap_widget._private.on_mouse_enter = function(w)
+		w:set_bg(beautiful.bg_urg)
+	end
+
+	ap_widget._private.on_mouse_leave = function(w)
+		w:set_bg(nil)
+	end
+
+	ap_widget:connect_signal("mouse::enter", ap_widget._private.on_mouse_enter)
+	ap_widget:connect_signal("mouse::leave", ap_widget._private.on_mouse_leave)
+
+	name:set_markup(is_active and text_icons.check .. " " .. ap_ssid or ap_ssid)
+
 	strength:set_markup(
 		ap_strength > 70 and "▂▄▆█"
 		or ap_strength > 45 and "▂▄▆"
 		or ap_strength > 20 and "▂▄"
 		or "▂"
 	)
-
-	ap_widget:connect_signal("mouse::enter", function(w)
-		w:set_bg(beautiful.bg_urg)
-	end)
-
-	ap_widget:connect_signal("mouse::leave", function(w)
-		w:set_bg(nil)
-	end)
 
 	ap_widget:buttons {
 		awful.button({}, 1, function()
@@ -73,6 +78,12 @@ end
 local function on_ap_list_changed(self, aps)
 	local wp = self._private
 	local aps_layout = self:get_children_by_id("access-points-layout")[1]
+
+	for _, old_ap_widget in ipairs(wp.ap_widgets) do
+		old_ap_widget:disconnect_signal("mouse::enter", old_ap_widget._private.on_mouse_enter)
+		old_ap_widget:disconnect_signal("mouse::leave", old_ap_widget._private.on_mouse_leave)
+	end
+
 	wp.ap_widgets = {}
 
 	for _, ap in pairs(aps) do
@@ -85,7 +96,7 @@ local function on_ap_list_changed(self, aps)
 	if aps_layout.children[1] ~= wp.ap_menu and #wp.ap_widgets ~= 0 then
 		aps_layout:reset()
 		for _, ap_widget in ipairs(wp.ap_widgets) do
-			if ap_widget.active then
+			if ap_widget._private.is_active then
 				aps_layout:insert(1, ap_widget)
 			else
 				aps_layout:add(ap_widget)

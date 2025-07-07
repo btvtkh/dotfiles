@@ -55,6 +55,9 @@ local function on_enter(self, index, args, type)
 		end
 	else
 		if wp.active_child then
+			for i = 1, #wp.children do
+				wp.children[i]:destroy()
+			end
 			wp.active_child:destroy()
 		end
 	end
@@ -132,9 +135,11 @@ local function entry(self, index, args)
 		})
 	end
 
-	ret:connect_signal("mouse::enter", function()
+	ret._private.on_mouse_enter = function()
 		on_enter(self, index, args, "mouse")
-	end)
+	end
+
+	ret:connect_signal("mouse::enter", ret._private.on_mouse_enter)
 
 	ret:buttons {
 		awful.button({}, 1, function()

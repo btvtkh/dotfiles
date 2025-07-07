@@ -6,11 +6,8 @@ local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local bt_adapter = require("service.bluetooth").get_default()
 
-local function create_dev_widget(path)
-	local dev = bt_adapter:get_device(path)
-
-	local dev_widget = wibox.widget {
-		path = path,
+local function create_dev_widget(path, device)
+	local device_widget = wibox.widget {
 		widget = wibox.container.background,
 		shape = beautiful.rrect(dpi(10)),
 		forced_height = dpi(40),
@@ -40,72 +37,96 @@ local function create_dev_widget(path)
 		}
 	}
 
-	local name = dev_widget:get_children_by_id("name")[1]
-	dev:connect_signal("property::connected", function(_, cnd)
-		name:set_markup((cnd and text_icons.check .. " " or "") .. (dev:get_name() or dev:get_address()))
-	end)
+	local name = device_widget:get_children_by_id("name")[1]
+	local percentage = device_widget:get_children_by_id("percentage")[1]
 
-	name:set_markup((dev:get_connected() and text_icons.check .. " " or "") .. (dev:get_name() or dev:get_address()))
+	device_widget._private.device_path = path
 
-	local percentage = dev_widget:get_children_by_id("percentage")[1]
-	dev:connect_signal("property::percentage", function(_, perc)
+	device_widget._private.on_connected = function(_, cnd)
+		name:set_markup(
+			(cnd and text_icons.check .. " " or "")
+			.. (device:get_name() or device:get_address())
+		)
+	end
+
+	device_widget._private.on_percentage = function(_, perc)
 		percentage:set_markup(perc ~= nil and string.format("%.0f%%", perc) or "")
-	end)
+	end
 
-	percentage:set_markup(dev:get_percentage() and string.format("%.0f%%", dev:get_percentage()) or "")
-
-	dev_widget:connect_signal("mouse::enter", function(w)
+	device_widget._private.on_mouse_enter = function(w)
 		w:set_bg(beautiful.bg_urg)
-	end)
+	end
 
-	dev_widget:connect_signal("mouse::leave", function(w)
+	device_widget._private.on_mouse_leave = function(w)
 		w:set_bg(nil)
-	end)
+	end
 
-	dev_widget:buttons {
+	device:connect_signal("property::connected", device_widget._private.on_connected)
+	device:connect_signal("property::percentage", device_widget._private.on_percentage)
+	device_widget:connect_signal("mouse::enter", device_widget._private.on_mouse_enter)
+	device_widget:connect_signal("mouse::leave", device_widget._private.on_mouse_leave)
+
+	name:set_markup(
+		(device:get_connected() and text_icons.check .. " " or "")
+		.. (device:get_name() or device:get_address())
+	)
+
+	percentage:set_markup(
+		device:get_percentage() and string.format("%.0f%%", device:get_percentage()) or ""
+	)
+
+	device_widget:buttons {
 		awful.button({}, 1, function()
-			if not dev:get_connected() then
-				dev:connect()
+			if not device:get_connected() then
+				device:connect()
 			else
-				dev:disconnect()
+				device:disconnect()
 			end
 		end)
 	}
 
-	return dev_widget
+	return device_widget
 end
 
 local function on_device_added(self, path)
-	local devs_layout = self:get_children_by_id("devices-layout")[1]
-	local dev_widget = create_dev_widget(path)
+	local device = bt_adapter:get_device(path)
+	local devices_layout = self:get_children_by_id("devices-layout")[1]
+	local device_widget = create_dev_widget(path, device)
 
-	if #devs_layout.children == 1 and not devs_layout.children[1].path then
-		devs_layout:reset()
+	if #devices_layout.children == 1
+	and not devices_layout.children[1]._private.device_path then
+		devices_layout:reset()
 	else
-		for _, old_dev_widget in ipairs(devs_layout.children) do
-			if old_dev_widget.path == path then
-				devs_layout:remove_widgets(old_dev_widget)
+		for _, old_device_widget in ipairs(devices_layout.children) do
+			if old_device_widget._private.device_path == path then
+				devices_layout:remove_widgets(old_device_widget)
 			end
 		end
 	end
 
-	if bt_adapter:get_device(path):get_connected() then
-		devs_layout:insert(1, dev_widget)
+	if device:get_connected() then
+		devices_layout:insert(1, device_widget)
 	else
-		devs_layout:add(dev_widget)
+		devices_layout:add(device_widget)
 	end
 end
 
 local function on_device_removed(self, path)
-	local devs_layout = self:get_children_by_id("devices-layout")[1]
-	for _, dev_widget in ipairs(devs_layout.children) do
-		if dev_widget.path == path then
-			devs_layout:remove_widgets(dev_widget)
+	local device = bt_adapter:get_device(path)
+	local devices_layout = self:get_children_by_id("devices-layout")[1]
+
+	for _, device_widget in ipairs(devices_layout.children) do
+		if device_widget._private.device_path == path then
+			device:disconnect_signal("property::connected", device_widget._private.on_connected)
+			device:disconnect_signal("property::percentage", device_widget._private.on_percentage)
+			device_widget:disconnect_signal("mouse::enter", device_widget._private.on_mouse_enter)
+			device_widget:disconnect_signal("mouse::leave", device_widget._private.on_mouse_leave)
+			devices_layout:remove_widgets(device_widget)
 		end
 	end
 
-	if #devs_layout.children == 0 then
-		devs_layout:add(wibox.widget {
+	if #devices_layout.children == 0 then
+		devices_layout:add(wibox.widget {
 			widget = wibox.container.background,
 			fg = beautiful.fg_alt,
 			forced_height = dpi(400),

@@ -32,12 +32,20 @@ function player:previous()
 	self._private.player_proxy:PreviousAsync(nil, {})
 end
 
+function player:play()
+	self._private.player_proxy:PlayAsync(nil, {})
+end
+
 function player:pause()
 	self._private.player_proxy:PauseAsync(nil, {})
 end
 
-function player:play()
-	self._private.player_proxy:PlayAsync(nil, {})
+function player:play_pause()
+	self._private.player_proxy:PlayPauseAsync(nil, {})
+end
+
+function player:get_playback_status()
+	return string.lower(self._private.player_proxy.PlaybackStatus)
 end
 
 function player:get_metadata()
@@ -45,6 +53,22 @@ function player:get_metadata()
 		self._private.player_proxy.Metadata,
 		{ __index = metadata }
 	)
+end
+
+function player:get_can_go_next()
+	return self._private.player_proxy.CanGoNext
+end
+
+function player:get_can_go_previous()
+	return self._private.player_proxy.CanGoPrevious
+end
+
+function player:get_can_play()
+	return self._private.player_proxy.CanPlay
+end
+
+function player:get_can_pause()
+	return self._private.player_proxy.CanPause
 end
 
 function metadata:get_track_id()
@@ -62,6 +86,7 @@ end
 function metadata:get_artist()
 	return self["xesam:artist"]
 end
+
 
 function metadata:get_art_url()
 	return string.gsub(self["mpris:artUrl"], "^file://", "")
@@ -97,8 +122,12 @@ local function new_player(name)
 	ret._private.properties_proxy:connect_signal("PropertiesChanged", function(_, _, props)
 		if props.Metadata ~= nil then
 			ret:emit_signal("property::metadata", setmetatable(
-				props.Metadata, { __index = metadata }
+				props.Metadata,
+				{ __index = metadata }
 			))
+		end
+		if props.PlaybackStatus ~= nil then
+			ret:emit_signal("property::playback-status", string.lower(props.PlaybackStatus))
 		end
 	end)
 

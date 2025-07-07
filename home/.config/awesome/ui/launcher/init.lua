@@ -100,8 +100,16 @@ end
 
 function launcher:update_entries()
 	local wp = self._private
-	local entries_container = self.widget:get_children_by_id("entries-container")[1]
-	entries_container:reset()
+	local entries_layout = self.widget:get_children_by_id("entries-layout")[1]
+
+	for _, old_entry_widget in ipairs(entries_layout.children) do
+		if old_entry_widget._private.is_entry then
+			old_entry_widget:disconnect_signal("mouse::enter", old_entry_widget._private.on_mouse_enter)
+			old_entry_widget:disconnect_signal("mouse::leave", old_entry_widget._private.on_mouse_leave)
+		end
+	end
+
+	entries_layout:reset()
 
 	if #wp.filtered > 0 then
 		for i, app in ipairs(wp.filtered) do
@@ -143,6 +151,28 @@ function launcher:update_entries()
 					}
 				}
 
+				entry_widget._private.is_entry = true
+
+				entry_widget._private.on_mouse_enter = function(w)
+					if i ~= wp.select_index then
+						w:set_bg(beautiful.bg_urg)
+					end
+				end
+
+				entry_widget._private.on_mouse_leave = function(w)
+					if i ~= wp.select_index then
+						w:set_bg(nil)
+					end
+				end
+
+				entry_widget:connect_signal("mouse::enter", entry_widget._private.on_mouse_enter)
+				entry_widget:connect_signal("mouse::leave", entry_widget._private.on_mouse_leave)
+
+				if i == wp.select_index then
+					entry_widget:set_bg(beautiful.ac)
+					entry_widget:set_fg(beautiful.bg)
+				end
+
 				entry_widget:buttons {
 					awful.button({}, 1, function()
 						if wp.select_index == i then
@@ -155,24 +185,11 @@ function launcher:update_entries()
 					end)
 				}
 
-				if i == wp.select_index then
-					entry_widget:set_bg(beautiful.ac)
-					entry_widget:set_fg(beautiful.bg)
-				else
-					entry_widget:connect_signal("mouse::enter", function(w)
-						w:set_bg(beautiful.bg_urg)
-					end)
-
-					entry_widget:connect_signal("mouse::leave", function(w)
-						w:set_bg(nil)
-					end)
-				end
-
-				entries_container:add(entry_widget)
+				entries_layout:add(entry_widget)
 			end
 		end
 	else
-		entries_container:add(wibox.widget {
+		entries_layout:add(wibox.widget {
 			widget = wibox.container.background,
 			forced_height = dpi(60) * wp.rows + dpi(3) * (wp.rows - 1),
 			fg = beautiful.fg_alt,
@@ -337,7 +354,7 @@ local function new()
 							}
 						},
 						{
-							id = "entries-container",
+							id = "entries-layout",
 							layout = wibox.layout.fixed.vertical,
 							spacing = dpi(3),
 							forced_width = dpi(300)
@@ -393,10 +410,10 @@ local function new()
 		end)
 	}
 
-	local entries_container = ret.widget:get_children_by_id("entries-container")[1]
-	entries_container:set_forced_height(dpi(60) * wp.rows + dpi(3) * (wp.rows - 1))
+	local entries_layout = ret.widget:get_children_by_id("entries-layout")[1]
+	entries_layout:set_forced_height(dpi(60) * wp.rows + dpi(3) * (wp.rows - 1))
 
-	entries_container:buttons {
+	entries_layout:buttons {
 		awful.button({}, 4, function()
 			ret:back()
 			ret:update_entries()
