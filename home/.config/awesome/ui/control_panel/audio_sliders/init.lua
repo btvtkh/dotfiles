@@ -1,5 +1,6 @@
 local awful = require("awful")
 local wibox = require("wibox")
+local gtimer = require("gears.timer")
 local beautiful = require("beautiful")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
@@ -132,10 +133,14 @@ local function new()
 		end
 	end)
 
-	speaker_slider:connect_signal("property::value", function(_, new_value)
-		speaker_value:set_markup(tostring(new_value * 5) .. "%")
-		audio:set_default_sink_volume(new_value * 5)
-	end)
+	speaker_slider:buttons {
+		awful.button({}, 1, function()
+			gtimer.delayed_call(function()
+				speaker_value:set_markup(tostring(speaker_slider:get_value() * 5) .. "%")
+				audio:set_default_sink_volume(speaker_slider:get_value() * 5)
+			end)
+		end)
+	}
 
 	speaker_mute:connect_signal("mouse::enter", function()
 		speaker_mute:set_bg(beautiful.bg_urg)
@@ -178,6 +183,15 @@ local function new()
 		microphone_value:set_markup(tostring(new_value * 5) .. "%")
 		audio:set_default_source_volume(new_value * 5)
 	end)
+
+	microphone_slider:buttons {
+		awful.button({}, 1, function()
+			gtimer.delayed_call(function()
+				microphone_value:set_markup(tostring(microphone_slider:get_value() * 5) .. "%")
+		audio:set_default_source_volume(microphone_slider:get_value() * 5)
+			end)
+		end)
+	}
 
 	microphone_mute:connect_signal("mouse::enter", function()
 		microphone_mute:set_bg(beautiful.bg_urg)

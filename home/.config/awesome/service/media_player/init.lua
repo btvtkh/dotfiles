@@ -44,6 +44,10 @@ function player:play_pause()
 	self._private.player_proxy:PlayPauseAsync(nil, {})
 end
 
+function player:set_position(id, pos)
+	self._private.player_proxy:SetPositionAsync(nil, {}, id, pos)
+end
+
 function player:get_playback_status()
 	return string.lower(self._private.player_proxy.PlaybackStatus)
 end
@@ -53,22 +57,6 @@ function player:get_metadata()
 		self._private.player_proxy.Metadata,
 		{ __index = metadata }
 	)
-end
-
-function player:get_can_go_next()
-	return self._private.player_proxy.CanGoNext
-end
-
-function player:get_can_go_previous()
-	return self._private.player_proxy.CanGoPrevious
-end
-
-function player:get_can_play()
-	return self._private.player_proxy.CanPlay
-end
-
-function player:get_can_pause()
-	return self._private.player_proxy.CanPause
 end
 
 function player:get_position()

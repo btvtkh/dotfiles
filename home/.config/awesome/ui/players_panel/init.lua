@@ -60,6 +60,7 @@ local function on_player_added(self, name)
 					{
 						layout = wibox.layout.fixed.vertical,
 						{
+							id = "slider-container",
 							widget = wibox.container.margin,
 							forced_height = dpi(30),
 							margins = { left = dpi(5), right = dpi(5) },
@@ -211,6 +212,18 @@ local function on_player_added(self, name)
 	next_button:buttons {
 		awful.button({}, 1, function()
 			player:next()
+		end)
+	}
+
+	timeline_slider:buttons {
+		awful.button({}, 1, function()
+			gtimer.delayed_call(function()
+				player:set_position(
+					player:get_metadata():get_track_id(),
+					player:get_metadata():get_length()
+					* timeline_slider:get_value()/100
+				)
+			end)
 		end)
 	}
 
