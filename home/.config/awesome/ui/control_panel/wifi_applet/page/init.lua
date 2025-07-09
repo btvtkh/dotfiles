@@ -41,10 +41,11 @@ local function create_ap_widget(self, ap)
 		}
 	}
 
-	local name = ap_widget:get_children_by_id("name")[1]
-	local strength = ap_widget:get_children_by_id("strength")[1]
 
 	ap_widget._private.is_active = is_active
+
+	local name = ap_widget:get_children_by_id("name")[1]
+	local strength = ap_widget:get_children_by_id("strength")[1]
 
 	ap_widget._private.on_mouse_enter = function(w)
 		w:set_bg(beautiful.bg_urg)
