@@ -1,4 +1,4 @@
-local DBusProxy = require("lib.dbus_proxy")
+local dbus_proxy = require("lib.dbus_proxy")
 local gobject = require("gears.object")
 local gtable = require("gears.table")
 
@@ -71,6 +71,10 @@ function player:get_can_pause()
 	return self._private.player_proxy.CanPause
 end
 
+function player:get_position()
+	return self._private.player_proxy.Position
+end
+
 function metadata:get_track_id()
 	return self["mpris:trackid"]
 end
@@ -87,9 +91,8 @@ function metadata:get_artist()
 	return self["xesam:artist"]
 end
 
-
 function metadata:get_art_url()
-	return string.gsub(self["mpris:artUrl"], "^file://", "")
+	return self["mpris:artUrl"]
 end
 
 function metadata:get_url()
@@ -105,15 +108,15 @@ local function new_player(name)
 	gtable.crush(ret, player, true)
 	ret._private = {}
 
-	ret._private.player_proxy = DBusProxy.Proxy:new {
-		bus = DBusProxy.Bus.SESSION,
+	ret._private.player_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SESSION,
 		name = name,
 		path = "/org/mpris/MediaPlayer2",
 		interface = "org.mpris.MediaPlayer2.Player"
 	}
 
-	ret._private.properties_proxy = DBusProxy.Proxy:new {
-		bus = DBusProxy.Bus.SESSION,
+	ret._private.properties_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SESSION,
 		name = name,
 		path = "/org/mpris/MediaPlayer2",
 		interface = "org.freedesktop.DBus.Properties"
@@ -129,6 +132,18 @@ local function new_player(name)
 		if props.PlaybackStatus ~= nil then
 			ret:emit_signal("property::playback-status", string.lower(props.PlaybackStatus))
 		end
+		if props.CanGoPrevious ~= nil then
+			ret:emit_signal("property::can-go-previous", props.CanGoPrevious)
+		end
+		if props.CanGoNext ~= nil then
+			ret:emit_signal("property::can-go-next", props.CanGoNext)
+		end
+		if props.CanPlay ~= nil then
+			ret:emit_signal("property::can-play", props.CanPlay)
+		end
+		if props.CanPause ~= nil then
+			ret:emit_signal("property::can-go-previous", props.CanPause)
+		end
 	end)
 
 	ret._private.player_proxy:connect_signal("Seeked", function(_, pos)
@@ -143,8 +158,8 @@ local function new()
 	gtable.crush(ret, media_player, true)
 	ret._private = {}
 
-	ret._private.names_proxy = DBusProxy.Proxy:new {
-		bus = DBusProxy.Bus.SESSION,
+	ret._private.names_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SESSION,
 		name = "org.freedesktop.DBus",
 		path = "/org/freedesktop/DBus",
 		interface = "org.freedesktop.DBus"

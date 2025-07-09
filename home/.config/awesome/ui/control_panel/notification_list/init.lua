@@ -164,6 +164,7 @@ local function create_notification_widget(n)
 	}
 
 	local close = widget:get_children_by_id("close")[1]
+
 	close:buttons {
 		awful.button({}, 1, function()
 			n:destroy(ncr.silent)
@@ -175,7 +176,9 @@ end
 
 local function remove_notification(self, w)
 	local notifs_layout = self:get_children_by_id("notifications-layout")[1]
+
 	notifs_layout:remove_widgets(w)
+
 	if #notifs_layout.children == 0 then
 		notifs_layout:insert(1, wibox.widget {
 			widget = wibox.container.background,
@@ -189,6 +192,7 @@ local function remove_notification(self, w)
 			}
 		})
 	end
+
 	self:update_count()
 end
 
@@ -196,19 +200,25 @@ local function add_notification(self, n)
 	if not n then return end
 	local notifs_layout = self:get_children_by_id("notifications-layout")[1]
 	local new_notification_widget = create_notification_widget(n)
+
 	if #notifs_layout.children == 1 and not notifs_layout.children[1].is_notification then
 		notifs_layout:reset()
 	end
+
 	notifs_layout:insert(1, new_notification_widget)
+
 	n:connect_signal("destroyed", function()
 		remove_notification(self, new_notification_widget)
 	end)
+
 	self:update_count()
 end
 
 function notification_list:clear_notifications()
 	local notifs_layout = self:get_children_by_id("notifications-layout")[1]
+
 	notifs_layout:reset()
+
 	notifs_layout:insert(1, wibox.widget {
 		widget = wibox.container.background,
 		fg = beautiful.fg_alt,
@@ -220,6 +230,7 @@ function notification_list:clear_notifications()
 			markup = "No notifications"
 		}
 	})
+
 	self:update_count()
 	naughty.destroy_all_notifications(nil, ncr.silent)
 end
@@ -227,6 +238,7 @@ end
 function notification_list:update_count()
 	local notifs_layout = self:get_children_by_id("notifications-layout")[1]
 	local notifs_title = self:get_children_by_id("notifications-title")[1]
+
 	if #notifs_layout.children > 0 and notifs_layout.children[1].is_notification then
 		notifs_title:set_markup(string.format(
 			"Notifications (%s)",
@@ -239,7 +251,9 @@ end
 
 function notification_list:toggle_dnd()
 	local wp = self._private
+
 	wp.dnd_mode = not wp.dnd_mode
+
 	if wp.dnd_mode then
 		naughty.suspend()
 	else
@@ -321,6 +335,9 @@ local function new()
 	wp.dnd_mode = false
 
 	local dnd_button = ret:get_children_by_id("dnd-button")[1]
+	local clear_button = ret:get_children_by_id("clear-button")[1]
+	local notifs_layout = ret:get_children_by_id("notifications-layout")[1]
+
 	dnd_button:buttons {
 		awful.button({}, 1, function()
 			ret:toggle_dnd()
@@ -332,14 +349,12 @@ local function new()
 		end)
 	}
 
-	local clear_button = ret:get_children_by_id("clear-button")[1]
 	clear_button:buttons {
 		awful.button({}, 1, function()
 			ret:clear_notifications()
 		end)
 	}
 
-	local notifs_layout = ret:get_children_by_id("notifications-layout")[1]
 	notifs_layout:insert(1, wibox.widget {
 		widget = wibox.container.background,
 		fg = beautiful.fg_alt,

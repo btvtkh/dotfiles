@@ -94,13 +94,14 @@ local function new()
 	}
 
 	local label_background = ret:get_children_by_id("label-background")[1]
+	local separator = ret:get_children_by_id("separator")[1]
+
 	label_background:buttons {
 		awful.button({}, 1, function()
 			bt_adapter:set_powered(not bt_adapter:get_powered())
 		end)
 	}
 
-	local separator = ret:get_children_by_id("separator")[1]
 	ret:connect_signal("mouse::enter", function()
 		if not bt_adapter:get_powered() then
 			ret:set_bg(beautiful.bg_urg)

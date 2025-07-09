@@ -1,5 +1,6 @@
 local awful = require("awful")
 local wibox = require("wibox")
+local gtimer = require("gears.timer")
 local beautiful = require("beautiful")
 local common = require("common")
 local dpi = beautiful.xresources.apply_dpi
@@ -14,62 +15,93 @@ local function on_player_added(self, name)
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
 		{
-			layout = wibox.layout.fixed.horizontal,
-			fill_space = true,
-			spacing = dpi(5),
-			--[[
+			widget = wibox.container.margin,
+			margins = dpi(10),
 			{
-				widget = wibox.container.constraint,
-				strategy = "max",
-				width = dpi(90),
-				height = dpi(90),
+				layout = wibox.layout.fixed.horizontal,
+				fill_space = true,
+				spacing = dpi(5),
 				{
-					id = "track-preview",
+					id = "preview",
 					widget = wibox.widget.imagebox,
+					forced_width = 120,
+					forced_height = 120,
 					resize = true,
 					halign = "center",
 					valign = "center",
 					horizontal_fit_policy = "cover",
 					vertical_fit_policy = "cover"
-				}
-			},
-			]]
-			{
-				layout = wibox.layout.fixed.vertical,
-				{
-					id = "track-title",
-					widget = wibox.widget.textbox
 				},
 				{
-					id = "track-artist",
-					widget = wibox.widget.textbox
-				},
-				--{
-				--	id = "track-slider",
-				--	widget = wibox.widget.slider
-				--},
-				{
-					layout = wibox.layout.flex.horizontal,
-					spacing = dpi(5),
+					layout = wibox.layout.align.vertical,
 					{
-						id = "previous-button",
-						widget = common.hover_button {
-							label = "prev",
-							bg_normal = beautiful.bg_urg
+						layout = wibox.layout.fixed.vertical,
+						{
+							widget = wibox.container.constraint,
+							strategy = "max",
+							height = dpi(25),
+							{
+								id = "title",
+								widget = wibox.widget.textbox
+							}
+						},
+						{
+							widget = wibox.container.constraint,
+							strategy = "max",
+							height = dpi(20),
+							{
+								id = "artist",
+								widget = wibox.widget.textbox,
+								font = beautiful.font_h0
+							}
 						}
 					},
+					nil,
 					{
-						id = "play-pause-button",
-						widget = common.hover_button {
-							label = "play/pause",
-							bg_normal = beautiful.bg_urg
-						}
-					},
-					{
-						id = "next-button",
-						widget = common.hover_button {
-							label = "next",
-							bg_normal = beautiful.bg_urg
+						layout = wibox.layout.fixed.vertical,
+						{
+							widget = wibox.container.margin,
+							forced_height = dpi(30),
+							margins = { left = dpi(5), right = dpi(5) },
+							{
+								id = "timeline",
+								widget = wibox.widget.slider,
+								maximum = 100,
+								bar_height = dpi(2),
+								handle_width = dpi(20),
+								handle_border_width = dpi(2),
+								handle_margins = { top = dpi(7), bottom = dpi(7) },
+								bar_color = beautiful.bg_urg,
+								bar_active_color = beautiful.ac,
+								handle_color = beautiful.bg_alt,
+								handle_border_color = beautiful.ac,
+								handle_shape = beautiful.crcl(5),
+								bar_shape = beautiful.rbar()
+							}
+						},
+						{
+							layout = wibox.layout.flex.horizontal,
+							spacing = dpi(5),
+							{
+								id = "previous",
+								widget = common.hover_button {
+									label = "prev",
+									bg_normal = beautiful.bg_urg
+								}
+							},
+							{
+								id = "play-pause",
+								widget = common.hover_button {
+									bg_normal = beautiful.bg_urg
+								}
+							},
+							{
+								id = "next",
+								widget = common.hover_button {
+									label = "next",
+									bg_normal = beautiful.bg_urg
+								}
+							}
 						}
 					}
 				}
@@ -77,31 +109,91 @@ local function on_player_added(self, name)
 		}
 	}
 
-	--local preview = player_widget:get_children_by_id("track-preview")[1]
-	local title = player_widget:get_children_by_id("track-title")[1]
-	local artist = player_widget:get_children_by_id("track-artist")[1]
-	local previous_button = player_widget:get_children_by_id("previous-button")[1]
-	local play_pause_button = player_widget:get_children_by_id("play-pause-button")[1]
-	local next_button = player_widget:get_children_by_id("next-button")[1]
 
 	player_widget._private.player_name = name
 
+	local preview_image = player_widget:get_children_by_id("preview")[1]
+	local title_text = player_widget:get_children_by_id("title")[1]
+	local artist_text = player_widget:get_children_by_id("artist")[1]
+	local timeline_slider = player_widget:get_children_by_id("timeline")[1]
+	local previous_button = player_widget:get_children_by_id("previous")[1]
+	local play_pause_button = player_widget:get_children_by_id("play-pause")[1]
+	local next_button = player_widget:get_children_by_id("next")[1]
+
+	player_widget._private.timeline_timer = gtimer {
+		timeout = 1,
+		autostart = false,
+		single_shot = false,
+		call_now = false,
+		callback = function()
+			local length = player:get_metadata():get_length() or 1
+			local timeline_step = 1000000/length*100
+
+			timeline_slider:set_value(timeline_slider:get_value() + timeline_step)
+
+			if player_widget._private.timeline_timer then
+				player_widget._private.timeline_timer:again()
+			end
+		end
+	}
+
 	player_widget._private.on_metadata = function(_, metadata)
-		--preview:set_image(metadata:get_art_url())
-		title:set_markup(metadata:get_title())
-		artist:set_markup(tostring(table.unpack(metadata:get_artist())))
+		local art_url = metadata:get_art_url()
+		preview_image:set_image(art_url ~= nil and art_url ~= ""
+			and string.gsub(art_url, "^file://", "") or os.getenv("HOME") .. "/Downloads/music.svg")
+
+		local position = player:get_position() or 0
+		local length = metadata:get_length() or 1
+		timeline_slider:set_value(position/length*100)
+
+		local title = metadata:get_title()
+		title_text:set_markup(title ~= nil and title ~= "" and title or "untitled")
+
+		local artist = metadata:get_artist()
+		local artist_string = artist ~= nil and artist ~= {} and tostring(table.unpack(artist)) or nil
+		artist_text:set_markup(artist_string ~= nil and artist_string ~= "" and artist_string or "unknown artist")
 	end
 
 	player_widget._private.on_playback_status = function(_, status)
 		play_pause_button:set_label(status == "playing" and "pause" or "play")
+
+		if status ~= "playing" then
+			player_widget._private.timeline_timer:stop()
+		else
+			player_widget._private.timeline_timer:start()
+		end
+	end
+
+	player_widget._private.on_seeked = function(_, pos)
+		local position = pos
+		local length = player:get_metadata():get_length()
+		timeline_slider:set_value(position/length*100)
+
+		player_widget._private.timeline_timer:stop()
+		if player:get_playback_status() == "playing" then
+			player_widget._private.timeline_timer:start()
+		end
 	end
 
 	player:connect_signal("property::metadata", player_widget._private.on_metadata)
 	player:connect_signal("property::playback-status", player_widget._private.on_playback_status)
+	player:connect_signal("seeked", player_widget._private.on_seeked)
 
-	--preview:set_image(player:get_metadata():get_art_url())
-	title:set_markup(player:get_metadata():get_title())
-	artist:set_markup(tostring(table.unpack(player:get_metadata():get_artist())))
+	local art_url = player:get_metadata():get_art_url()
+	preview_image:set_image(art_url ~= nil and art_url ~= ""
+		and string.gsub(art_url, "^file://", "") or os.getenv("HOME") .. "/Downloads/music.svg")
+
+	local title = player:get_metadata():get_title()
+	title_text:set_markup(title ~= nil and title ~= "" and title or "untitled")
+
+	local artist = player:get_metadata():get_artist()
+	local artist_string = artist ~= nil and artist ~= {} and tostring(table.unpack(artist)) or nil
+	artist_text:set_markup(artist_string ~= nil and artist_string ~= "" and artist_string or "unknown artist")
+
+	local position = player:get_position() or 0
+	local length = player:get_metadata():get_length() or 1
+	timeline_slider:set_value(position/length*100)
+
 	play_pause_button:set_label(player:get_playback_status() == "playing" and "pause" or "play")
 
 	previous_button:buttons {
@@ -122,6 +214,10 @@ local function on_player_added(self, name)
 		end)
 	}
 
+	if player:get_playback_status() == "playing" then
+		player_widget._private.timeline_timer:start()
+	end
+
 	players_layout:insert(1, player_widget)
 end
 
@@ -131,11 +227,19 @@ local function on_player_removed(self, name)
 
 	for _, player_widget in ipairs(players_layout.children) do
 		if player_widget._private.player_name == name then
+			local previous_button = player_widget:get_children_by_id("previous")[1]
+			local play_pause_button = player_widget:get_children_by_id("play-pause")[1]
+			local next_button = player_widget:get_children_by_id("next")[1]
+
 			player:disconnect_signal("property::metadata", player_widget._private.on_metadata)
 			player:disconnect_signal("property::playback-status", player_widget._private.on_playback_status)
-			player_widget:get_children_by_id("previous-button")[1]:clear_mouse_signals()
-			player_widget:get_children_by_id("play-pause-button")[1]:clear_mouse_signals()
-			player_widget:get_children_by_id("next-button")[1]:clear_mouse_signals()
+			player:disconnect_signal("seeked", player_widget._private.on_seeked)
+			previous_button:clear_mouse_signals()
+			play_pause_button:clear_mouse_signals()
+			next_button:clear_mouse_signals()
+			player_widget._private.timeline_timer:stop()
+			player_widget._private.timeline_timer = nil
+
 			players_layout:remove_widgets(player_widget)
 		end
 	end
@@ -155,7 +259,7 @@ local function new()
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
 			forced_width = dpi(500),
-			forced_height = dpi(250),
+			forced_height = dpi(350),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(10),

@@ -371,13 +371,17 @@ local function new()
 	wp.rows = 6
 
 	local powermenu_button = ret.widget:get_children_by_id("powermenu-button")[1]
+	local wallpaper_button = ret.widget:get_children_by_id("wallpaper-button")[1]
+	local home_button = ret.widget:get_children_by_id("home-button")[1]
+	local entries_layout = ret.widget:get_children_by_id("entries-layout")[1]
+	local text_input = ret.widget:get_children_by_id("text-input")[1]
+
 	powermenu_button:buttons {
 		awful.button({}, 1, function()
 			powermenu:show()
 		end)
 	}
 
-	local wallpaper_button = ret.widget:get_children_by_id("wallpaper-button")[1]
 	wallpaper_button:buttons {
 		awful.button({}, 1, function()
 			awful.spawn.easy_async("zenity --file-selection", function(stdout)
@@ -395,7 +399,6 @@ local function new()
 		end)
 	}
 
-	local home_button = ret.widget:get_children_by_id("home-button")[1]
 	home_button:buttons {
 		awful.button({}, 1, function()
 			local app = Gio.AppInfo.get_default_for_type("inode/directory")
@@ -410,7 +413,6 @@ local function new()
 		end)
 	}
 
-	local entries_layout = ret.widget:get_children_by_id("entries-layout")[1]
 	entries_layout:set_forced_height(dpi(60) * wp.rows + dpi(3) * (wp.rows - 1))
 
 	entries_layout:buttons {
@@ -424,7 +426,6 @@ local function new()
 		end)
 	}
 
-	local text_input = ret.widget:get_children_by_id("text-input")[1]
 	text_input:on_focused(function()
 		text_input:set_input("")
 		text_input:set_cursor_index(1)

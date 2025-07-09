@@ -149,26 +149,27 @@ end
 function wifi_page:open_ap_menu(ap)
 	local wp = self._private
 	local aps_layout = self:get_children_by_id("access-points-layout")[1]
+	local close_button = wp.ap_menu:get_children_by_id("close-button")[1]
+	local title = wp.ap_menu:get_children_by_id("title")[1]
+	local password_widget = wp.ap_menu:get_children_by_id("password-widget")[1]
+	local password_input = wp.ap_menu:get_children_by_id("password-input")[1]
+	local connect_disconnect_button = wp.ap_menu:get_children_by_id("connect-disconnect-button")[1]
 
 	local obscure = true
 	local auto_connect = true
 
-	local close_button = wp.ap_menu:get_children_by_id("close-button")[1]
 	close_button:buttons {
 		awful.button({}, 1, function()
 			self:close_ap_menu()
 		end)
 	}
 
-	local title = wp.ap_menu:get_children_by_id("title")[1]
 	title:set_markup(ap:get_ssid())
-
-	local password_widget = wp.ap_menu:get_children_by_id("password-widget")[1]
-	local password_input = wp.ap_menu:get_children_by_id("password-input")[1]
-	local connect_disconnect_button = wp.ap_menu:get_children_by_id("connect-disconnect-button")[1]
 
 	if ap ~= nm_client.wireless:get_active_access_point() then
 		local obscure_icon = wp.ap_menu:get_children_by_id("obscure-icon")[1]
+		local auto_connect_icon = wp.ap_menu:get_children_by_id("auto-connect-icon")[1]
+
 		obscure_icon:set_markup(text_icons.eye_off)
 		obscure_icon:buttons {
 			awful.button({}, 1, function()
@@ -178,7 +179,6 @@ function wifi_page:open_ap_menu(ap)
 			end)
 		}
 
-		local auto_connect_icon = wp.ap_menu:get_children_by_id("auto-connect-icon")[1]
 		auto_connect_icon:set_markup(text_icons.check_on)
 		auto_connect_icon:buttons {
 			awful.button({}, 1, function()
@@ -426,13 +426,14 @@ local function new()
 	}
 
 	local bottombar_toggle_button = ret:get_children_by_id("bottombar-toggle-button")[1]
+	local bottombar_refresh_button = ret:get_children_by_id("bottombar-refresh-button")[1]
+
 	bottombar_toggle_button:buttons {
 		awful.button({}, 1, function()
 			nm_client:set_wireless_enabled(not nm_client:get_wireless_enabled())
 		end)
 	}
 
-	local bottombar_refresh_button = ret:get_children_by_id("bottombar-refresh-button")[1]
 	bottombar_refresh_button:buttons {
 		awful.button({}, 1, function()
 			if nm_client:get_wireless_enabled() then

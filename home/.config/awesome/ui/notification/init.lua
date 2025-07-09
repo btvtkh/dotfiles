@@ -203,6 +203,7 @@ local function create_notification_popup(n)
 	}
 
 	local close = popup_widget.widget:get_children_by_id("close")[1]
+
 	close:buttons {
 		awful.button({}, 1, function()
 			n:destroy(ncr.silent)

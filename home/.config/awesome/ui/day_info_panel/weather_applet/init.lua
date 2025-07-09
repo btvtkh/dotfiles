@@ -306,7 +306,9 @@ end
 
 function weather_applet:setup_widget(data)
 	local main_layout = self:get_children_by_id("main-layout")[1]
+
 	main_layout:reset()
+
 	if data then
 		data = data[1] or data
 		main_layout:add(

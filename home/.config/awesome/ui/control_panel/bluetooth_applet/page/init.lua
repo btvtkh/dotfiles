@@ -264,13 +264,14 @@ local function new()
 	}
 
 	local bottombar_toggle_button = ret:get_children_by_id("bottombar-toggle-button")[1]
+	local bottombar_discover_button = ret:get_children_by_id("bottombar-discover-button")[1]
+
 	bottombar_toggle_button:buttons {
 		awful.button({}, 1, function()
 			bt_adapter:set_powered(not bt_adapter:get_powered())
 		end)
 	}
 
-	local bottombar_discover_button = ret:get_children_by_id("bottombar-discover-button")[1]
 	bottombar_discover_button:buttons {
 		awful.button({}, 1, function()
 			if bt_adapter:get_powered() then
