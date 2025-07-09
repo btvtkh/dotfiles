@@ -28,18 +28,6 @@ function button:set_fg_hover(color)
 	wp.fg_hover = color
 end
 
-function button:setup_mouse_signals()
-	local wp = self._private
-	self:connect_signal("mouse::enter", wp.on_mouse_enter)
-	self:connect_signal("mouse::leave", wp.on_mouse_leave)
-end
-
-function button:clear_mouse_signals()
-	local wp = self._private
-	self:disconnect_signal("mouse::enter", wp.on_mouse_enter)
-	self:disconnect_signal("mouse::leave", wp.on_mouse_leave)
-end
-
 local function new(args)
 	args = args or {}
 	local ret = wibox.widget {
@@ -96,7 +84,8 @@ local function new(args)
 		w:set_fg(wp.fg_normal)
 	end
 
-	ret:setup_mouse_signals()
+	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
+	ret:connect_signal("mouse::leave", wp.on_mouse_leave)
 
 	return ret
 end

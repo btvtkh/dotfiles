@@ -102,13 +102,6 @@ function launcher:update_entries()
 	local wp = self._private
 	local entries_layout = self.widget:get_children_by_id("entries-layout")[1]
 
-	for _, old_entry_widget in ipairs(entries_layout.children) do
-		if old_entry_widget._private.is_entry then
-			old_entry_widget:disconnect_signal("mouse::enter", old_entry_widget._private.on_mouse_enter)
-			old_entry_widget:disconnect_signal("mouse::leave", old_entry_widget._private.on_mouse_leave)
-		end
-	end
-
 	entries_layout:reset()
 
 	if #wp.filtered > 0 then

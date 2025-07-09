@@ -240,16 +240,9 @@ local function on_player_removed(self, name)
 
 	for _, player_widget in ipairs(players_layout.children) do
 		if player_widget._private.player_name == name then
-			local previous_button = player_widget:get_children_by_id("previous")[1]
-			local play_pause_button = player_widget:get_children_by_id("play-pause")[1]
-			local next_button = player_widget:get_children_by_id("next")[1]
-
 			player:disconnect_signal("property::metadata", player_widget._private.on_metadata)
 			player:disconnect_signal("property::playback-status", player_widget._private.on_playback_status)
 			player:disconnect_signal("seeked", player_widget._private.on_seeked)
-			previous_button:clear_mouse_signals()
-			play_pause_button:clear_mouse_signals()
-			next_button:clear_mouse_signals()
 			player_widget._private.timeline_timer:stop()
 			player_widget._private.timeline_timer = nil
 

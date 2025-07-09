@@ -119,8 +119,6 @@ local function on_device_removed(self, path)
 		if device_widget._private.device_path == path then
 			device:disconnect_signal("property::connected", device_widget._private.on_connected)
 			device:disconnect_signal("property::percentage", device_widget._private.on_percentage)
-			device_widget:disconnect_signal("mouse::enter", device_widget._private.on_mouse_enter)
-			device_widget:disconnect_signal("mouse::leave", device_widget._private.on_mouse_leave)
 			devices_layout:remove_widgets(device_widget)
 		end
 	end

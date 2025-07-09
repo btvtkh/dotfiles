@@ -41,10 +41,6 @@ if #n.actions == 0 then return nil end
 			}
 		}
 
-		n:connect_signal("destroyed", function()
-			action_hover_button:clear_mouse_signals()
-		end)
-
 		main_layout:add(wibox.widget {
 			widget = wibox.container.constraint,
 			strategy = "max",

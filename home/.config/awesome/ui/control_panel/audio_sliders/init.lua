@@ -179,16 +179,11 @@ local function new()
 		end
 	end)
 
-	microphone_slider:connect_signal("property::value", function(_, new_value)
-		microphone_value:set_markup(tostring(new_value * 5) .. "%")
-		audio:set_default_source_volume(new_value * 5)
-	end)
-
 	microphone_slider:buttons {
 		awful.button({}, 1, function()
 			gtimer.delayed_call(function()
 				microphone_value:set_markup(tostring(microphone_slider:get_value() * 5) .. "%")
-		audio:set_default_source_volume(microphone_slider:get_value() * 5)
+				audio:set_default_source_volume(microphone_slider:get_value() * 5)
 			end)
 		end)
 	}

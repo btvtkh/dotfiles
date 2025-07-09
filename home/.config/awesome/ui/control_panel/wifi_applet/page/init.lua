@@ -79,11 +79,6 @@ local function on_ap_list_changed(self, aps)
 	local wp = self._private
 	local aps_layout = self:get_children_by_id("access-points-layout")[1]
 
-	for _, old_ap_widget in ipairs(wp.ap_widgets) do
-		old_ap_widget:disconnect_signal("mouse::enter", old_ap_widget._private.on_mouse_enter)
-		old_ap_widget:disconnect_signal("mouse::leave", old_ap_widget._private.on_mouse_leave)
-	end
-
 	wp.ap_widgets = {}
 
 	for _, ap in pairs(aps) do

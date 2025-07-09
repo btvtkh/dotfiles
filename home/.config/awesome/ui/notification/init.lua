@@ -71,10 +71,6 @@ local function create_actions_widget(n)
 			}
 		}
 
-		n:connect_signal("destroyed", function()
-			action_hover_button:clear_mouse_signals()
-		end)
-
 		main_layout:add(wibox.widget {
 			widget = wibox.container.constraint,
 			strategy = "max",
