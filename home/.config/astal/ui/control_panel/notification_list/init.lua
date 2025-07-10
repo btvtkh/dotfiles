@@ -2,6 +2,7 @@ local astal = require("astal")
 local AstalNotifd = astal.require("AstalNotifd")
 local Widget = require("astal.gtk3").Widget
 local varlist = require("lib.table").varlist
+
 local NotifWidget = require("ui.notifications.widget")
 
 return function()

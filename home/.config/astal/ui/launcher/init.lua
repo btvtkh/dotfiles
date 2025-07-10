@@ -77,11 +77,20 @@ local function AppButton(app)
 			launch_app(app)
 			hide()
 		end,
-		Widget.Label {
-			class_name = "name",
-			xalign = 0,
-			ellipsize = "END",
-			label = app:get_name()
+		Widget.Box {
+			vertical = true,
+			Widget.Label {
+				class_name = "name",
+				xalign = 0,
+				ellipsize = "END",
+				label = app:get_name()
+			},
+			Widget.Label {
+				class_name = "description",
+				xalign = 0,
+				ellipsize = "END",
+				label = app:get_description()
+			}
 		}
 	}
 end
@@ -108,7 +117,7 @@ return function()
 
 	local scrollable = Widget.Scrollable {
 		vexpand = true,
-		height_request = 390,
+		height_request = 375,
 		Widget.Box {
 			vertical = true,
 			spacing = 3,

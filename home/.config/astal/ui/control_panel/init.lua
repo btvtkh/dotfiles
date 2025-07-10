@@ -7,12 +7,16 @@ local Astal = require("astal.gtk3").Astal
 local Anchor = Astal.WindowAnchor
 local Gdk = require("astal.gtk3").Gdk
 local Gtk = require("astal.gtk3").Gtk
+local astalify = require("astal.gtk3").astalify
+
+local Separator = astalify(Gtk.Separator)
 local NotificationList = require("ui.control_panel.notification_list")
 local AudioSliders = require("ui.control_panel.audio_sliders")
 local WifiButton = require("ui.control_panel.wifi_applet.button")
 local WifiPage = require("ui.control_panel.wifi_applet.page")
 local BluetoothButton = require("ui.control_panel.bluetooth_applet.button")
 local BluetoothPage = require("ui.control_panel.bluetooth_applet.page")
+
 
 local function hide()
 	local panel = App:get_window("Control-panel")
@@ -29,9 +33,7 @@ return function()
 		vertical = true,
 		spacing = 8,
 		NotificationList(),
-		Gtk.Separator {
-			visible = true
-		},
+		Separator(),
 		AudioSliders(),
 		Widget.Box {
 			spacing = 8,

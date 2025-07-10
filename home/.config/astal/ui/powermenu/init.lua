@@ -37,7 +37,6 @@ return function()
 		Widget.Button {
 			on_clicked = function()
 				hyprland:dispatch("exit", "")
-				--astal.exec("hyprctl dispatch exit")
 			end,
 			Widget.Icon {
 				icon = "system-log-out-symbolic"

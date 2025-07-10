@@ -234,5 +234,28 @@ window.control-panel {
         }
       }
     }
+
+    .wifi-page, .bluetooth-page {
+      .bottombar {
+        background-color: $bg-alt;
+        border-radius: 10px;
+        padding: 5px 10px 5px 5px;
+
+        button {
+          color: $fg;
+          background-color: $bg-alt;
+          transition: 200ms;
+
+          &:hover {
+            color: $bg;
+            background-color: $ac;
+          }
+        }
+
+        separator {
+          margin: 5px;
+        }
+      }
+    }
   }
 }

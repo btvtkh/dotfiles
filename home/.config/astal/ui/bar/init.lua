@@ -135,7 +135,7 @@ local function SysTray()
 			end,
 			Widget.Icon {
 				icon = bind(tray_visibility):as(function(v)
-					return v and "arrow-right" or "arrow-left"
+					return v and "pan-end-symbolic" or "pan-start-symbolic"
 				end)
 			}
 		},

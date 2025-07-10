@@ -1,9 +1,12 @@
 local Widget = require("astal.gtk3").Widget
 local Gtk = require("astal.gtk3").Gtk
 local Astal = require("astal.gtk3").Astal
+local astalify = require("astal.gtk3").astalify
 local map = require("lib.table").map
 local time = require("lib.util").time
 local file_exists = require("lib.file").exists
+
+local Separator = astalify(Gtk.Separator)
 
 local function is_icon(icon)
 	return Astal.Icon.lookup_icon(icon) ~= nil
@@ -84,9 +87,7 @@ return function(n, args)
 		setup = args.setup,
 		vertical = true,
 		header,
-		Gtk.Separator {
-			visible = true
-		},
+		Separator(),
 		content,
 		#n.actions > 0 and Widget.Box {
 			class_name = "actions",
