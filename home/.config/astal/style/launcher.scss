@@ -12,7 +12,7 @@ window.launcher {
   .mainbox {
     background-color: $bg;
     border: 1px solid $bg-urg;
-    border-radius: 18px;
+    border-radius: 20px;
     padding: 10px;
     margin: 0 0 7px 7px;
 
@@ -20,9 +20,33 @@ window.launcher {
       all: unset;
     }
 
+    .shortcuts-sidebar {
+      background-color: $bg-alt;
+      border-radius: 10px;
+      padding: 5px;
+
+      button {
+        color: $fg;
+        background-color: transparent;
+        transition: 200ms;
+
+        &:hover {
+          color: $bg;
+          background-color: $ac;
+        }
+      }
+
+      separator {
+        margin: 5px;
+      }
+    }
+
     entry {
-      border-radius: 8px;
-      margin-bottom: 10px;
+      color: $fg;
+      background-color: $bg;
+      border: none;
+      box-shadow: none;
+      margin-top: 5px;
     }
 
     .app-button {
@@ -30,8 +54,8 @@ window.launcher {
       color: $fg;
       min-width: 0;
       min-height: 0;
-      padding: 8px 10px;
-      border-radius: 8px;
+      padding: 10px;
+      border-radius: 10px;
       transition: 200ms;
 
       label.name {

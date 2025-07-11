@@ -112,6 +112,7 @@ window.control-panel {
             background-size: cover;
             background-position: center;
             margin-right: 5px;
+            border-radius: 5px;
           }
         }
 
@@ -212,11 +213,11 @@ window.control-panel {
     }
 
     .wifi-button, .bluetooth-button {
-      border-radius: 8px;
+      border-radius: 10px;
 
       .toggle-button {
         margin: 0;
-        border-radius: 8px 0 0 8px;
+        border-radius: 10px 0 0 10px;
         padding: 10px;
 
         label {
@@ -226,7 +227,7 @@ window.control-panel {
 
       .arrow-button {
         margin: 0;
-        border-radius: 0 8px 8px 0;
+        border-radius: 0 10px 10px 0;
         padding: 10px 0 10px 0;
 
         icon {

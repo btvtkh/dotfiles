@@ -8,9 +8,13 @@ local App = require("astal.gtk3").App
 local Widget = require("astal.gtk3").Widget
 local Astal = require("astal.gtk3").Astal
 local Anchor = Astal.WindowAnchor
+local Gtk = require("astal.gtk3").Gtk
 local Gdk = require("astal.gtk3").Gdk
+local astalify = require("astal.gtk3").astalify
 local map = require("lib.table").map
 local lua_escape = require("lib.string").lua_escape
+
+local Separator = astalify(Gtk.Separator)
 
 local function launch_app(app)
 	if not app then return end
@@ -117,7 +121,7 @@ return function()
 
 	local scrollable = Widget.Scrollable {
 		vexpand = true,
-		height_request = 375,
+		height_request = 400,
 		Widget.Box {
 			vertical = true,
 			spacing = 3,
@@ -141,13 +145,77 @@ return function()
 		}
 	}
 
-	local mainbox = Widget.Box {
-		class_name = "mainbox",
+	local shortcuts_sidebar = Widget.Box {
+		class_name = "shortcuts-sidebar",
 		vertical = true,
 		vexpand = false,
+		Widget.Box {
+			vertical = true,
+			valign = "START",
+			Widget.Button {
+				on_clicked = function()
+					hide()
+					local powermenu = App:get_window("Powermenu")
+					if powermenu then powermenu:show() end
+				end,
+				Widget.Icon {
+					icon = "system-shutdown-symbolic"
+				}
+			}
+		},
+		Widget.Box {
+			vertical = true,
+			vexpand = true,
+			valign = "END",
+			Widget.Button {
+				on_clicked = function()
+					local hyprland = AstalHyprland.get_default()
+
+					hide()
+					hyprland:dispatch(
+						"exec",
+						os.getenv("HOME") .. "/.config/hypr/hyprpaper-set.sh"
+					)
+				end,
+				Widget.Icon {
+					icon = "image-x-generic-symbolic"
+				}
+			},
+			Separator(),
+			Widget.Button {
+				on_clicked = function()
+					local hyprland = AstalHyprland.get_default()
+					local app = Gio.AppInfo.get_default_for_type("inode/directory")
+
+					hide()
+					if app then
+						hyprland:dispatch(
+							"exec",
+							string.format("%s %s", app:get_executable(), os.getenv("HOME"))
+						)
+					end
+				end,
+				Widget.Icon {
+					icon = "user-home-symbolic"
+				}
+			}
+		}
+	}
+
+	local mainbox = Widget.Box {
+		class_name = "mainbox",
 		width_request = 400,
-		entry,
-		scrollable
+		spacing = 5,
+		shortcuts_sidebar,
+		Widget.Box {
+			vertical = true,
+			hexpand = true,
+			vexpand = false,
+			spacing = 5,
+			entry,
+			Separator(),
+			scrollable
+		}
 	}
 
 	local revealer = Widget.Revealer {

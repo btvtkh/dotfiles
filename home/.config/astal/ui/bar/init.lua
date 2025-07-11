@@ -194,7 +194,7 @@ local function ControlPanelButton()
 			end
 		end,
 		Widget.Icon {
-			icon = "multimedia-equalizer-symbolic"
+			icon = "preferences-system-symbolic"
 		}
 	}
 end
