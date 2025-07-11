@@ -5,7 +5,6 @@ local gtable = require("gears.table")
 local gfs = require("gears.filesystem")
 local common = require("common")
 local user = require("user")
-local is_supported = require("lib.file").is_supported
 local table_to_file = require("lib.file").table_to_file
 local capi = { awesome = awesome, screen = screen, client = client }
 local screenshot = require("service.screenshot").get_default()
@@ -38,17 +37,19 @@ local function create_desktop_menu()
 					{
 						label = "set wallpaper",
 						exec = function()
-							awful.spawn.easy_async("zenity --file-selection", function(stdout)
-								stdout = string.gsub(stdout, "\n", "")
-								local formats = { "png", "jpg", "jpeg" }
-								if stdout ~= nil and stdout ~= "" and is_supported(stdout, formats) then
-									for s in capi.screen do
-										s.wallpaper:set_image(stdout)
+							awful.spawn.easy_async(
+								"zenity --file-selection --file-filter='Image files | *.png *.jpg *.jpeg'",
+								function(stdout)
+									stdout = string.gsub(stdout, "\n", "")
+									if stdout ~= nil and stdout ~= "" then
+										for s in capi.screen do
+											s.wallpaper:set_image(stdout)
+										end
+										user.wallpaper = stdout
+										table_to_file(user, gfs.get_configuration_dir() .. "/user.lua")
 									end
-									user.wallpaper = stdout
-									table_to_file(user, gfs.get_configuration_dir() .. "/user.lua")
 								end
-							end)
+							)
 						end
 					},
 					{

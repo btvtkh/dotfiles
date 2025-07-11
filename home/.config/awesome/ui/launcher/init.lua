@@ -371,37 +371,40 @@ local function new()
 
 	powermenu_button:buttons {
 		awful.button({}, 1, function()
+			ret:hide()
 			powermenu:show()
 		end)
 	}
 
 	wallpaper_button:buttons {
 		awful.button({}, 1, function()
-			awful.spawn.easy_async("zenity --file-selection", function(stdout)
-				stdout = string.gsub(stdout, "\n", "")
-				local formats = { "png", "jpg", "jpeg" }
-				if stdout ~= nil and stdout ~= "" and is_supported(stdout, formats) then
-					for s in capi.screen do
-						s.wallpaper:set_image(stdout)
-					end
-					user.wallpaper = stdout
-					table_to_file(user, gfs.get_configuration_dir() .. "/user.lua")
-				end
-			end)
 			ret:hide()
+			awful.spawn.easy_async(
+				"zenity --file-selection --file-filter='Image files | *.png *.jpg *.jpeg'",
+				function(stdout)
+					stdout = string.gsub(stdout, "\n", "")
+					if stdout ~= nil and stdout ~= "" then
+						for s in capi.screen do
+							s.wallpaper:set_image(stdout)
+						end
+						user.wallpaper = stdout
+						table_to_file(user, gfs.get_configuration_dir() .. "/user.lua")
+					end
+				end
+			)
 		end)
 	}
 
 	home_button:buttons {
 		awful.button({}, 1, function()
 			local app = Gio.AppInfo.get_default_for_type("inode/directory")
+			ret:hide()
 			if app then
 				awful.spawn(string.format(
 					"%s %s",
 					app:get_executable(),
 					os.getenv("HOME")
 				))
-				ret:hide()
 			end
 		end)
 	}

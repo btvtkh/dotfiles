@@ -6,7 +6,7 @@ local awful = require("awful")
 local gobject = require("gears.object")
 local gtable = require("gears.table")
 local user = require("user")
-local file_exists = require("lib.file").file_exists
+local file_exists = require("lib.file").exists
 
 local screenshot = {}
 
