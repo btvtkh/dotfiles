@@ -49,18 +49,27 @@ function player:set_position(id, pos)
 end
 
 function player:get_playback_status()
-	return string.lower(self._private.player_proxy.PlaybackStatus)
+	return string.lower(self._private.properties_proxy:Get(
+		self._private.player_proxy.interface,
+		"PlaybackStatus"
+	))
 end
 
 function player:get_metadata()
 	return setmetatable(
-		self._private.player_proxy.Metadata,
+		self._private.properties_proxy:Get(
+			self._private.player_proxy.interface,
+			"Metadata"
+		),
 		{ __index = metadata }
 	)
 end
 
 function player:get_position()
-	return self._private.player_proxy.Position
+	return self._private.properties_proxy:Get(
+		self._private.player_proxy.interface,
+		"Position"
+	)
 end
 
 function metadata:get_track_id()
@@ -91,7 +100,7 @@ function metadata:get_length()
 	return self["mpris:length"]
 end
 
-local function new_player(name)
+local function create_player_object(name)
 	local ret = gobject {}
 	gtable.crush(ret, player, true)
 	ret._private = {}
@@ -120,18 +129,6 @@ local function new_player(name)
 		if props.PlaybackStatus ~= nil then
 			ret:emit_signal("property::playback-status", string.lower(props.PlaybackStatus))
 		end
-		if props.CanGoPrevious ~= nil then
-			ret:emit_signal("property::can-go-previous", props.CanGoPrevious)
-		end
-		if props.CanGoNext ~= nil then
-			ret:emit_signal("property::can-go-next", props.CanGoNext)
-		end
-		if props.CanPlay ~= nil then
-			ret:emit_signal("property::can-play", props.CanPlay)
-		end
-		if props.CanPause ~= nil then
-			ret:emit_signal("property::can-go-previous", props.CanPause)
-		end
 	end)
 
 	ret._private.player_proxy:connect_signal("Seeked", function(_, pos)
@@ -158,7 +155,7 @@ local function new()
 		ret._private.names_proxy:connect_signal("NameOwnerChanged", function(_, name, old_owner, new_owner)
 			if name:match("org%.mpris%.MediaPlayer2%.%w+") then
 				if old_owner == "" and new_owner ~= "" then
-					ret.players[name] = new_player(name)
+					ret.players[name] = create_player_object(name)
 					ret:emit_signal("player-added", name)
 				elseif old_owner ~= "" and new_owner == "" then
 					ret:emit_signal("player-removed", name)
@@ -169,7 +166,7 @@ local function new()
 
 		for _, name in ipairs(ret._private.names_proxy:ListNames()) do
 			if name:match("org%.mpris%.MediaPlayer2%.%w+") then
-				ret.players[name] = new_player(name)
+				ret.players[name] = create_player_object(name)
 			end
 		end
 	end

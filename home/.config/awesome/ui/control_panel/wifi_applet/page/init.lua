@@ -13,7 +13,7 @@ local wifi_page = {}
 local function create_ap_widget(self, ap)
 	local ap_ssid = ap:get_ssid()
 	local ap_strength = ap:get_strength()
-	local is_active = ap == nm_client.wireless:get_active_access_point()
+	local is_active = ap:get_path() == nm_client.wireless:get_active_access_point_path()
 
 	local ap_widget = wibox.widget {
 		widget = wibox.container.background,
@@ -162,7 +162,7 @@ function wifi_page:open_ap_menu(ap)
 
 	title:set_markup(ap:get_ssid())
 
-	if ap ~= nm_client.wireless:get_active_access_point() then
+	if ap:get_path() ~= nm_client.wireless:get_active_access_point_path() then
 		local obscure_icon = wp.ap_menu:get_children_by_id("obscure-icon")[1]
 		local auto_connect_icon = wp.ap_menu:get_children_by_id("auto-connect-icon")[1]
 

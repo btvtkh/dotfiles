@@ -6,53 +6,29 @@ local gtable = require("gears.table")
 local adapter = {}
 local device = {}
 
-local function create_device_object(path)
-	if not path or path == "/" then return end
-	local device_object = gobject {}
-	gtable.crush(device_object, device, true)
-	device_object._private = {}
+function adapter:get_powered()
+	if self._private.properties_proxy.interface
+	and self._private.properties_proxy.Get then
+		return self._private.properties_proxy:Get(
+			self._private.adapter_proxy.interface,
+			"Powered"
+		)
+	end
+end
 
-	device_object._private.device_proxy = dbus_proxy.Proxy:new {
-		bus = dbus_proxy.Bus.SYSTEM,
-		name = "org.bluez",
-		path = path,
-		interface = "org.bluez.Device1"
-	}
-
-	device_object._private.battery_proxy = dbus_proxy.Proxy:new {
-		bus = dbus_proxy.Bus.SYSTEM,
-		name = "org.bluez",
-		path = path,
-		interface = "org.bluez.Battery1"
-	}
-
-	device_object._private.properties_proxy = dbus_proxy.Proxy:new {
-		bus = dbus_proxy.Bus.SYSTEM,
-		name = "org.bluez",
-		path = path,
-		interface = "org.freedesktop.DBus.Properties"
-	}
-
-	device_object._private.properties_proxy:connect_signal("PropertiesChanged", function(_, _, props)
-		if props.Connected ~= nil then
-			device_object:emit_signal("property::connected", props.Connected)
-		end
-		if props.Paired ~= nil then
-			device_object:emit_signal("property::paired", props.Paired)
-		end
-		if props.Trusted ~= nil then
-			device_object:emit_signal("property::trusted", props.Trusted)
-		end
-		if props.Percentage ~= nil then
-			device_object:emit_signal("property::percentage", props.Percentage)
-		end
-	end)
-
-	return device_object
+function adapter:get_discovering()
+	if self._private.adapter_proxy.interface
+	and self._private.properties_proxy.Get then
+		return self._private.properties_proxy:Get(
+			self._private.adapter_proxy.interface,
+			"Discovering"
+		)
+	end
 end
 
 function adapter:set_powered(state)
-	if self._private.adapter_proxy.SetAsync then
+	if self._private.adapter_proxy.interface
+	and self._private.adapter_proxy.SetAsync then
 		self._private.adapter_proxy:SetAsync(
 			nil,
 			{},
@@ -60,6 +36,7 @@ function adapter:set_powered(state)
 			"Powered",
 			lgi.GLib.Variant("b", state)
 		)
+
 		self._private.adapter_proxy.Powered = {
 			signature = "b",
 			value = state
@@ -67,26 +44,20 @@ function adapter:set_powered(state)
 	end
 end
 
-function adapter:get_powered()
-	return self._private.adapter_proxy.Powered
-end
-
 function adapter:start_discovery()
-	if not self._private.adapter_proxy then return end
-	if self._private.adapter_proxy.Discovering ~= true then
-		self._private.adapter_proxy:StartDiscoveryAsync(nil, {})
+	if self._private.adapter_proxy.StartDiscoveryAsync then
+		if self:get_discovering() ~= true then
+			self._private.adapter_proxy:StartDiscoveryAsync(nil, {})
+		end
 	end
 end
 
 function adapter:stop_discovery()
-	if not self._private.adapter_proxy then return end
-	if self._private.adapter_proxy.Discovering == true then
-		self._private.adapter_proxy:StopDiscoveryAsync(nil, {})
+	if self._private.adapter_proxy.StopDiscoveryAsync then
+		if self:get_discovering() == true then
+			self._private.adapter_proxy:StopDiscoveryAsync(nil, {})
+		end
 	end
-end
-
-function adapter:get_discovering()
-	return self._private.adapter_proxy.Discovering
 end
 
 function adapter:get_devices()
@@ -98,25 +69,25 @@ function adapter:get_device(path)
 end
 
 function device:connect()
-	if self._private.device_proxy.Connected ~= true then
+	if self:get_connected() ~= true then
 		self._private.device_proxy:ConnectAsync(nil, {})
 	end
 end
 
 function device:disconnect()
-	if self._private.device_proxy.Connected == true then
+	if self:get_connected() == true then
 		self._private.device_proxy:DisconnectAsync(nil, {})
 	end
 end
 
 function device:pair()
-	if self._private.device_proxy.Paired ~= true then
+	if self:get_paired() ~= true then
 		self._private.device_proxy:PairAsync(nil, {})
 	end
 end
 
 function device:cancel_pairing()
-	if self._private.device_proxy.Paired == true then
+	if self:get_paired() == true then
 		self._private.device_proxy:CancelPairingAsync(nil, {})
 	end
 end
@@ -136,35 +107,102 @@ function device:set_trusted(trusted)
 end
 
 function device:get_connected()
-	return self._private.device_proxy.Connected
+	return self._private.properties_proxy:Get(
+		self._private.device_proxy.interface,
+		"Connected"
+	)
 end
 
 function device:get_paired()
-	return self._private.device_proxy.Paired
+	return self._private.properties_proxy:Get(
+		self._private.device_proxy.interface,
+		"Paired"
+	)
 end
 
 function device:get_trusted()
-	return self._private.device_proxy.Trusted
+	return self._private.properties_proxy:Get(
+		self._private.device_proxy.interface,
+		"Trusted"
+	)
 end
 
 function device:get_name()
-	return self._private.device_proxy.Name
+	return self._private.properties_proxy:Get(
+		self._private.device_proxy.interface,
+		"Name"
+	)
 end
 
 function device:get_icon()
-	return self._private.device_proxy.Icon
+	return self._private.properties_proxy:Get(
+		self._private.device_proxy.interface,
+		"Icon"
+	)
 end
 
 function device:get_address()
-	return self._private.device_proxy.Address
+	return self._private.properties_proxy:Get(
+		self._private.device_proxy.interface,
+		"Address"
+	)
 end
 
 function device:get_percentage()
-	return self._private.battery_proxy.Percentage
+	return self._private.properties_proxy:Get(
+		self._private.battery_proxy.interface,
+		"Percentage"
+	)
 end
 
 function device:get_path()
 	return self._private.device_proxy.object_path
+end
+
+local function create_device_object(path)
+	if not path or path == "/" then return end
+
+	local ret = gobject {}
+	gtable.crush(ret, device, true)
+	ret._private = {}
+
+	ret._private.device_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.bluez",
+		path = path,
+		interface = "org.bluez.Device1"
+	}
+
+	ret._private.battery_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.bluez",
+		path = path,
+		interface = "org.bluez.Battery1"
+	}
+
+	ret._private.properties_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.bluez",
+		path = path,
+		interface = "org.freedesktop.DBus.Properties"
+	}
+
+	ret._private.properties_proxy:connect_signal("PropertiesChanged", function(_, _, props)
+		if props.Connected ~= nil then
+			ret:emit_signal("property::connected", props.Connected)
+		end
+		if props.Paired ~= nil then
+			ret:emit_signal("property::paired", props.Paired)
+		end
+		if props.Trusted ~= nil then
+			ret:emit_signal("property::trusted", props.Trusted)
+		end
+		if props.Percentage ~= nil then
+			ret:emit_signal("property::percentage", props.Percentage)
+		end
+	end)
+
+	return ret
 end
 
 local function new()
@@ -179,51 +217,49 @@ local function new()
 		interface = "org.freedesktop.DBus.ObjectManager"
 	}
 
-	if ret._private.object_manager_proxy then
-		ret._private.adapter_proxy = dbus_proxy.Proxy:new {
-			bus = dbus_proxy.Bus.SYSTEM,
-			name = "org.bluez",
-			path = "/org/bluez/hci0",
-			interface = "org.bluez.Adapter1"
-		}
+	ret._private.adapter_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.bluez",
+		path = "/org/bluez/hci0",
+		interface = "org.bluez.Adapter1"
+	}
 
-		ret._private.properties_proxy = dbus_proxy.Proxy:new {
-			bus = dbus_proxy.Bus.SYSTEM,
-			name = "org.bluez",
-			path = "/org/bluez/hci0",
-			interface = "org.freedesktop.DBus.Properties"
-		}
+	ret._private.properties_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.bluez",
+		path = "/org/bluez/hci0",
+		interface = "org.freedesktop.DBus.Properties"
+	}
 
-		ret._private.properties_proxy:connect_signal("PropertiesChanged", function(_, _, props)
-			if props.Powered ~= nil then
-				ret:emit_signal("property::powered", props.Powered)
-			end
-			if props.Discovering ~= nil then
-				ret:emit_signal("property::discovering", props.Discovering)
-			end
-		end)
+	ret._private.properties_proxy:connect_signal("PropertiesChanged", function(_, _, props)
+		if props.Powered ~= nil then
+			ret:emit_signal("property::powered", props.Powered)
+		end
+		if props.Discovering ~= nil then
+			ret:emit_signal("property::discovering", props.Discovering)
+		end
+	end)
 
-		ret.devices = {}
-		ret._private.object_manager_proxy:connect_signal("InterfacesAdded", function(_, path)
+	ret.devices = {}
+	ret._private.object_manager_proxy:connect_signal("InterfacesAdded", function(_, path)
+		if path:match("^/org/bluez/hci0/dev_%w%w_%w%w_%w%w_%w%w_%w%w_%w%w$") then
+			ret.devices[path] = create_device_object(path)
+			ret:emit_signal("device-added", path)
+		end
+	end)
+
+	ret._private.object_manager_proxy:connect_signal("InterfacesRemoved", function(_, path)
+		if path:match("^/org/bluez/hci0/dev_%w%w_%w%w_%w%w_%w%w_%w%w_%w%w$")then
+			ret:emit_signal("device-removed", path)
+			ret.devices[path] = nil
+		end
+	end)
+
+	if ret._private.object_manager_proxy.GetManagedObjects then
+		local object_paths = ret._private.object_manager_proxy:GetManagedObjects()
+		for path, _ in pairs(object_paths) do
 			if path:match("^/org/bluez/hci0/dev_%w%w_%w%w_%w%w_%w%w_%w%w_%w%w$") then
 				ret.devices[path] = create_device_object(path)
-				ret:emit_signal("device-added", path)
-			end
-		end)
-
-		ret._private.object_manager_proxy:connect_signal("InterfacesRemoved", function(_, path)
-			if path:match("^/org/bluez/hci0/dev_%w%w_%w%w_%w%w_%w%w_%w%w_%w%w$")then
-				ret:emit_signal("device-removed", path)
-				ret.devices[path] = nil
-			end
-		end)
-
-		if ret._private.object_manager_proxy.GetManagedObjects then
-			local object_paths = ret._private.object_manager_proxy:GetManagedObjects()
-			for path, _ in pairs(object_paths) do
-				if path:match("^/org/bluez/hci0/dev_%w%w_%w%w_%w%w_%w%w_%w%w_%w%w$") then
-					ret.devices[path] = create_device_object(path)
-				end
 			end
 		end
 	end

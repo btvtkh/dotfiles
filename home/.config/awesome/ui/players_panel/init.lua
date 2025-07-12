@@ -128,9 +128,10 @@ local function on_player_added(self, name)
 		call_now = false,
 		callback = function()
 			local length = player:get_metadata():get_length() or 1
-			local timeline_step = 1000000/length*100
+			local position = player:get_position()
+			local current = position/length*100
 
-			timeline_slider:set_value(timeline_slider:get_value() + timeline_step)
+			timeline_slider:set_value(current)
 
 			if player_widget._private.timeline_timer then
 				player_widget._private.timeline_timer:again()

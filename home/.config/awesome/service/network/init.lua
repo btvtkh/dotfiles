@@ -136,52 +136,31 @@ local function create_ap_profile(ap, password, auto_connect)
 	}
 end
 
-local function create_connection_object(path)
-	if not path or path == "/" then return end
-	local connection_object = gobject {}
-	gtable.crush(connection_object, connection, true)
-	connection_object._private = {}
-	connection_object._private.connection_proxy = dbus_proxy.Proxy:new {
-		bus = dbus_proxy.Bus.SYSTEM,
-		name = "org.freedesktop.NetworkManager",
-		path = path,
-		interface = "org.freedesktop.NetworkManager.Settings.Connection",
-	}
-
-	return connection_object
-end
-
-local function create_access_point_object(path)
-	if not path or path == "/" then return end
-	local access_point_object = gobject {}
-	gtable.crush(access_point_object, access_point, true)
-	access_point_object._private = {}
-	access_point_object._private.access_point_proxy = dbus_proxy.Proxy:new {
-		bus = dbus_proxy.Bus.SYSTEM,
-		name = "org.freedesktop.NetworkManager",
-		path = path,
-		interface = "org.freedesktop.NetworkManager.AccessPoint",
-	}
-
-	return access_point_object
-end
-
 function client:get_state()
-	return self._private.client_proxy.State
+	return self._private.client_properties_proxy:Get(
+		self._private.client_proxy.interface,
+		"State"
+	)
 end
 
 function client:get_networking_enabled()
-	return self._private.client_proxy.NetworkingEnabled
+	return self._private.client_properties_proxy:Get(
+		self._private.client_proxy.interface,
+		"NetworkingEnabled"
+	)
+end
+
+function client:get_wireless_enabled()
+	return self._private.client_properties_proxy:Get(
+		self._private.client_proxy.interface,
+		"WirelessEnabled"
+	)
 end
 
 function client:enable(state)
 	if self._private.client_proxy.EnableAsync then
 		self._private.client_proxy:EnableAsync(nil, {}, state)
 	end
-end
-
-function client:get_wireless_enabled()
-	return self._private.client_proxy.WirelessEnabled
 end
 
 function client:set_wireless_enabled(state)
@@ -197,6 +176,7 @@ function client:set_wireless_enabled(state)
 			"WirelessEnabled",
 			lgi.GLib.Variant("b", state)
 		)
+
 		self._private.client_proxy.WirelessEnabled = {
 			signature = "b",
 			value = state
@@ -240,6 +220,7 @@ function client:connect_access_point(ap, password, auto_connect)
 			{},
 			profile
 		)
+
 		self._private.client_proxy:ActivateConnectionAsync(
 			nil,
 			{},
@@ -259,34 +240,31 @@ function client:disconnect_active_access_point()
 end
 
 function connection:get_filename()
-	return self._private.connection_proxy.Filename
+	return self._private.properties_proxy:Get(
+		self._private.connection_proxy.interface,
+		"Filename"
+	)
 end
 
 function connection:get_path()
 	return self._private.connection_proxy.object_path
 end
 
-function wired:get_hw_address()
-	if self._private.device_proxy then
-		return self._private.device_proxy.HwAddress
-	end
-end
-
 function wired:get_state()
-	if self._private.device_proxy then
-		return self._private.device_proxy.State
-	end
-end
-
-function wireless:get_hw_address()
-	if self._private.device_proxy then
-		return self._private.device_proxy.HwAddress
+	if self._private.device_proxy and self._private.properties_proxy then
+		return self._private.properties_proxy:Get(
+			self._private.device_proxy.interface,
+			"State"
+		)
 	end
 end
 
 function wireless:get_state()
-	if self._private.device_proxy then
-		return self._private.device_proxy.State
+	if self._private.device_proxy and self._private.properties_proxy then
+		return self._private.properties_proxy:Get(
+			self._private.device_proxy.interface,
+			"State"
+		)
 	end
 end
 
@@ -298,8 +276,11 @@ function wireless:get_access_point(path)
 	return self.access_points[path]
 end
 
-function wireless:get_active_access_point()
-	return self:get_access_point(self._private.wireless_proxy.ActiveAccessPoint)
+function wireless:get_active_access_point_path()
+	return self._private.properties_proxy:Get(
+		self._private.wireless_proxy.interface,
+		"ActiveAccessPoint"
+	)
 end
 
 function wireless:request_scan()
@@ -309,27 +290,88 @@ function wireless:request_scan()
 end
 
 function access_point:get_ssid()
-	return NM.utils_ssid_to_utf8(self._private.access_point_proxy.Ssid)
-end
-
-function access_point:get_hw_address()
-	return self._private.access_point_proxy.HwAddress
+	return NM.utils_ssid_to_utf8(
+		self._private.properties_proxy:Get(
+			self._private.access_point_proxy.interface,
+			"Ssid"
+		)
+	)
 end
 
 function access_point:get_security()
 	return flags_to_security(
-		self._private.access_point_proxy.Flags,
-		self._private.access_point_proxy.WpaFlags,
-		self._private.access_point_proxy.RsnFlags
+		self._private.properties_proxy:Get(
+			self._private.access_point_proxy.interface,
+			"Flags"
+		),
+		self._private.properties_proxy:Get(
+			self._private.access_point_proxy.interface,
+			"WpaFlags"
+		),
+		self._private.properties_proxy:Get(
+			self._private.access_point_proxy.interface,
+			"RsnFlags"
+		)
 	)
 end
 
 function access_point:get_strength()
-	return self._private.access_point_proxy.Strength
+	return self._private.properties_proxy:Get(
+		self._private.access_point_proxy.interface,
+		"Strength"
+	)
 end
 
 function access_point:get_path()
 	return self._private.access_point_proxy.object_path
+end
+
+local function create_connection_object(path)
+	if not path or path == "/" then return end
+
+	local ret = gobject {}
+	gtable.crush(ret, connection, true)
+	ret._private = {}
+
+	ret._private.connection_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.freedesktop.NetworkManager",
+		path = path,
+		interface = "org.freedesktop.NetworkManager.Settings.Connection",
+	}
+
+	ret._private.properties_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.freedesktop.NetworkManager",
+		path = path,
+		interface = "org.freedesktop.DBus.Properties"
+	}
+
+	return ret
+end
+
+local function create_access_point_object(path)
+	if not path or path == "/" then return end
+
+	local ret = gobject {}
+	gtable.crush(ret, access_point, true)
+	ret._private = {}
+
+	ret._private.access_point_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.freedesktop.NetworkManager",
+		path = path,
+		interface = "org.freedesktop.NetworkManager.AccessPoint",
+	}
+
+	ret._private.properties_proxy = dbus_proxy.Proxy:new {
+		bus = dbus_proxy.Bus.SYSTEM,
+		name = "org.freedesktop.NetworkManager",
+		path = path,
+		interface = "org.freedesktop.DBus.Properties"
+	}
+
+	return ret
 end
 
 local function new()
@@ -422,6 +464,7 @@ local function new()
 		if device_proxy then
 			if device_proxy.DeviceType == network.DeviceType.ETHERNET then
 				ret.wired._private.device_proxy = device_proxy
+
 				ret.wired._private.wired_proxy = dbus_proxy.Proxy:new {
 					bus = dbus_proxy.Bus.SYSTEM,
 					name = "org.freedesktop.NetworkManager",
@@ -430,6 +473,7 @@ local function new()
 				}
 			elseif device_proxy.DeviceType == network.DeviceType.WIFI then
 				ret.wireless._private.device_proxy = device_proxy
+
 				ret.wireless._private.wireless_proxy = dbus_proxy.Proxy:new {
 					bus = dbus_proxy.Bus.SYSTEM,
 					name = "org.freedesktop.NetworkManager",
