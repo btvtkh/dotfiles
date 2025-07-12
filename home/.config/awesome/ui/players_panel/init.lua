@@ -26,6 +26,8 @@ local function on_player_added(self, name)
 	local player_widget = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
+		forced_width = dpi(450),
+		shape = beautiful.rrect(dpi(10)),
 		{
 			widget = wibox.container.margin,
 			margins = dpi(10),
@@ -49,112 +51,116 @@ local function on_player_added(self, name)
 					}
 				},
 				{
-					layout = wibox.layout.align.vertical,
+					widget = wibox.container.margin,
+					margins = dpi(5),
 					{
-						layout = wibox.layout.fixed.vertical,
+						layout = wibox.layout.align.vertical,
 						{
-							widget = wibox.container.constraint,
-							strategy = "max",
-							height = dpi(25),
+							layout = wibox.layout.fixed.vertical,
 							{
-								id = "title",
-								widget = wibox.widget.textbox
+								widget = wibox.container.constraint,
+								strategy = "max",
+								height = dpi(25),
+								{
+									id = "title",
+									widget = wibox.widget.textbox
+								}
+							},
+							{
+								widget = wibox.container.constraint,
+								strategy = "max",
+								height = dpi(20),
+								{
+									id = "artist",
+									widget = wibox.widget.textbox,
+									font = beautiful.font_h0
+								}
 							}
 						},
+						nil,
 						{
-							widget = wibox.container.constraint,
-							strategy = "max",
-							height = dpi(20),
+							layout = wibox.layout.fixed.vertical,
 							{
-								id = "artist",
-								widget = wibox.widget.textbox,
-								font = beautiful.font_h0
+								layout = wibox.layout.flex.horizontal,
+								{
+									widget = wibox.container.place,
+									halign = "left",
+									{
+										widget = wibox.container.background,
+										fg = beautiful.fg_alt,
+										{
+											id = "position",
+											widget = wibox.widget.textbox,
+											font = beautiful.font_h0
+										}
+									}
+								},
+								{
+									widget = wibox.container.place,
+									halign = "center",
+									{
+										layout = wibox.layout.fixed.horizontal,
+										spacing = dpi(5),
+										{
+											id = "previous",
+											widget = common.hover_button {
+												label = "",
+												margins = dpi(4),
+												shape = beautiful.rrect(dpi(6))
+											}
+										},
+										{
+											id = "play-pause",
+											widget = common.hover_button {
+												margins = dpi(4),
+												shape = beautiful.rrect(dpi(6))
+											}
+										},
+										{
+											id = "next",
+											widget = common.hover_button {
+												label = "",
+												margins = dpi(4),
+												shape = beautiful.rrect(dpi(6))
+											}
+										}
+									}
+								},
+								{
+									widget = wibox.container.place,
+									halign = "right",
+									{
+										widget = wibox.container.background,
+										fg = beautiful.fg_alt,
+										{
+											id = "length",
+											widget = wibox.widget.textbox,
+											font = beautiful.font_h0
+										}
+									}
+								}
+							},
+							{
+								id = "slider-container",
+								widget = wibox.container.margin,
+								forced_height = dpi(20),
+								{
+									id = "timeline",
+									widget = wibox.widget.slider,
+									maximum = 100,
+									bar_height = dpi(2),
+									handle_width = dpi(20),
+									handle_border_width = dpi(2),
+									handle_margins = { top = dpi(7), bottom = dpi(7) },
+									bar_color = beautiful.bg_urg,
+									bar_active_color = beautiful.ac,
+									handle_color = beautiful.bg_alt,
+									handle_border_color = beautiful.ac,
+									handle_shape = beautiful.crcl(5),
+									bar_shape = beautiful.rbar()
+								}
 							}
 						}
-					},
-					nil,
-					{
-						layout = wibox.layout.fixed.vertical,
-						{
-							layout = wibox.layout.flex.horizontal,
-							{
-								widget = wibox.container.place,
-								halign = "left",
-								{
-									widget = wibox.container.background,
-									fg = beautiful.fg_alt,
-									{
-										id = "position",
-										widget = wibox.widget.textbox,
-										font = beautiful.font_h0
-									}
-								}
-							},
-							{
-								widget = wibox.container.place,
-								halign = "center",
-								{
-									layout = wibox.layout.fixed.horizontal,
-									spacing = dpi(5),
-									{
-										id = "previous",
-										widget = common.hover_button {
-											label = "",
-											margins = dpi(4),
-											shape = beautiful.rrect(dpi(6))
-										}
-									},
-									{
-										id = "play-pause",
-										widget = common.hover_button {
-											margins = dpi(4),
-											shape = beautiful.rrect(dpi(6))
-										}
-									},
-									{
-										id = "next",
-										widget = common.hover_button {
-											label = "",
-											margins = dpi(4),
-											shape = beautiful.rrect(dpi(6))
-										}
-									}
-								}
-							},
-							{
-								widget = wibox.container.place,
-								halign = "right",
-								{
-									widget = wibox.container.background,
-									fg = beautiful.fg_alt,
-									{
-										id = "length",
-										widget = wibox.widget.textbox,
-										font = beautiful.font_h0
-									}
-								}
-							}
-						},
-						{
-							id = "slider-container",
-							widget = wibox.container.margin,
-							forced_height = dpi(20),
-							{
-								id = "timeline",
-								widget = wibox.widget.slider,
-								maximum = 100,
-								bar_height = dpi(2),
-								handle_width = dpi(20),
-								handle_border_width = dpi(2),
-								handle_margins = { top = dpi(7), bottom = dpi(7) },
-								bar_color = beautiful.bg_urg,
-								bar_active_color = beautiful.ac,
-								handle_color = beautiful.bg_alt,
-								handle_border_color = beautiful.ac,
-								handle_shape = beautiful.crcl(5),
-								bar_shape = beautiful.rbar()
-							}
-						},
 					}
 				}
 			}
@@ -291,6 +297,10 @@ local function on_player_added(self, name)
 		player_widget._private.timeline_timer:start()
 	end
 
+	if not players_layout.children[1]._private.player_name then
+		players_layout:remove(1)
+	end
+
 	players_layout:insert(1, player_widget)
 end
 
@@ -307,6 +317,21 @@ local function on_player_removed(self, name)
 			player_widget._private.timeline_timer = nil
 
 			players_layout:remove_widgets(player_widget)
+
+			if #players_layout.children == 0 then
+				players_layout:add(wibox.widget {
+					widget = wibox.container.background,
+					forced_width = dpi(300),
+					forced_height = dpi(100),
+					fg = beautiful.fg_alt,
+					{
+						widget = wibox.widget.textbox,
+						align = "center",
+						font = beautiful.font_h2,
+						text = "Nothing playing"
+					}
+				})
+			end
 		end
 	end
 end
@@ -317,25 +342,57 @@ local function new()
 		ontop = true,
 		type = "dock",
 		screen = capi.screen.primary,
-		placement = function() return { 0, 0 } end,
+		placement = function(d)
+			awful.placement.bottom_right(d, {
+				honor_workarea = true,
+				margins = beautiful.useless_gap
+			})
+		end,
 		bg = "#00000000",
 		widget = {
 			widget = wibox.container.background,
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			forced_width = dpi(500),
-			forced_height = dpi(350),
+			shape = beautiful.rrect(dpi(20)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(10),
 				{
 					id = "players-layout",
-					layout = wibox.layout.fixed.vertical,
-					spacing = dpi(10)
+					layout = wibox.layout.stack,
+					top_only = true,
+					{
+						widget = wibox.container.background,
+						forced_width = dpi(300),
+						forced_height = dpi(100),
+						fg = beautiful.fg_alt,
+						{
+							widget = wibox.widget.textbox,
+							align = "center",
+							font = beautiful.font_h2,
+							text = "Nothing playing"
+						}
+					}
 				}
 			}
 		}
+	}
+
+	local players_layout = ret.widget:get_children_by_id("players-layout")[1]
+
+	players_layout:buttons {
+		awful.button({}, 4, function()
+			if #players_layout.children > 1 then
+				players_layout:raise(#players_layout.children)
+			end
+		end),
+		awful.button({}, 5, function()
+			if #players_layout.children > 1 then
+				players_layout:add(players_layout.children[1])
+				players_layout:remove(1)
+			end
+		end)
 	}
 
 	media_player:connect_signal("player-added", function(_, name)
