@@ -157,6 +157,14 @@ function client:get_wireless_enabled()
 	)
 end
 
+function client:get_connections()
+	return self.connections
+end
+
+function client:get_connection(path)
+	return self.connections[path]
+end
+
 function client:enable(state)
 	if self._private.client_proxy.EnableAsync then
 		self._private.client_proxy:EnableAsync(nil, {}, state)
@@ -182,14 +190,6 @@ function client:set_wireless_enabled(state)
 			value = state
 		}
 	end
-end
-
-function client:get_connections()
-	return self.connections
-end
-
-function client:get_connection(path)
-	return self.connections[path]
 end
 
 function client:connect_access_point(ap, password, auto_connect)

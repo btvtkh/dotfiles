@@ -24,6 +24,32 @@ function media_player:match_players(match)
 	return p
 end
 
+function player:get_playback_status()
+	return string.lower(
+		self._private.properties_proxy:Get(
+			self._private.player_proxy.interface,
+			"PlaybackStatus"
+		)
+	)
+end
+
+function player:get_metadata()
+	return setmetatable(
+		self._private.properties_proxy:Get(
+			self._private.player_proxy.interface,
+			"Metadata"
+		),
+		{ __index = metadata }
+	)
+end
+
+function player:get_position()
+	return self._private.properties_proxy:Get(
+		self._private.player_proxy.interface,
+		"Position"
+	)
+end
+
 function player:next()
 	self._private.player_proxy:NextAsync(nil, {})
 end
@@ -46,30 +72,6 @@ end
 
 function player:set_position(id, pos)
 	self._private.player_proxy:SetPositionAsync(nil, {}, id, pos)
-end
-
-function player:get_playback_status()
-	return string.lower(self._private.properties_proxy:Get(
-		self._private.player_proxy.interface,
-		"PlaybackStatus"
-	))
-end
-
-function player:get_metadata()
-	return setmetatable(
-		self._private.properties_proxy:Get(
-			self._private.player_proxy.interface,
-			"Metadata"
-		),
-		{ __index = metadata }
-	)
-end
-
-function player:get_position()
-	return self._private.properties_proxy:Get(
-		self._private.player_proxy.interface,
-		"Position"
-	)
 end
 
 function metadata:get_track_id()

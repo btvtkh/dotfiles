@@ -26,6 +26,14 @@ function adapter:get_discovering()
 	end
 end
 
+function adapter:get_devices()
+	return self.devices
+end
+
+function adapter:get_device(path)
+	return self.devices[path]
+end
+
 function adapter:set_powered(state)
 	if self._private.adapter_proxy.interface
 	and self._private.adapter_proxy.SetAsync then
@@ -58,52 +66,6 @@ function adapter:stop_discovery()
 			self._private.adapter_proxy:StopDiscoveryAsync(nil, {})
 		end
 	end
-end
-
-function adapter:get_devices()
-	return self.devices
-end
-
-function adapter:get_device(path)
-	return self.devices[path]
-end
-
-function device:connect()
-	if self:get_connected() ~= true then
-		self._private.device_proxy:ConnectAsync(nil, {})
-	end
-end
-
-function device:disconnect()
-	if self:get_connected() == true then
-		self._private.device_proxy:DisconnectAsync(nil, {})
-	end
-end
-
-function device:pair()
-	if self:get_paired() ~= true then
-		self._private.device_proxy:PairAsync(nil, {})
-	end
-end
-
-function device:cancel_pairing()
-	if self:get_paired() == true then
-		self._private.device_proxy:CancelPairingAsync(nil, {})
-	end
-end
-
-function device:set_trusted(trusted)
-	self._private.device_proxy:SetAsync(
-		nil,
-		{},
-		self._private.device_proxy.interface,
-		"Trusted",
-		lgi.GLib.Variant("b", trusted)
-	)
-	self._private.device_proxy.Trusted = {
-		signature = "b",
-		value = trusted
-	}
 end
 
 function device:get_connected()
@@ -157,6 +119,44 @@ end
 
 function device:get_path()
 	return self._private.device_proxy.object_path
+end
+
+function device:connect()
+	if self:get_connected() ~= true then
+		self._private.device_proxy:ConnectAsync(nil, {})
+	end
+end
+
+function device:disconnect()
+	if self:get_connected() == true then
+		self._private.device_proxy:DisconnectAsync(nil, {})
+	end
+end
+
+function device:pair()
+	if self:get_paired() ~= true then
+		self._private.device_proxy:PairAsync(nil, {})
+	end
+end
+
+function device:cancel_pairing()
+	if self:get_paired() == true then
+		self._private.device_proxy:CancelPairingAsync(nil, {})
+	end
+end
+
+function device:set_trusted(trusted)
+	self._private.device_proxy:SetAsync(
+		nil,
+		{},
+		self._private.device_proxy.interface,
+		"Trusted",
+		lgi.GLib.Variant("b", trusted)
+	)
+	self._private.device_proxy.Trusted = {
+		signature = "b",
+		value = trusted
+	}
 end
 
 local function create_device_object(path)

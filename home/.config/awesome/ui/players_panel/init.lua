@@ -7,6 +7,18 @@ local dpi = beautiful.xresources.apply_dpi
 local capi = { screen = screen }
 local media_player = require("service.media_player").get_default()
 
+local function us_to_hms(us)
+	local total_s = us / 1000000
+	local h = math.floor(total_s / 3600)
+	local remaining_s = total_s % 3600
+	local m = math.floor(remaining_s / 60)
+	local s = remaining_s % 60
+
+	return (h > 0 and string.format("%02d", math.floor(h)) .. ":" or "")
+		.. string.format("%02d", math.floor(m)) .. ":"
+		.. string.format("%02d", math.floor(s))
+end
+
 local function on_player_added(self, name)
 	local player = media_player:get_player(name)
 	local players_layout = self.widget:get_children_by_id("players-layout")[1]
@@ -20,17 +32,21 @@ local function on_player_added(self, name)
 			{
 				layout = wibox.layout.fixed.horizontal,
 				fill_space = true,
-				spacing = dpi(5),
+				spacing = dpi(10),
 				{
-					id = "preview",
-					widget = wibox.widget.imagebox,
-					forced_width = 120,
-					forced_height = 120,
-					resize = true,
-					halign = "center",
-					valign = "center",
-					horizontal_fit_policy = "cover",
-					vertical_fit_policy = "cover"
+					widget = wibox.container.background,
+					shape = beautiful.rrect(dpi(6)),
+					{
+						id = "preview",
+						widget = wibox.widget.imagebox,
+						forced_width = 120,
+						forced_height = 120,
+						resize = true,
+						halign = "center",
+						valign = "center",
+						horizontal_fit_policy = "cover",
+						vertical_fit_policy = "cover"
+					}
 				},
 				{
 					layout = wibox.layout.align.vertical,
@@ -60,10 +76,69 @@ local function on_player_added(self, name)
 					{
 						layout = wibox.layout.fixed.vertical,
 						{
+							layout = wibox.layout.flex.horizontal,
+							{
+								widget = wibox.container.place,
+								halign = "left",
+								{
+									widget = wibox.container.background,
+									fg = beautiful.fg_alt,
+									{
+										id = "position",
+										widget = wibox.widget.textbox,
+										font = beautiful.font_h0
+									}
+								}
+							},
+							{
+								widget = wibox.container.place,
+								halign = "center",
+								{
+									layout = wibox.layout.fixed.horizontal,
+									spacing = dpi(5),
+									{
+										id = "previous",
+										widget = common.hover_button {
+											label = "",
+											margins = dpi(4),
+											shape = beautiful.rrect(dpi(6))
+										}
+									},
+									{
+										id = "play-pause",
+										widget = common.hover_button {
+											margins = dpi(4),
+											shape = beautiful.rrect(dpi(6))
+										}
+									},
+									{
+										id = "next",
+										widget = common.hover_button {
+											label = "",
+											margins = dpi(4),
+											shape = beautiful.rrect(dpi(6))
+										}
+									}
+								}
+							},
+							{
+								widget = wibox.container.place,
+								halign = "right",
+								{
+									widget = wibox.container.background,
+									fg = beautiful.fg_alt,
+									{
+										id = "length",
+										widget = wibox.widget.textbox,
+										font = beautiful.font_h0
+									}
+								}
+							}
+						},
+						{
 							id = "slider-container",
 							widget = wibox.container.margin,
-							forced_height = dpi(30),
-							margins = { left = dpi(5), right = dpi(5) },
+							forced_height = dpi(20),
 							{
 								id = "timeline",
 								widget = wibox.widget.slider,
@@ -80,46 +155,23 @@ local function on_player_added(self, name)
 								bar_shape = beautiful.rbar()
 							}
 						},
-						{
-							layout = wibox.layout.flex.horizontal,
-							spacing = dpi(5),
-							{
-								id = "previous",
-								widget = common.hover_button {
-									label = "prev",
-									bg_normal = beautiful.bg_urg
-								}
-							},
-							{
-								id = "play-pause",
-								widget = common.hover_button {
-									bg_normal = beautiful.bg_urg
-								}
-							},
-							{
-								id = "next",
-								widget = common.hover_button {
-									label = "next",
-									bg_normal = beautiful.bg_urg
-								}
-							}
-						}
 					}
 				}
 			}
 		}
 	}
 
-
-	player_widget._private.player_name = name
-
 	local preview_image = player_widget:get_children_by_id("preview")[1]
 	local title_text = player_widget:get_children_by_id("title")[1]
 	local artist_text = player_widget:get_children_by_id("artist")[1]
-	local timeline_slider = player_widget:get_children_by_id("timeline")[1]
 	local previous_button = player_widget:get_children_by_id("previous")[1]
 	local play_pause_button = player_widget:get_children_by_id("play-pause")[1]
 	local next_button = player_widget:get_children_by_id("next")[1]
+	local position_text = player_widget:get_children_by_id("position")[1]
+	local length_text = player_widget:get_children_by_id("length")[1]
+	local timeline_slider = player_widget:get_children_by_id("timeline")[1]
+
+	player_widget._private.player_name = name
 
 	player_widget._private.timeline_timer = gtimer {
 		timeout = 1,
@@ -129,9 +181,9 @@ local function on_player_added(self, name)
 		callback = function()
 			local length = player:get_metadata():get_length() or 1
 			local position = player:get_position()
-			local current = position/length*100
 
-			timeline_slider:set_value(current)
+			position_text:set_markup(us_to_hms(position))
+			timeline_slider:set_value(position/length*100)
 
 			if player_widget._private.timeline_timer then
 				player_widget._private.timeline_timer:again()
@@ -146,6 +198,8 @@ local function on_player_added(self, name)
 
 		local position = player:get_position() or 0
 		local length = metadata:get_length() or 1
+		position_text:set_markup(us_to_hms(position))
+		length_text:set_markup(us_to_hms(length))
 		timeline_slider:set_value(position/length*100)
 
 		local title = metadata:get_title()
@@ -154,10 +208,11 @@ local function on_player_added(self, name)
 		local artist = metadata:get_artist()
 		local artist_string = artist ~= nil and artist ~= {} and tostring(table.unpack(artist)) or nil
 		artist_text:set_markup(artist_string ~= nil and artist_string ~= "" and artist_string or "unknown artist")
+
 	end
 
 	player_widget._private.on_playback_status = function(_, status)
-		play_pause_button:set_label(status == "playing" and "pause" or "play")
+		play_pause_button:set_label(status == "playing" and "" or "")
 
 		if status ~= "playing" then
 			player_widget._private.timeline_timer:stop()
@@ -169,6 +224,8 @@ local function on_player_added(self, name)
 	player_widget._private.on_seeked = function(_, pos)
 		local position = pos
 		local length = player:get_metadata():get_length()
+		position_text:set_markup(us_to_hms(position))
+		length_text:set_markup(us_to_hms(length))
 		timeline_slider:set_value(position/length*100)
 
 		player_widget._private.timeline_timer:stop()
@@ -194,9 +251,11 @@ local function on_player_added(self, name)
 
 	local position = player:get_position() or 0
 	local length = player:get_metadata():get_length() or 1
+	position_text:set_markup(us_to_hms(position))
+	length_text:set_markup(us_to_hms(length))
 	timeline_slider:set_value(position/length*100)
 
-	play_pause_button:set_label(player:get_playback_status() == "playing" and "pause" or "play")
+	play_pause_button:set_label(player:get_playback_status() == "playing" and "" or "")
 
 	previous_button:buttons {
 		awful.button({}, 1, function()
