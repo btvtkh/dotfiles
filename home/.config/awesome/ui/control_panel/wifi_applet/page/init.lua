@@ -438,8 +438,8 @@ local function new()
 		end)
 	}
 
-	nm_client.wireless:connect_signal("property::access-points", function()
-		on_ap_list_changed(ret, nm_client.wireless:get_access_points())
+	nm_client.wireless:connect_signal("property::access-points", function(_, _, aps)
+		on_ap_list_changed(ret, aps)
 	end)
 
 	nm_client.wireless:connect_signal("property::state", function(_, state)
@@ -463,8 +463,4 @@ local function new()
 	return ret
 end
 
-return setmetatable({
-	new = new
-}, {
-	__call = new
-})
+return setmetatable({ new = new }, { __call = new })

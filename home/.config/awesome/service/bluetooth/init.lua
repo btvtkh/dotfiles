@@ -244,13 +244,13 @@ local function new()
 	ret._private.object_manager_proxy:connect_signal("InterfacesAdded", function(_, path)
 		if path:match("^/org/bluez/hci0/dev_%w%w_%w%w_%w%w_%w%w_%w%w_%w%w$") then
 			ret.devices[path] = create_device_object(path)
-			ret:emit_signal("device-added", path)
+			ret:emit_signal("device-added", path, ret:get_device(path))
 		end
 	end)
 
 	ret._private.object_manager_proxy:connect_signal("InterfacesRemoved", function(_, path)
 		if path:match("^/org/bluez/hci0/dev_%w%w_%w%w_%w%w_%w%w_%w%w_%w%w$")then
-			ret:emit_signal("device-removed", path)
+			ret:emit_signal("device-removed", path, ret:get_device(path))
 			ret.devices[path] = nil
 		end
 	end)
@@ -275,6 +275,4 @@ local function get_default()
 	return instance
 end
 
-return {
-	get_default = get_default
-}
+return { get_default = get_default }

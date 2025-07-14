@@ -424,11 +424,11 @@ local function new()
 	ret._private.settings_proxy:connect_signal("NewConnection", function(_, path)
 		local connection_object = create_connection_object(path)
 		ret.connections[path] = connection_object
-		ret:emit_signal("connection-added", path)
+		ret:emit_signal("connection-added", path, ret:get_connection(path))
 	end)
 
 	ret._private.settings_proxy:connect_signal("ConnectionRemoved", function(_, path)
-		ret:emit_signal("connection-removed", path)
+		ret:emit_signal("connection-removed", path, ret:get_connection(path))
 		ret.connections[path] = nil
 	end)
 
@@ -508,11 +508,11 @@ local function new()
 		ret.wireless._private.wireless_proxy:connect_signal("AccessPointAdded", function(_, path)
 			local access_point_object = create_access_point_object(path)
 			ret.wireless.access_points[path] = access_point_object
-			ret.wireless:emit_signal("access-point-added", path)
+			ret.wireless:emit_signal("access-point-added", path, ret.wireless:get_access_point(path))
 		end)
 
 		ret.wireless._private.wireless_proxy:connect_signal("AccessPointRemoved", function(_, path)
-			ret.wireless:emit_signal("access-point-removed", path)
+			ret.wireless:emit_signal("access-point-removed", path, ret.wireless:get_access_point(path))
 			ret.wireless.access_points[path] = nil
 		end)
 
@@ -528,10 +528,18 @@ local function new()
 	if ret.wireless._private.properties_proxy then
 		ret.wireless._private.properties_proxy:connect_signal("PropertiesChanged", function(_, _, props)
 			if props.AccessPoints ~= nil then
-				ret.wireless:emit_signal("property::access-points", props.AccessPoints)
+				ret.wireless:emit_signal(
+					"property::access-points",
+					props.AccessPoints,
+					ret.wireless:get_access_points()
+				)
 			end
 			if props.ActiveAccessPoint ~= nil then
-				ret.wireless:emit_signal("property::active-access-point", props.ActiveAccessPoint)
+				ret.wireless:emit_signal(
+					"property::active-access-point",
+					props.ActiveAccessPoint,
+					ret.wireless:get_access_point(props.ActiveAccessPoint)
+				)
 			end
 		end)
 	end
@@ -551,8 +559,7 @@ local function get_default()
 	return instance
 end
 
-return setmetatable({
-	get_default = get_default
-}, {
-	__index = network
-})
+return setmetatable(
+	{ get_default = get_default },
+	{ __index = network }
+)

@@ -1,5 +1,5 @@
 local awful = require("awful")
-local players = require("ui.players_panel").get_default()
+local players = require("ui.media").get_default()
 
 awful.keyboard.append_global_keybinding(
 	awful.key({ "Mod4" }, "k", function()

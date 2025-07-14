@@ -19,8 +19,7 @@ local function us_to_hms(us)
 		.. string.format("%02d", math.floor(s))
 end
 
-local function on_player_added(self, name)
-	local player = media_player:get_player(name)
+local function on_player_added(self, name, player)
 	local players_layout = self.widget:get_children_by_id("players-layout")[1]
 
 	local player_widget = wibox.widget {
@@ -304,8 +303,7 @@ local function on_player_added(self, name)
 	players_layout:insert(1, player_widget)
 end
 
-local function on_player_removed(self, name)
-	local player = media_player:get_player(name)
+local function on_player_removed(self, name, player)
 	local players_layout = self.widget:get_children_by_id("players-layout")[1]
 
 	for _, player_widget in ipairs(players_layout.children) do
@@ -395,16 +393,16 @@ local function new()
 		end)
 	}
 
-	media_player:connect_signal("player-added", function(_, name)
-		on_player_added(ret, name)
+	media_player:connect_signal("player-added", function(_, name, player)
+		on_player_added(ret, name, player)
 	end)
 
-	media_player:connect_signal("player-removed", function(_, name)
-		on_player_removed(ret, name)
+	media_player:connect_signal("player-removed", function(_, name, player)
+		on_player_removed(ret, name, player)
 	end)
 
-	for name, _ in pairs(media_player:get_players()) do
-		on_player_added(ret, name)
+	for name, player in pairs(media_player:get_players()) do
+		on_player_added(ret, name, player)
 	end
 
 	return ret

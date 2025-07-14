@@ -158,9 +158,9 @@ local function new()
 			if name:match("org%.mpris%.MediaPlayer2%.%w+") then
 				if old_owner == "" and new_owner ~= "" then
 					ret.players[name] = create_player_object(name)
-					ret:emit_signal("player-added", name)
+					ret:emit_signal("player-added", name, ret:get_player(name))
 				elseif old_owner ~= "" and new_owner == "" then
-					ret:emit_signal("player-removed", name)
+					ret:emit_signal("player-removed", name, ret:get_player(name))
 					ret.players[name] = nil
 				end
 			end
@@ -184,6 +184,4 @@ local function get_default()
 	return instance
 end
 
-return {
-	get_default = get_default
-}
+return { get_default = get_default }

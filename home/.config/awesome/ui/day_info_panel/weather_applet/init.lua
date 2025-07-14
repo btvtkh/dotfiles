@@ -365,8 +365,4 @@ local function new()
 	return ret
 end
 
-return setmetatable({
-	new = new
-}, {
-	__call = new
-})
+return setmetatable({ new = new }, { __call = new })

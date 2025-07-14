@@ -278,6 +278,4 @@ local function get_default()
 	return instance
 end
 
-return {
-	get_default = get_default
-}
+return { get_default = get_default }

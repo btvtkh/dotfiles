@@ -272,10 +272,11 @@ local function new(args)
 	return ret
 end
 
-return setmetatable({
-	new = new
-}, {
-	__call = function(_, ...)
-		return new(...)
-	end
-})
+return setmetatable(
+	{ new = new },
+	{
+		__call = function(_, ...)
+			return new(...)
+		end
+	}
+)

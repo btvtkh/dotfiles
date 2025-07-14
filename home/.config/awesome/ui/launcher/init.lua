@@ -217,6 +217,7 @@ function launcher:hide()
 	wp.filtered = {}
 	wp.select_index, wp.select_index = 1, 1
 	self.widget:get_children_by_id("text-input")[1]:unfocus()
+	self.widget:get_children_by_id("entries-layout")[1]:reset()
 	self.visible = false
 	self:emit_signal("property::shown", wp.shown)
 end
@@ -463,6 +464,4 @@ local function get_default()
 	return instance
 end
 
-return {
-	get_default = get_default
-}
+return { get_default = get_default }

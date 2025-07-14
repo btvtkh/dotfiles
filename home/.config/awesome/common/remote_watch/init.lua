@@ -41,10 +41,11 @@ local function new(command, interval, output_file, callback)
 	return timer
 end
 
-return setmetatable({
-	new = new
-}, {
-	__call = function(_, ...)
-		return new(...)
-	end
-})
+return setmetatable(
+	{ new = new },
+	{
+		__call = function(_, ...)
+			return new(...)
+		end
+	}
+)

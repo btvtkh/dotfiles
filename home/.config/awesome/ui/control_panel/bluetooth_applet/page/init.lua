@@ -88,8 +88,7 @@ local function create_dev_widget(path, device)
 	return device_widget
 end
 
-local function on_device_added(self, path)
-	local device = bt_adapter:get_device(path)
+local function on_device_added(self, path, device)
 	local devices_layout = self:get_children_by_id("devices-layout")[1]
 	local device_widget = create_dev_widget(path, device)
 
@@ -111,8 +110,7 @@ local function on_device_added(self, path)
 	end
 end
 
-local function on_device_removed(self, path)
-	local device = bt_adapter:get_device(path)
+local function on_device_removed(self, path, device)
 	local devices_layout = self:get_children_by_id("devices-layout")[1]
 
 	for _, device_widget in ipairs(devices_layout.children) do
@@ -168,8 +166,8 @@ local function on_powered(self, powered)
 			}
 		})
 
-		for _, dev in pairs(bt_adapter:get_devices()) do
-			on_device_added(self, dev:get_path())
+		for path, device in pairs(bt_adapter:get_devices()) do
+			on_device_added(self, path, device)
 		end
 
 		bt_adapter:start_discovery()
@@ -282,12 +280,12 @@ local function new()
 		end)
 	}
 
-	bt_adapter:connect_signal("device-added", function(_, path)
-		on_device_added(ret, path)
+	bt_adapter:connect_signal("device-added", function(_, path, device)
+		on_device_added(ret, path, device)
 	end)
 
-	bt_adapter:connect_signal("device-removed", function(_, path)
-		on_device_removed(ret, path)
+	bt_adapter:connect_signal("device-removed", function(_, path, device)
+		on_device_removed(ret, path, device)
 	end)
 
 	bt_adapter:connect_signal("property::discovering", function(_, dsc)
@@ -303,8 +301,4 @@ local function new()
 	return ret
 end
 
-return setmetatable({
-	new = new
-}, {
-	__call = new
-})
+return setmetatable({ new = new }, { __call = new })
