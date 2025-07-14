@@ -10,7 +10,6 @@ local user = require("user")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local lua_escape = require("lib.string").lua_escape
-local is_supported = require("lib.file").is_supported
 local table_to_file = require("lib.file").table_to_file
 local capi = { screen = screen }
 local powermenu = require("ui.powermenu").get_default()

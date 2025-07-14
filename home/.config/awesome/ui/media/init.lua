@@ -19,9 +19,7 @@ local function us_to_hms(us)
 		.. string.format("%02d", math.floor(s))
 end
 
-local function on_player_added(self, name, player)
-	local players_layout = self.widget:get_children_by_id("players-layout")[1]
-
+local function create_player_widget(name, player)
 	local player_widget = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
@@ -166,6 +164,7 @@ local function on_player_added(self, name, player)
 		}
 	}
 
+	local wp = player_widget._private
 	local preview_image = player_widget:get_children_by_id("preview")[1]
 	local title_text = player_widget:get_children_by_id("title")[1]
 	local artist_text = player_widget:get_children_by_id("artist")[1]
@@ -176,9 +175,9 @@ local function on_player_added(self, name, player)
 	local length_text = player_widget:get_children_by_id("length")[1]
 	local timeline_slider = player_widget:get_children_by_id("timeline")[1]
 
-	player_widget._private.player_name = name
+	wp.player_name = name
 
-	player_widget._private.timeline_timer = gtimer {
+	wp.timeline_timer = gtimer {
 		timeout = 1,
 		autostart = false,
 		single_shot = false,
@@ -190,13 +189,13 @@ local function on_player_added(self, name, player)
 			position_text:set_markup(us_to_hms(position))
 			timeline_slider:set_value(position/length*100)
 
-			if player_widget._private.timeline_timer then
-				player_widget._private.timeline_timer:again()
+			if wp.timeline_timer then
+				wp.timeline_timer:again()
 			end
 		end
 	}
 
-	player_widget._private.on_metadata = function(_, metadata)
+	wp.on_metadata = function(_, metadata)
 		local art_url = metadata:get_art_url()
 		preview_image:set_image(art_url ~= nil and art_url ~= ""
 			and string.gsub(art_url, "^file://", "") or os.getenv("HOME") .. "/Downloads/music.svg")
@@ -216,32 +215,32 @@ local function on_player_added(self, name, player)
 
 	end
 
-	player_widget._private.on_playback_status = function(_, status)
+	wp.on_playback_status = function(_, status)
 		play_pause_button:set_label(status == "playing" and "" or "")
 
 		if status ~= "playing" then
-			player_widget._private.timeline_timer:stop()
+			wp.timeline_timer:stop()
 		else
-			player_widget._private.timeline_timer:start()
+			wp.timeline_timer:start()
 		end
 	end
 
-	player_widget._private.on_seeked = function(_, pos)
+	wp.on_seeked = function(_, pos)
 		local position = pos
 		local length = player:get_metadata():get_length()
 		position_text:set_markup(us_to_hms(position))
 		length_text:set_markup(us_to_hms(length))
 		timeline_slider:set_value(position/length*100)
 
-		player_widget._private.timeline_timer:stop()
+		wp.timeline_timer:stop()
 		if player:get_playback_status() == "playing" then
-			player_widget._private.timeline_timer:start()
+			wp.timeline_timer:start()
 		end
 	end
 
-	player:connect_signal("property::metadata", player_widget._private.on_metadata)
-	player:connect_signal("property::playback-status", player_widget._private.on_playback_status)
-	player:connect_signal("seeked", player_widget._private.on_seeked)
+	player:connect_signal("property::metadata", wp.on_metadata)
+	player:connect_signal("property::playback-status", wp.on_playback_status)
+	player:connect_signal("seeked", wp.on_seeked)
 
 	local art_url = player:get_metadata():get_art_url()
 	preview_image:set_image(art_url ~= nil and art_url ~= ""
@@ -293,45 +292,10 @@ local function on_player_added(self, name, player)
 	}
 
 	if player:get_playback_status() == "playing" then
-		player_widget._private.timeline_timer:start()
+		wp.timeline_timer:start()
 	end
 
-	if not players_layout.children[1]._private.player_name then
-		players_layout:remove(1)
-	end
-
-	players_layout:insert(1, player_widget)
-end
-
-local function on_player_removed(self, name, player)
-	local players_layout = self.widget:get_children_by_id("players-layout")[1]
-
-	for _, player_widget in ipairs(players_layout.children) do
-		if player_widget._private.player_name == name then
-			player:disconnect_signal("property::metadata", player_widget._private.on_metadata)
-			player:disconnect_signal("property::playback-status", player_widget._private.on_playback_status)
-			player:disconnect_signal("seeked", player_widget._private.on_seeked)
-			player_widget._private.timeline_timer:stop()
-			player_widget._private.timeline_timer = nil
-
-			players_layout:remove_widgets(player_widget)
-
-			if #players_layout.children == 0 then
-				players_layout:add(wibox.widget {
-					widget = wibox.container.background,
-					forced_width = dpi(300),
-					forced_height = dpi(100),
-					fg = beautiful.fg_alt,
-					{
-						widget = wibox.widget.textbox,
-						align = "center",
-						font = beautiful.font_h2,
-						text = "Nothing playing"
-					}
-				})
-			end
-		end
-	end
+	return player_widget
 end
 
 local function new()
@@ -377,7 +341,52 @@ local function new()
 		}
 	}
 
+	local wp = ret._private
 	local players_layout = ret.widget:get_children_by_id("players-layout")[1]
+
+	wp.on_player_added = function(_, name, player)
+		if not players_layout.children[1]._private.player_name then
+			players_layout:remove(1)
+		end
+
+		players_layout:insert(1, create_player_widget(name, player))
+	end
+
+	wp.on_player_removed = function(_, name, player)
+		for _, player_widget in ipairs(players_layout.children) do
+			if player_widget._private.player_name == name then
+				player:disconnect_signal("property::metadata", player_widget._private.on_metadata)
+				player:disconnect_signal("property::playback-status", player_widget._private.on_playback_status)
+				player:disconnect_signal("seeked", player_widget._private.on_seeked)
+				player_widget._private.timeline_timer:stop()
+				player_widget._private.timeline_timer = nil
+
+				players_layout:remove_widgets(player_widget)
+
+				if #players_layout.children == 0 then
+					players_layout:add(wibox.widget {
+						widget = wibox.container.background,
+						forced_width = dpi(300),
+						forced_height = dpi(100),
+						fg = beautiful.fg_alt,
+						{
+							widget = wibox.widget.textbox,
+							align = "center",
+							font = beautiful.font_h2,
+							text = "Nothing playing"
+						}
+					})
+				end
+			end
+		end
+	end
+
+	media_player:connect_signal("player-added", wp.on_player_added)
+	media_player:connect_signal("player-removed", wp.on_player_removed)
+
+	for name, player in pairs(media_player:get_players()) do
+		wp.on_player_added(nil, name, player)
+	end
 
 	players_layout:buttons {
 		awful.button({}, 4, function()
@@ -392,18 +401,6 @@ local function new()
 			end
 		end)
 	}
-
-	media_player:connect_signal("player-added", function(_, name, player)
-		on_player_added(ret, name, player)
-	end)
-
-	media_player:connect_signal("player-removed", function(_, name, player)
-		on_player_removed(ret, name, player)
-	end)
-
-	for name, player in pairs(media_player:get_players()) do
-		on_player_added(ret, name, player)
-	end
 
 	return ret
 end

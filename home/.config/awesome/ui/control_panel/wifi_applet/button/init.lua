@@ -5,23 +5,6 @@ local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local nm_client = require("service.network").get_default()
 
-local function on_wireless_enabled(self, enabled)
-	local separator = self:get_children_by_id("separator")[1]
-	local description = self:get_children_by_id("description")[1]
-
-	if enabled then
-		self:set_bg(beautiful.ac)
-		self:set_fg(beautiful.bg)
-		separator:set_color(beautiful.bg)
-		description:set_markup("Enabled")
-	else
-		self:set_bg(beautiful.bg_alt)
-		self:set_fg(beautiful.fg)
-		separator:set_color(beautiful.bg_urg)
-		description:set_markup("Disabled")
-	end
-end
-
 local function new()
 	local ret = wibox.widget {
 		widget = wibox.container.background,
@@ -93,8 +76,42 @@ local function new()
 		}
 	}
 
+	local wp = ret._private
 	local label_background = ret:get_children_by_id("label-background")[1]
+	local description = ret:get_children_by_id("description")[1]
 	local separator = ret:get_children_by_id("separator")[1]
+
+	wp.on_wireless_enabled = function(_, enabled)
+		if enabled then
+			ret:set_bg(beautiful.ac)
+			ret:set_fg(beautiful.bg)
+			separator:set_color(beautiful.bg)
+			description:set_markup("Enabled")
+		else
+			ret:set_bg(beautiful.bg_alt)
+			ret:set_fg(beautiful.fg)
+			separator:set_color(beautiful.bg_urg)
+			description:set_markup("Disabled")
+		end
+	end
+
+	wp.on_mouse_enter = function()
+		if not nm_client:get_wireless_enabled() then
+			ret:set_bg(beautiful.bg_urg)
+			separator:set_color(beautiful.fg_alt)
+		end
+	end
+
+	wp.on_mouse_leave = function()
+		if not nm_client:get_wireless_enabled() then
+			ret:set_bg(beautiful.bg_alt)
+			separator:set_color(beautiful.bg_urg)
+		end
+	end
+
+	nm_client:connect_signal("property::wireless-enabled", wp.on_wireless_enabled)
+	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
+	ret:connect_signal("mouse::leave", wp.on_mouse_leave)
 
 	label_background:buttons {
 		awful.button({}, 1, function()
@@ -102,25 +119,7 @@ local function new()
 		end)
 	}
 
-	ret:connect_signal("mouse::enter", function()
-		if not nm_client:get_wireless_enabled() then
-			ret:set_bg(beautiful.bg_urg)
-			separator:set_color(beautiful.fg_alt)
-		end
-	end)
-
-	ret:connect_signal("mouse::leave", function()
-		if not nm_client:get_wireless_enabled() then
-			ret:set_bg(beautiful.bg_alt)
-			separator:set_color(beautiful.bg_urg)
-		end
-	end)
-
-	nm_client:connect_signal("property::wireless-enabled", function(_, enabled)
-		on_wireless_enabled(ret, enabled)
-	end)
-
-	on_wireless_enabled(ret, nm_client:get_wireless_enabled())
+	wp.on_wireless_enabled(nil, nm_client:get_wireless_enabled())
 
 	return ret
 end

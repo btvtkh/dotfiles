@@ -76,71 +76,7 @@ local function create_ap_widget(self, ap)
 	return ap_widget
 end
 
-local function on_ap_list_changed(self, aps)
-	local wp = self._private
-	local aps_layout = self:get_children_by_id("access-points-layout")[1]
 
-	wp.ap_widgets = {}
-
-	for _, ap in pairs(aps) do
-		if ap:get_ssid() ~= nil then
-			local ap_widget = create_ap_widget(self, ap)
-			table.insert(wp.ap_widgets, ap_widget)
-		end
-	end
-
-	if aps_layout.children[1] ~= wp.ap_menu and #wp.ap_widgets ~= 0 then
-		aps_layout:reset()
-		for _, ap_widget in ipairs(wp.ap_widgets) do
-			if ap_widget._private.is_active then
-				aps_layout:insert(1, ap_widget)
-			else
-				aps_layout:add(ap_widget)
-			end
-		end
-	end
-end
-
-local function on_wireless_enabled(self, enabled)
-	local wp = self._private
-	local aps_layout = self:get_children_by_id("access-points-layout")[1]
-	local bottombar_toggle_button = self:get_children_by_id("bottombar-toggle-button")[1]
-	local password_input = wp.ap_menu:get_children_by_id("password-input")[1]
-
-	if enabled then
-		bottombar_toggle_button:set_label(text_icons.switch_on)
-		aps_layout:reset()
-		aps_layout:add(wibox.widget {
-			widget = wibox.container.background,
-			fg = beautiful.fg_alt,
-			forced_height = dpi(400),
-			{
-				widget = wibox.widget.textbox,
-				align = "center",
-				font = beautiful.font_h2,
-				markup = text_icons.wait
-			}
-		})
-	else
-		wp.ap_widgets = {}
-		bottombar_toggle_button:set_label(text_icons.switch_off)
-		aps_layout:reset()
-
-		aps_layout:add(wibox.widget {
-			widget = wibox.container.background,
-			fg = beautiful.fg_alt,
-			forced_height = dpi(400),
-			{
-				widget = wibox.widget.textbox,
-				align = "center",
-				font = beautiful.font_h2,
-				markup = "Wifi Disabled"
-			}
-		})
-
-		password_input:unfocus()
-	end
-end
 
 function wifi_page:open_ap_menu(ap)
 	local wp = self._private
@@ -243,7 +179,8 @@ function wifi_page:close_ap_menu()
 end
 
 function wifi_page:refresh()
-	on_ap_list_changed(self, nm_client.wireless:get_access_points())
+	local wp = self._private
+	wp.on_ap_list(nil, nil, nm_client.wireless:get_access_points())
 	nm_client.wireless:request_scan()
 end
 
@@ -421,8 +358,79 @@ local function new()
 		}
 	}
 
+	local aps_layout = ret:get_children_by_id("access-points-layout")[1]
 	local bottombar_toggle_button = ret:get_children_by_id("bottombar-toggle-button")[1]
 	local bottombar_refresh_button = ret:get_children_by_id("bottombar-refresh-button")[1]
+	local password_input = wp.ap_menu:get_children_by_id("password-input")[1]
+
+	wp.on_wireless_enabled = function(_, enabled)
+		if enabled then
+			bottombar_toggle_button:set_label(text_icons.switch_on)
+			aps_layout:reset()
+			aps_layout:add(wibox.widget {
+				widget = wibox.container.background,
+				fg = beautiful.fg_alt,
+				forced_height = dpi(400),
+				{
+					widget = wibox.widget.textbox,
+					align = "center",
+					font = beautiful.font_h2,
+					markup = text_icons.wait
+				}
+			})
+		else
+			wp.ap_widgets = {}
+			bottombar_toggle_button:set_label(text_icons.switch_off)
+			aps_layout:reset()
+
+			aps_layout:add(wibox.widget {
+				widget = wibox.container.background,
+				fg = beautiful.fg_alt,
+				forced_height = dpi(400),
+				{
+					widget = wibox.widget.textbox,
+					align = "center",
+					font = beautiful.font_h2,
+					markup = "Wifi Disabled"
+				}
+			})
+
+			password_input:unfocus()
+		end
+	end
+
+	wp.on_ap_list = function(_, _, aps)
+		wp.ap_widgets = {}
+
+		for _, ap in pairs(aps) do
+			if ap:get_ssid() ~= nil then
+				local ap_widget = create_ap_widget(ret, ap)
+				table.insert(wp.ap_widgets, ap_widget)
+			end
+		end
+
+		if aps_layout.children[1] ~= wp.ap_menu and #wp.ap_widgets ~= 0 then
+			aps_layout:reset()
+			for _, ap_widget in ipairs(wp.ap_widgets) do
+				if ap_widget._private.is_active then
+					aps_layout:insert(1, ap_widget)
+				else
+					aps_layout:add(ap_widget)
+				end
+			end
+		end
+	end
+
+	wp.on_wireless_state = function(_, state)
+		if state == network.DeviceState.ACTIVATED
+		or state == network.DeviceState.DISCONNECTED then
+			wp.on_ap_list(nil, nil, nm_client.wireless:get_access_points())
+		end
+	end
+
+	nm_client.wireless:connect_signal("property::access-points", wp.on_ap_list)
+	nm_client.wireless:connect_signal("property::state", wp.on_wireless_state)
+	nm_client:connect_signal("property::wireless-enabled", wp.on_wireless_enabled)
 
 	bottombar_toggle_button:buttons {
 		awful.button({}, 1, function()
@@ -438,27 +446,8 @@ local function new()
 		end)
 	}
 
-	nm_client.wireless:connect_signal("property::access-points", function(_, _, aps)
-		on_ap_list_changed(ret, aps)
-	end)
-
-	nm_client.wireless:connect_signal("property::state", function(_, state)
-		if state == network.DeviceState.ACTIVATED
-		or state == network.DeviceState.DISCONNECTED then
-			on_ap_list_changed(ret, nm_client.wireless:get_access_points())
-		end
-	end)
-
-	nm_client:connect_signal("property::wireless-enabled", function(_, enabled)
-		on_wireless_enabled(ret, enabled)
-	end)
-
-	on_wireless_enabled(ret, nm_client:get_wireless_enabled())
-
-	if nm_client.wireless:get_state() == network.DeviceState.ACTIVATED
-	or nm_client.wireless:get_state() == network.DeviceState.DISCONNECTED then
-		on_ap_list_changed(ret, nm_client.wireless:get_access_points())
-	end
+	wp.on_wireless_enabled(nil, nm_client:get_wireless_enabled())
+	wp.on_wireless_state(nil, nm_client.wireless:get_state())
 
 	return ret
 end

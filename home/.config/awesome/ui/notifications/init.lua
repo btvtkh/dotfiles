@@ -9,37 +9,22 @@ local ncr = naughty.notification_closed_reason
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local create_markup = require("lib.string").create_markup
-local remove_nonindex = require("lib.table").remove_nonindex
 
 local notifications = {}
 
-local function update_positions(screen)
-	if #screen.notifications > 0 then
-		for i = 1, #screen.notifications do
-			screen.notifications[i]:geometry({
+local function update_positions(self)
+	if #self.popups > 0 then
+		for i = 1, #self.popups do
+			local screen = self._private.screen
+			self.popups[i]:geometry({
 				x = screen.workarea.x + screen.workarea.width
-					- beautiful.notification_margins - screen.notifications[i].width,
-				y = i > 1 and screen.notifications[i - 1].y
-					+ screen.notifications[i - 1].height + beautiful.notification_spacing
+					- beautiful.notification_margins - self.popups[i].width,
+				y = i > 1 and self.popups[i - 1].y
+					+ self.popups[i - 1].height + beautiful.notification_spacing
 					or screen.workarea.y + beautiful.notification_margins
 			})
 		end
 	end
-end
-
-local function add_popup(popup, screen)
-	if not popup then return end
-	table.insert(screen.notifications, 1, popup)
-	popup.visible = true
-	update_positions(screen)
-end
-
-local function remove_popup(popup, screen)
-	if not popup then return end
-	remove_nonindex(screen.notifications, popup)
-	popup.visible = false
-	popup = nil
-	update_positions(screen)
 end
 
 local function create_actions_widget(n)
@@ -82,7 +67,7 @@ local function create_actions_widget(n)
 	return actions_widget
 end
 
-local function create_notification_popup(n)
+local function create_notification_popup(self, n)
 	local popup_widget = awful.popup {
 		type = "notification",
 		screen = n.screen,
@@ -198,7 +183,26 @@ local function create_notification_popup(n)
 		}
 	}
 
+	local wp = popup_widget._private
 	local close = popup_widget.widget:get_children_by_id("close")[1]
+
+	wp.notification = n
+
+	wp.display_timer = gtimer {
+		timeout = beautiful.notification_timeout or 5,
+		autostart = false,
+		single_shot = true,
+		call_now = false,
+		callback = function()
+			popup_widget.visible = false
+			for i, p in ipairs(self.popups) do
+				if p == popup_widget then
+					table.remove(self.popups, i)
+				end
+			end
+			wp.display_timer = nil
+		end
+	}
 
 	close:buttons {
 		awful.button({}, 1, function()
@@ -209,47 +213,51 @@ local function create_notification_popup(n)
 	return popup_widget
 end
 
-function notifications.display(n)
-	if not n then return end
-	local notification_popup = create_notification_popup(n)
-	local display_timer = gtimer {
-		timeout = beautiful.notification_timeout or 5,
-		callback = function()
-			remove_popup(notification_popup, n.screen)
-		end
-	}
-
-	n:connect_signal("destroyed", function()
-		display_timer:stop()
-		display_timer = nil
-		remove_popup(notification_popup, n.screen)
-	end)
-
-	add_popup(notification_popup, n.screen)
-
-	if display_timer then
-		display_timer:start()
-	end
-end
-
-local function new()
+local function new(s)
+	if not s then return end
 	local ret = {}
 	gtable.crush(ret, notifications, true)
+	ret._private = {}
+	local wp = ret._private
 
-	awful.screen.connect_for_each_screen(function(s)
-		s.notifications = {}
-	end)
+	wp.screen = s
+	ret.popups = {}
 
-	require("ui.notification.screenshots")
+	wp.on_added = function(n)
+		if n.screen == wp.screen then
+			local popup = create_notification_popup(ret, n)
+			table.insert(ret.popups, 1, popup)
+			popup.visible = true
+			update_positions(ret)
+			popup._private.display_timer:start()
+		end
+	end
+
+	wp.on_destroyed = function(n)
+		for i, popup in ipairs(ret.popups) do
+			if popup.screen == n.screen and popup._private.notification == n then
+				if popup._private.display_timer then
+					popup._private.display_timer:stop()
+					popup._private.display_timer = nil
+				end
+				popup.visible = false
+				table.remove(ret.popups, i)
+				update_positions(ret)
+			end
+		end
+	end
+
+	naughty.connect_signal("destroyed", wp.on_destroyed)
+	naughty.connect_signal("added", wp.on_added)
+
 	return ret
 end
 
-local instance = nil
-local function get_default()
-	if not instance then
-		instance = new()
-	end
-	return instance
-end
-
-return { get_default = get_default }
+return setmetatable(
+	{ new = new },
+	{
+		__call = function(_, ...)
+			return new(...)
+		end
+	}
+)

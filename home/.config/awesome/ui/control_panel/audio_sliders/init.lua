@@ -111,17 +111,22 @@ local function new()
 		}
 	}
 
+	local wp = ret._private
 	local speaker_mute = ret:get_children_by_id("speaker-mute-button")[1]
 	local speaker_icon = ret:get_children_by_id("speaker-mute-button-icon")[1]
 	local speaker_slider = ret:get_children_by_id("speaker-slider")[1]
 	local speaker_value = ret:get_children_by_id("speaker-volume-value")[1]
+	local microphone_mute = ret:get_children_by_id("microphone-mute-button")[1]
+	local microphone_icon = ret:get_children_by_id("microphone-mute-button-icon")[1]
+	local microphone_slider = ret:get_children_by_id("microphone-slider")[1]
+	local microphone_value = ret:get_children_by_id("microphone-volume-value")[1]
 
-	audio:connect_signal("default-sink::volume", function(_, val)
+	wp.on_sink_volume = function(_, val)
 		speaker_slider:set_value(tonumber(val) / 5)
 		speaker_value:set_markup(val .. "%")
-	end)
+	end
 
-	audio:connect_signal("default-sink::mute", function(_, mute)
+	wp.on_sink_mute = function(_, mute)
 		if mute then
 			speaker_icon:set_markup(text_icons.vol_off)
 			speaker_slider:set_bar_active_color(beautiful.fg_alt)
@@ -131,7 +136,49 @@ local function new()
 			speaker_slider:set_bar_active_color(beautiful.ac)
 			speaker_slider:set_handle_border_color(beautiful.ac)
 		end
-	end)
+	end
+
+	wp.on_speaker_mute_mouse_enter = function()
+		speaker_mute:set_bg(beautiful.bg_urg)
+	end
+
+	wp.on_speaker_mute_mouse_leave = function()
+		speaker_mute:set_bg(nil)
+	end
+
+	wp.on_source_volume = function(_, val)
+		microphone_slider:set_value(tonumber(val) / 5)
+		microphone_value:set_markup(val .. "%")
+	end
+
+	wp.on_source_mute = function(_, mute)
+		if mute then
+			microphone_icon:set_markup(text_icons.mic_off)
+			microphone_slider:set_bar_active_color(beautiful.fg_alt)
+			microphone_slider:set_handle_border_color(beautiful.fg_alt)
+		else
+			microphone_icon:set_markup(text_icons.mic_on)
+			microphone_slider:set_bar_active_color(beautiful.ac)
+			microphone_slider:set_handle_border_color(beautiful.ac)
+		end
+	end
+
+	wp.on_microphone_mute_mouse_enter = function()
+		microphone_mute:set_bg(beautiful.bg_urg)
+	end
+
+	wp.on_microphone_mute_mouse_leave = function()
+		microphone_mute:set_bg(nil)
+	end
+
+	audio:connect_signal("default-sink::volume", wp.on_sink_volume)
+	audio:connect_signal("default-sink::mute", wp.on_sink_mute)
+	audio:connect_signal("default-source::volume", wp.on_source_volume)
+	audio:connect_signal("default-source::mute", wp.on_source_mute)
+	speaker_mute:connect_signal("mouse::enter", wp.on_speaker_mute_mouse_enter)
+	speaker_mute:connect_signal("mouse::leave", wp.on_speaker_mute_mouse_leave)
+	microphone_mute:connect_signal("mouse::enter", wp.on_microphone_mute_mouse_enter)
+	microphone_mute:connect_signal("mouse::leave", wp.on_microphone_mute_mouse_leave)
 
 	speaker_slider:buttons {
 		awful.button({}, 1, function()
@@ -142,42 +189,12 @@ local function new()
 		end)
 	}
 
-	speaker_mute:connect_signal("mouse::enter", function()
-		speaker_mute:set_bg(beautiful.bg_urg)
-	end)
-
-	speaker_mute:connect_signal("mouse::leave", function()
-		speaker_mute:set_bg(nil)
-	end)
-
 	speaker_mute:buttons {
 		awful.button({}, 1, function()
 			audio:toggle_default_sink_mute()
 			audio:get_default_sink_data()
 		end)
 	}
-
-	local microphone_mute = ret:get_children_by_id("microphone-mute-button")[1]
-	local microphone_icon = ret:get_children_by_id("microphone-mute-button-icon")[1]
-	local microphone_slider = ret:get_children_by_id("microphone-slider")[1]
-	local microphone_value = ret:get_children_by_id("microphone-volume-value")[1]
-
-	audio:connect_signal("default-source::volume", function(_, val)
-		microphone_slider:set_value(tonumber(val) / 5)
-		microphone_value:set_markup(val .. "%")
-	end)
-
-	audio:connect_signal("default-source::mute", function(_, mute)
-		if mute then
-			microphone_icon:set_markup(text_icons.mic_off)
-			microphone_slider:set_bar_active_color(beautiful.fg_alt)
-			microphone_slider:set_handle_border_color(beautiful.fg_alt)
-		else
-			microphone_icon:set_markup(text_icons.mic_on)
-			microphone_slider:set_bar_active_color(beautiful.ac)
-			microphone_slider:set_handle_border_color(beautiful.ac)
-		end
-	end)
 
 	microphone_slider:buttons {
 		awful.button({}, 1, function()
@@ -187,14 +204,6 @@ local function new()
 			end)
 		end)
 	}
-
-	microphone_mute:connect_signal("mouse::enter", function()
-		microphone_mute:set_bg(beautiful.bg_urg)
-	end)
-
-	microphone_mute:connect_signal("mouse::leave", function()
-		microphone_mute:set_bg(nil)
-	end)
 
 	microphone_mute:buttons {
 		awful.button({}, 1, function()

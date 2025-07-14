@@ -304,46 +304,6 @@ local function create_daily(data)
 	return widget
 end
 
-function weather_applet:setup_widget(data)
-	local main_layout = self:get_children_by_id("main-layout")[1]
-
-	main_layout:reset()
-
-	if data then
-		data = data[1] or data
-		main_layout:add(
-			create_current(data),
-			create_hourly(data),
-			wibox.widget {
-				widget = wibox.container.margin,
-				forced_width = 1,
-				forced_height = beautiful.separator_thickness,
-				margins = { left = dpi(10), right = dpi(10) },
-				{
-					widget = wibox.widget.separator,
-					orientation = "horizontal"
-				}
-			},
-			create_daily(data)
-		)
-	else
-		local err_msg = wibox.widget {
-			widget = wibox.container.background,
-			bg = beautiful.bg_alt,
-			fg = beautiful.fg_alt,
-			forced_height = dpi(100),
-			{
-				widget = wibox.widget.textbox,
-				align = "center",
-				font = beautiful.font_h2,
-				markup = "No weather data"
-			}
-		}
-
-		main_layout:add(err_msg)
-	end
-end
-
 local function new()
 	local ret = wibox.widget {
 		widget = wibox.container.background,
@@ -357,10 +317,48 @@ local function new()
 	}
 
 	gtable.crush(ret, weather_applet, true)
+	local wp = ret._private
+	local main_layout = ret:get_children_by_id("main-layout")[1]
 
-	weather:connect_signal("data-received", function(_, data)
-		ret:setup_widget(data)
-	end)
+	wp.on_data_received = function(_, data)
+		main_layout:reset()
+
+		if data then
+			data = data[1] or data
+			main_layout:add(
+				create_current(data),
+				create_hourly(data),
+				wibox.widget {
+					widget = wibox.container.margin,
+					forced_width = 1,
+					forced_height = beautiful.separator_thickness,
+					margins = { left = dpi(10), right = dpi(10) },
+					{
+						widget = wibox.widget.separator,
+						orientation = "horizontal"
+					}
+				},
+				create_daily(data)
+			)
+		else
+			local err_msg = wibox.widget {
+				widget = wibox.container.background,
+				bg = beautiful.bg_alt,
+				fg = beautiful.fg_alt,
+				forced_height = dpi(100),
+				{
+					widget = wibox.widget.textbox,
+					align = "center",
+					font = beautiful.font_h2,
+					markup = "No weather data"
+				}
+			}
+
+			main_layout:add(err_msg)
+		end
+	end
+
+	weather:connect_signal("data-received", wp.on_data_received)
 
 	return ret
 end

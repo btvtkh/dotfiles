@@ -3,6 +3,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local common = require("common")
 local text_icons = beautiful.text_icons
+local has_common = require("lib.table").has_common
 local dpi = beautiful.xresources.apply_dpi
 local capi = { client = client }
 local menu = require("ui.menu").get_default()
@@ -167,38 +168,6 @@ local function kblayout()
 		shape = beautiful.rrect(dpi(8)),
 		{
 			widget = awful.widget.keyboardlayout {}
-		}
-	}
-
-	widget:connect_signal("mouse::enter", function(w)
-		w:set_bg(beautiful.bg_urg)
-	end)
-
-	widget:connect_signal("mouse::leave", function(w)
-		w:set_bg(beautiful.bg_alt)
-	end)
-
-	return widget
-end
-
-local function layoutbox(s)
-	local widget = wibox.widget {
-		widget = wibox.container.background,
-		bg = beautiful.bg_alt,
-		shape = beautiful.rrect(dpi(8)),
-		buttons = {
-			awful.button({ }, 1, function()
-				awful.layout.inc(1)
-			end)
-		},
-		{
-			widget = wibox.container.margin,
-			margins = dpi(7),
-			{
-				widget = awful.widget.layoutbox {
-					screen = s
-				}
-			}
 		}
 	}
 
@@ -418,7 +387,7 @@ local function tasklist(s)
 end
 
 function bar.create_secondary(s)
-	return awful.wibar {
+	local ret = awful.wibar {
 		position = "bottom",
 		ontop = true,
 		screen = s,
@@ -442,7 +411,6 @@ function bar.create_secondary(s)
 							{
 								layout = wibox.layout.fixed.horizontal,
 								spacing = dpi(5),
-								--layoutbox(s),
 								taglist(s),
 								tasklist(s)
 							}
@@ -452,10 +420,45 @@ function bar.create_secondary(s)
 			}
 		}
 	}
+
+	local wp = ret._private
+
+	wp.on_client_manage = function(c)
+		local focused_screen = awful.screen.focused({ client = true })
+
+		if ret.screen == focused_screen
+		and has_common(c:tags(), focused_screen.selected_tags) then
+			if c.fullscreen then
+				ret.visible = false
+			else
+				ret.visible = true
+			end
+		end
+	end
+
+	wp.on_client_unmanage = function(c)
+		local focused_screen = awful.screen.focused({ client = true })
+
+		if ret.screen == focused_screen then
+			if c.fullscreen then
+				ret.visible = true
+			end
+		end
+	end
+
+	capi.client.connect_signal("request::manage", wp.on_client_manage)
+	capi.client.connect_signal("focus", wp.on_client_manage)
+	capi.client.connect_signal("property::fullscreen", wp.on_client_manage)
+
+	capi.client.connect_signal("request::unmanage", wp.on_client_unmanage)
+	capi.client.connect_signal("unfocus", wp.on_client_unmanage)
+	capi.client.connect_signal("property::minimized", wp.on_client_unmanage)
+
+	return ret
 end
 
 function bar.create_primary(s)
-	return awful.wibar {
+	local ret = awful.wibar {
 		position = "bottom",
 		ontop = true,
 		screen = s,
@@ -481,7 +484,6 @@ function bar.create_primary(s)
 								layout = wibox.layout.fixed.horizontal,
 								spacing = dpi(5),
 								launcher_button(),
-								--layoutbox(s),
 								taglist(s),
 								tasklist(s)
 							}
@@ -506,6 +508,41 @@ function bar.create_primary(s)
 			}
 		}
 	}
+
+	local wp = ret._private
+
+	wp.on_client_manage = function(c)
+		local focused_screen = awful.screen.focused({ client = true })
+
+		if ret.screen == focused_screen
+		and has_common(c:tags(), focused_screen.selected_tags) then
+			if c.fullscreen then
+				ret.visible = false
+			else
+				ret.visible = true
+			end
+		end
+	end
+
+	wp.on_client_unmanage = function(c)
+		local focused_screen = awful.screen.focused({ client = true })
+
+		if ret.screen == focused_screen then
+			if c.fullscreen then
+				ret.visible = true
+			end
+		end
+	end
+
+	capi.client.connect_signal("request::manage", wp.on_client_manage)
+	capi.client.connect_signal("focus", wp.on_client_manage)
+	capi.client.connect_signal("property::fullscreen", wp.on_client_manage)
+
+	capi.client.connect_signal("request::unmanage", wp.on_client_unmanage)
+	capi.client.connect_signal("unfocus", wp.on_client_unmanage)
+	capi.client.connect_signal("property::minimized", wp.on_client_unmanage)
+
+	return ret
 end
 
 return bar
