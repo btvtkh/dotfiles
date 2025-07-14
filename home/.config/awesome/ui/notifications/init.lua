@@ -1,7 +1,6 @@
 local awful = require("awful")
 local naughty = require("naughty")
 local wibox = require("wibox")
-local gtable = require("gears.table")
 local gtimer = require("gears.timer")
 local common = require("common")
 local beautiful = require("beautiful")
@@ -9,8 +8,6 @@ local ncr = naughty.notification_closed_reason
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local create_markup = require("lib.string").create_markup
-
-local notifications = {}
 
 local function update_positions(self)
 	if #self.popups > 0 then
@@ -216,7 +213,6 @@ end
 local function new(s)
 	if not s then return end
 	local ret = {}
-	gtable.crush(ret, notifications, true)
 	ret._private = {}
 	local wp = ret._private
 
