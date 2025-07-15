@@ -6,8 +6,8 @@ local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local bt_adapter = require("service.bluetooth").get_default()
 
-local function create_dev_widget(path, device)
-	local device_widget = wibox.widget {
+local function create_device_widget(path, device)
+	local ret = wibox.widget {
 		widget = wibox.container.background,
 		shape = beautiful.rrect(dpi(10)),
 		forced_height = dpi(40),
@@ -37,9 +37,9 @@ local function create_dev_widget(path, device)
 		}
 	}
 
-	local wp = device_widget._private
-	local name = device_widget:get_children_by_id("name")[1]
-	local percentage = device_widget:get_children_by_id("percentage")[1]
+	local wp = ret._private
+	local name = ret:get_children_by_id("name")[1]
+	local percentage = ret:get_children_by_id("percentage")[1]
 
 	wp.device_path = path
 
@@ -64,8 +64,8 @@ local function create_dev_widget(path, device)
 
 	device:connect_signal("property::connected", wp.on_connected)
 	device:connect_signal("property::percentage", wp.on_percentage)
-	device_widget:connect_signal("mouse::enter", wp.on_mouse_enter)
-	device_widget:connect_signal("mouse::leave", wp.on_mouse_leave)
+	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
+	ret:connect_signal("mouse::leave", wp.on_mouse_leave)
 
 	name:set_markup(
 		(device:get_connected() and text_icons.check .. " " or "")
@@ -76,7 +76,7 @@ local function create_dev_widget(path, device)
 		device:get_percentage() and string.format("%.0f%%", device:get_percentage()) or ""
 	)
 
-	device_widget:buttons {
+	ret:buttons {
 		awful.button({}, 1, function()
 			if not device:get_connected() then
 				device:connect()
@@ -86,7 +86,7 @@ local function create_dev_widget(path, device)
 		end)
 	}
 
-	return device_widget
+	return ret
 end
 
 local function new()
@@ -164,7 +164,7 @@ local function new()
 	local bottombar_discover_button = ret:get_children_by_id("bottombar-discover-button")[1]
 
 	wp.on_device_added = function(_, path, device)
-		local device_widget = create_dev_widget(path, device)
+		local device_widget = create_device_widget(path, device)
 
 		if #devices_layout.children == 1
 		and not devices_layout.children[1]._private.device_path then

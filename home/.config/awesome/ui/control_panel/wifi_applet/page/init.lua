@@ -11,11 +11,7 @@ local nm_client = network.get_default()
 local wifi_page = {}
 
 local function create_ap_widget(self, ap)
-	local ap_ssid = ap:get_ssid()
-	local ap_strength = ap:get_strength()
-	local is_active = ap:get_path() == nm_client.wireless:get_active_access_point_path()
-
-	local ap_widget = wibox.widget {
+	local ret = wibox.widget {
 		widget = wibox.container.background,
 		shape = beautiful.rrect(dpi(10)),
 		{
@@ -41,22 +37,25 @@ local function create_ap_widget(self, ap)
 		}
 	}
 
+	local wp = ret._private
+	local name = ret:get_children_by_id("name")[1]
+	local strength = ret:get_children_by_id("strength")[1]
+	local ap_ssid = ap:get_ssid()
+	local ap_strength = ap:get_strength()
+	local is_active = ap:get_path() == nm_client.wireless:get_active_access_point_path()
 
-	ap_widget._private.is_active = is_active
+	wp.is_active = is_active
 
-	local name = ap_widget:get_children_by_id("name")[1]
-	local strength = ap_widget:get_children_by_id("strength")[1]
-
-	ap_widget._private.on_mouse_enter = function(w)
-		w:set_bg(beautiful.bg_urg)
+	wp.on_mouse_enter = function()
+		ret:set_bg(beautiful.bg_urg)
 	end
 
-	ap_widget._private.on_mouse_leave = function(w)
-		w:set_bg(nil)
+	wp.on_mouse_leave = function()
+		ret:set_bg(nil)
 	end
 
-	ap_widget:connect_signal("mouse::enter", ap_widget._private.on_mouse_enter)
-	ap_widget:connect_signal("mouse::leave", ap_widget._private.on_mouse_leave)
+	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
+	ret:connect_signal("mouse::leave", wp.on_mouse_leave)
 
 	name:set_markup(is_active and text_icons.check .. " " .. ap_ssid or ap_ssid)
 
@@ -67,16 +66,14 @@ local function create_ap_widget(self, ap)
 		or "▂"
 	)
 
-	ap_widget:buttons {
+	ret:buttons {
 		awful.button({}, 1, function()
 			self:open_ap_menu(ap)
 		end)
 	}
 
-	return ap_widget
+	return ret
 end
-
-
 
 function wifi_page:open_ap_menu(ap)
 	local wp = self._private

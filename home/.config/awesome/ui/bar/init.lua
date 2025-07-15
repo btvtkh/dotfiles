@@ -10,7 +10,7 @@ local Client_list = require("ui.bar.client_list")
 local Tag_list = require("ui.bar.tag_list")
 local Tray = require("ui.bar.tray")
 local Time = require("ui.bar.time")
-local Kblayout = require("ui.bar.kblayout")
+local Kb_layout = require("ui.bar.kb_layout")
 local launcher = require("ui.launcher").get_default()
 local control_panel = require("ui.control_panel").get_default()
 
@@ -162,7 +162,7 @@ function bar.create_primary(s)
 								layout = wibox.layout.fixed.horizontal,
 								spacing = dpi(5),
 								Tray(),
-								Kblayout(),
+								Kb_layout(),
 								Time(),
 								Control_panel_button()
 							}
