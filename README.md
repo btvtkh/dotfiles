@@ -97,15 +97,15 @@ $ cp -r Sharp-Cursors ~/.icons
 | `Mod+Tab`             | Switch to next client by index           |
 | `Mod+Shift+Tab`       | Switch to previus client by index        |
 | `Mod+Ctrl+Tab`        | Restore minimized client                 |
-| `Mod+Shift+s`         | Swap with next client by index           |
-| `Mod+Ctrl+s`          | Swap with previous client by index       |
-| `Mod+Shift+a`         | Increase the number of master clients    |
-| `Mod+Ctrl+a`          | Decrease the number of master clients    |
-| `Mod+Shift+q`         | Increase the number of columns           |
-| `Mod+Ctrl+q`          | Decrease the number of columns           |
-| `Mod+Shift+e`         | Increase master width factor             |
-| `Mod+Ctrl+e`          | Decrease master width factor             |
-| `Mod+Ctrl+Shift+e`    | Reset master width factor                |
+| `Mod+s`               | Swap with next client by index           |
+| `Mod+Shift+s`         | Swap with previous client by index       |
+| `Mod+a`               | Increase the number of master clients    |
+| `Mod+Shift+a`         | Decrease the number of master clients    |
+| `Mod+w`               | Increase the number of columns           |
+| `Mod+Shift+w`         | Decrease the number of columns           |
+| `Mod+e`               | Increase master width factor             |
+| `Mod+Shift+e`         | Decrease master width factor             |
+| `Mod+Ctrl+e`          | Reset master width factor                |
 | `Mod+Space`           | Switch layout                            |
 | `Mod+1...9`           | Only view tag                            |
 | `Mod+Shift+1...9`     | Move focused client to tag               |
@@ -118,8 +118,8 @@ $ cp -r Sharp-Cursors ~/.icons
 | `Mod+Ctrl+Return`     | Move client to master                    |
 | `Mod+d`               | Open app launcher                        |
 | `Mod+q`               | Open powermenu                           |
-| `Mod+w`               | Open control panel                       |
-| `Mod+e`               | Open day info panel                      |
+| `Mod+f`               | Open control panel                       |
+| `Mod+g`               | Open day info panel                      |
 | `Mod+Return`          | Open terminal                            |
 | `Mod+Print`           | Take screenshot                          |
 | `Mod+Shift+Print`     | Take screenshot area                     |

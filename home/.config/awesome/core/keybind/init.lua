@@ -94,31 +94,31 @@ awful.keyboard.append_global_keybindings {
 			end
 		end
 	},
-	awful.key({ mod, "Shift" }, "s", function()
+	awful.key({ mod }, "s", function()
 		awful.client.swap.byidx(1)
 	end),
-	awful.key({ mod, "Control" }, "s", function()
+	awful.key({ mod, "Shift" }, "s", function()
 		awful.client.swap.byidx(-1)
 	end),
-	awful.key({ mod, "Shift" }, "a", function()
+	awful.key({ mod }, "a", function()
 		awful.tag.incnmaster(1, nil, true)
 	end),
-	awful.key({ mod, "Control" }, "a", function()
+	awful.key({ mod, "Shift" }, "a", function()
 		awful.tag.incnmaster(-1, nil, true)
 	end),
-	awful.key({ mod, "Shift" }, "q", function()
+	awful.key({ mod }, "w", function()
 		awful.tag.incncol(1, nil, true)
 	end),
-	awful.key({ mod, "Control" }, "q", function()
+	awful.key({ mod, "Shift" }, "w", function()
 		awful.tag.incncol(-1, nil, true)
 	end),
-	awful.key({ mod, "Shift" }, "e", function()
+	awful.key({ mod }, "e", function()
 		awful.tag.incmwfact(0.05)
 	end),
-	awful.key({ mod, "Control" }, "e", function()
+	awful.key({ mod, "Shift" }, "e", function()
 		awful.tag.incmwfact(-0.05)
 	end),
-	awful.key({ mod, "Control", "Shift" }, "e", function()
+	awful.key({ mod, "Control" }, "e", function()
 		awful.tag.setmwfact(0.5)
 	end),
 	awful.key({ mod, }, "space", function()
@@ -134,10 +134,10 @@ awful.keyboard.append_global_keybindings {
 	awful.key({ mod }, "d", function()
 		launcher:show()
 	end),
-	awful.key({ mod }, "w", function()
+	awful.key({ mod }, "f", function()
 		control_panel:toggle()
 	end),
-	awful.key({ mod }, "e", function()
+	awful.key({ mod }, "g", function()
 		day_info_panel:toggle()
 	end),
 	awful.key({ mod }, "q", function()

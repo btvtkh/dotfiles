@@ -9,11 +9,11 @@ local function new(s)
 		screen = s,
 		filter = awful.widget.tasklist.filter.currenttags,
 		buttons = {
-			awful.button({ }, 1, function(c)
+			awful.button({}, 1, function(c)
 				c:activate { context = "tasklist", action = "toggle_minimization" }
 				menu:hide()
 			end),
-			awful.button({ }, 3, function(c)
+			awful.button({}, 3, function(c)
 				menu:toggle_client_menu(c)
 			end)
 		},
