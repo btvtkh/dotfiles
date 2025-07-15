@@ -308,9 +308,9 @@ local function new()
 	end
 
 	wp.on_destroyed = function(n)
-		for _, w in ipairs(notifs_layout.children) do
+		for i, w in ipairs(notifs_layout.children) do
 			if w._private.notification == n then
-				notifs_layout:remove_widgets(w)
+				notifs_layout:remove(i)
 			end
 		end
 
