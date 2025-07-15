@@ -80,7 +80,7 @@ local function new(s)
 
 		wp.on_mouse_leave = function()
 			if not t.selected then
-				t_background:set_bg(beautiful.bg_alt)
+				t_background:set_bg(nil)
 			end
 		end
 
@@ -93,10 +93,10 @@ local function new(s)
 			t_background:set_bg(beautiful.ac)
 			t_background:set_fg(beautiful.bg)
 		elseif #t:clients() > 0 then
-			t_background:set_bg(beautiful.bg_alt)
+			t_background:set_bg(nil)
 			t_background:set_fg(beautiful.fg)
 		else
-			t_background:set_bg(beautiful.bg_alt)
+			t_background:set_bg(nil)
 			t_background:set_fg(beautiful.fg_alt)
 		end
 
@@ -118,10 +118,10 @@ local function new(s)
 			t_background:set_bg(beautiful.ac)
 			t_background:set_fg(beautiful.bg)
 		elseif #t:clients() > 0 then
-			t_background:set_bg(beautiful.bg_alt)
+			t_background:set_bg(nil)
 			t_background:set_fg(beautiful.fg)
 		else
-			t_background:set_bg(beautiful.bg_alt)
+			t_background:set_bg(nil)
 			t_background:set_fg(beautiful.fg_alt)
 		end
 
