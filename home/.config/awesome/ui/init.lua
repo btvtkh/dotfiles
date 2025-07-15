@@ -3,10 +3,10 @@ local gtimer = require("gears.timer")
 local beautiful = require("beautiful")
 local user = require("user")
 local capi = { screen = screen, client = client }
-local titlebar = require("ui.titlebar")
-local wallpaper = require("ui.wallpaper")
-local bar = require("ui.bar")
-local notifications = require("ui.notifications")
+local Bar = require("ui.bar")
+local Notifications = require("ui.notifications")
+local Wallpaper = require("ui.wallpaper")
+local Titlebar = require("ui.titlebar")
 local menu = require("ui.menu").get_default()
 local launcher = require("ui.launcher").get_default()
 local powermenu = require("ui.powermenu").get_default()
@@ -44,15 +44,15 @@ end
 
 awful.screen.connect_for_each_screen(function(s)
 	if s == capi.screen.primary then
-		s.bar = bar.create_primary(s)
+		s.bar = Bar.create_primary(s)
 		s.bar:connect_signal("property::visible", on_primary_bar_visible)
 	else
-		s.bar = bar.create_secondary(s)
+		s.bar = Bar.create_secondary(s)
 	end
 
-	s.notifications = notifications(s)
+	s.notifications = Notifications(s)
 
-	s.wallpaper = wallpaper(s)
+	s.wallpaper = Wallpaper(s)
 
 	if user.wallpaper then
 		s.wallpaper:set_image(user.wallpaper)
@@ -60,7 +60,7 @@ awful.screen.connect_for_each_screen(function(s)
 end)
 
 capi.client.connect_signal("request::titlebars", function(c)
-	titlebar(c)
+	Titlebar(c)
 end)
 
 powermenu:connect_signal("property::shown", function(_, shown)

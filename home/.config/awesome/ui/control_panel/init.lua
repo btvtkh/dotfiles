@@ -4,12 +4,12 @@ local beautiful = require("beautiful")
 local gtable = require("gears.table")
 local dpi = beautiful.xresources.apply_dpi
 local capi = { screen = screen }
-local notification_list = require("ui.control_panel.notification_list")
-local audio_sliders = require("ui.control_panel.audio_sliders")
-local wifi_button = require("ui.control_panel.wifi_applet.button")
-local wifi_page = require("ui.control_panel.wifi_applet.page")
-local bluetooth_button = require("ui.control_panel.bluetooth_applet.button")
-local bluetooth_page = require("ui.control_panel.bluetooth_applet.page")
+local Notification_list = require("ui.control_panel.notification_list")
+local Audio_sliders = require("ui.control_panel.audio_sliders")
+local Wifi_button = require("ui.control_panel.wifi_applet.button")
+local Wifi_page = require("ui.control_panel.wifi_applet.page")
+local Bluetooth_button = require("ui.control_panel.bluetooth_applet.button")
+local Bluetooth_page = require("ui.control_panel.bluetooth_applet.page")
 local audio = require("service.audio").get_default()
 
 local control_panel = {}
@@ -115,12 +115,12 @@ local function new()
 	gtable.crush(ret, control_panel, true)
 	local wp = ret._private
 
-	wp.notification_list = notification_list()
-	wp.audio_sliders = audio_sliders()
-	wp.wifi_button = wifi_button()
-	wp.wifi_page = wifi_page()
-	wp.bluetooth_button = bluetooth_button()
-	wp.bluetooth_page = bluetooth_page()
+	wp.notification_list = Notification_list()
+	wp.audio_sliders = Audio_sliders()
+	wp.wifi_button = Wifi_button()
+	wp.wifi_page = Wifi_page()
+	wp.bluetooth_button = Bluetooth_button()
+	wp.bluetooth_page = Bluetooth_page()
 
 	wp.wifi_button:get_children_by_id("reveal-button")[1]:buttons {
 		awful.button({}, 1, function()

@@ -5,7 +5,7 @@ local gtable = require("gears.table")
 local common = require("common")
 local dpi = beautiful.xresources.apply_dpi
 local capi = { screen = screen }
-local weather_applet = require("ui.day_info_panel.weather_applet")
+local Weather_applet = require("ui.day_info_panel.weather_applet")
 
 local day_info = {}
 
@@ -59,7 +59,7 @@ local function new()
 				{
 					layout = wibox.layout.fixed.vertical,
 					spacing = dpi(6),
-					weather_applet(),
+					Weather_applet(),
 					{
 						id = "calendar",
 						widget = common.calendar {

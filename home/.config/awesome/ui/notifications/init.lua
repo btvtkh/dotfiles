@@ -65,7 +65,7 @@ local function create_actions_widget(n)
 end
 
 local function create_notification_popup(self, n)
-	local popup_widget = awful.popup {
+	local ret = awful.popup {
 		type = "notification",
 		screen = n.screen,
 		visible = false,
@@ -180,8 +180,8 @@ local function create_notification_popup(self, n)
 		}
 	}
 
-	local wp = popup_widget._private
-	local close = popup_widget.widget:get_children_by_id("close")[1]
+	local wp = ret._private
+	local close = ret.widget:get_children_by_id("close")[1]
 
 	wp.notification = n
 
@@ -191,13 +191,14 @@ local function create_notification_popup(self, n)
 		single_shot = true,
 		call_now = false,
 		callback = function()
-			popup_widget.visible = false
+			ret.visible = false
 			for i, p in ipairs(self.popups) do
-				if p == popup_widget then
+				if p == ret then
 					table.remove(self.popups, i)
 				end
 			end
 			wp.display_timer = nil
+			ret = nil
 		end
 	}
 
@@ -207,7 +208,7 @@ local function create_notification_popup(self, n)
 		end)
 	}
 
-	return popup_widget
+	return ret
 end
 
 local function new(s)
@@ -216,8 +217,8 @@ local function new(s)
 	ret._private = {}
 	local wp = ret._private
 
-	wp.screen = s
 	ret.popups = {}
+	wp.screen = s
 
 	wp.on_added = function(n)
 		if n.screen == wp.screen then
@@ -238,6 +239,7 @@ local function new(s)
 				end
 				popup.visible = false
 				table.remove(ret.popups, i)
+				popup = nil
 				update_positions(ret)
 			end
 		end
