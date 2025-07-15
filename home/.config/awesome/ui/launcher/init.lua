@@ -360,14 +360,13 @@ local function new()
 
 	gtable.crush(ret, launcher, true)
 	local wp = ret._private
-
-	wp.rows = 6
-
 	local powermenu_button = ret.widget:get_children_by_id("powermenu-button")[1]
 	local wallpaper_button = ret.widget:get_children_by_id("wallpaper-button")[1]
 	local home_button = ret.widget:get_children_by_id("home-button")[1]
 	local entries_layout = ret.widget:get_children_by_id("entries-layout")[1]
 	local text_input = ret.widget:get_children_by_id("text-input")[1]
+
+	wp.rows = 6
 
 	powermenu_button:buttons {
 		awful.button({}, 1, function()
