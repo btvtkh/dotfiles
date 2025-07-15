@@ -197,7 +197,8 @@ function notification_list:update_count()
 	local notifs_layout = self:get_children_by_id("notifications-layout")[1]
 	local notifs_title = self:get_children_by_id("notifications-title")[1]
 
-	if #notifs_layout.children > 0 and notifs_layout.children[1].is_notification then
+	if #notifs_layout.children > 0
+	and notifs_layout.children[1]._private.notification then
 		notifs_title:set_markup(string.format(
 			"Notifications (%s)",
 			#notifs_layout.children
