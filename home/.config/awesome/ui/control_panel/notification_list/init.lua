@@ -12,7 +12,7 @@ local create_markup = require("lib.string").create_markup
 local notification_list = {}
 
 local function create_actions_widget(n)
-if #n.actions == 0 then return nil end
+	if #n.actions == 0 then return nil end
 
 	local actions_widget = wibox.widget {
 		widget = wibox.container.margin,
@@ -52,9 +52,8 @@ if #n.actions == 0 then return nil end
 	return actions_widget
 end
 
-local function create_notification_widget(self, n)
-	local widget = wibox.widget {
-		is_notification = true,
+local function create_notification_widget(n)
+	local ret = wibox.widget {
 		widget = wibox.container.constraint,
 		strategy = "max",
 		height = 260,
@@ -159,31 +158,10 @@ local function create_notification_widget(self, n)
 		}
 	}
 
-	local wp = widget._private
-	local close = widget:get_children_by_id("close")[1]
+	local wp = ret._private
+	local close = ret:get_children_by_id("close")[1]
 
-	wp.on_destroyed = function()
-		local notifs_layout = self:get_children_by_id("notifications-layout")[1]
-		notifs_layout:remove_widgets(widget)
-
-		if #notifs_layout.children == 0 then
-			notifs_layout:insert(1, wibox.widget {
-				widget = wibox.container.background,
-				fg = beautiful.fg_alt,
-				forced_height = dpi(560),
-				{
-					widget = wibox.widget.textbox,
-					align = "center",
-					font = beautiful.font_h2,
-					markup = "No notifications"
-				}
-			})
-		end
-
-		self:update_count()
-	end
-
-	n:connect_signal("destroyed", wp.on_destroyed)
+	wp.notification = n
 
 	close:buttons {
 		awful.button({}, 1, function()
@@ -191,7 +169,7 @@ local function create_notification_widget(self, n)
 		end)
 	}
 
-	return widget
+	return ret
 end
 
 function notification_list:clear_notifications()
@@ -317,19 +295,44 @@ local function new()
 
 	wp.dnd_mode = false
 
-	wp.on_request_display = function(n)
+	wp.on_added = function(n)
 		if not n then return end
 
 		if #notifs_layout.children == 1
-		and not notifs_layout.children[1].is_notification then
+		and not notifs_layout.children[1]._private.notification then
 			notifs_layout:reset()
 		end
 
-		notifs_layout:insert(1, create_notification_widget(ret, n))
+		notifs_layout:insert(1, create_notification_widget(n))
 		ret:update_count()
 	end
 
-	naughty.connect_signal("request::display", wp.on_request_display)
+	wp.on_destroyed = function(n)
+		for _, w in ipairs(notifs_layout.children) do
+			if w._private.notification == n then
+				notifs_layout:remove_widgets(w)
+			end
+		end
+
+		if #notifs_layout.children == 0 then
+			notifs_layout:insert(1, wibox.widget {
+				widget = wibox.container.background,
+				fg = beautiful.fg_alt,
+				forced_height = dpi(560),
+				{
+					widget = wibox.widget.textbox,
+					align = "center",
+					font = beautiful.font_h2,
+					markup = "No notifications"
+				}
+			})
+		end
+
+		ret:update_count()
+	end
+
+	naughty.connect_signal("destroyed", wp.on_destroyed)
+	naughty.connect_signal("request::display", wp.on_added)
 
 	dnd_button:buttons {
 		awful.button({}, 1, function()

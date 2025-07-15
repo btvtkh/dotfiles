@@ -246,7 +246,7 @@ local function new(s)
 	end
 
 	naughty.connect_signal("destroyed", wp.on_destroyed)
-	naughty.connect_signal("added", wp.on_added)
+	naughty.connect_signal("request::display", wp.on_added)
 
 	return ret
 end
