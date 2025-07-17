@@ -255,9 +255,8 @@ function menu:back()
 end
 
 function menu:hide()
+	if not self.visible then return end
 	local wp = self._private
-	if not wp.shown then return end
-	wp.shown = false
 	awful.keygrabber.stop(wp.keygrabber)
 	wp.select_index = nil
 	self:destroy_active_children()
@@ -265,9 +264,7 @@ function menu:hide()
 end
 
 function menu:show()
-	local wp = self._private
-	if wp.shown then return end
-	wp.shown = true
+	if self.visible then return end
 	update_items(self)
 	self.screen = capi.mouse.screen
 	set_coords(self)

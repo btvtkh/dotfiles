@@ -107,24 +107,22 @@ function powermenu:update_elements()
 end
 
 function powermenu:show()
+	if self.visible then return end
 	local wp = self._private
-	if wp.shown then return end
-	wp.shown = true
-	self.visible = true
-	self:emit_signal("property::shown", wp.shown)
 	wp.select_index = 1
 	self:update_elements()
 	run_keygrabber(self)
+	self.visible = true
+	self:emit_signal("property::visible", self.visible)
 end
 
 function powermenu:hide()
+	if not self.visible then return end
 	local wp = self._private
-	if not wp.shown then return end
-	wp.shown = false
 	awful.keygrabber.stop(wp.keygrabber)
 	wp.select_index = 1
 	self.visible = false
-	self:emit_signal("property::shown", wp.shown)
+	self:emit_signal("property::visible", self.visible)
 end
 
 function powermenu:toggle()

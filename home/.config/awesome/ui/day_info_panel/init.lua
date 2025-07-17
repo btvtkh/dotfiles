@@ -11,20 +11,16 @@ local Weather_applet = require("ui.day_info_panel.weather_applet")
 local day_info = {}
 
 function day_info:show()
-	local wp = self._private
-	if wp.shown then return end
-	wp.shown = true
-	self.visible = true
+	if self.visible then return end
 	self.widget:get_children_by_id("calendar")[1]:set_current_date()
-	self:emit_signal("property::shown", wp.shown)
+	self.visible = true
+	self:emit_signal("property::visible", self.visible)
 end
 
 function day_info:hide()
-	local wp = self._private
-	if not wp.shown then return end
-	wp.shown = false
+	if not self.visible then return end
 	self.visible = false
-	self:emit_signal("property::shown", wp.shown)
+	self:emit_signal("property::visible", self.visible)
 end
 
 function day_info:toggle()

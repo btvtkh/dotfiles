@@ -25,12 +25,12 @@ local function launch_app(app)
 
 	awful.spawn(
 		term_needed and
-			term and string.format("%s -e %s", term:get_executable(), app:get_executable())
+		term and string.format("%s -e %s", term:get_executable(), app:get_executable())
 		or
-			string.match(app:get_executable(), "^env") and
-				string.gsub(app:get_commandline(), "%%%a", "")
-			or
-				app:get_executable()
+		string.match(app:get_executable(), "^env") and
+		string.gsub(app:get_commandline(), "%%%a", "")
+		or
+		app:get_executable()
 	)
 end
 
@@ -197,29 +197,27 @@ function launcher:update_entries()
 end
 
 function launcher:show()
+	if self.visible then return end
 	local wp = self._private
-	if wp.shown then return end
-	wp.shown = true
-	self.visible = true
-	self:emit_signal("property::shown", wp.shown)
 	wp.unfiltered = Gio.AppInfo.get_all()
 	wp.filtered = filter_apps(wp.unfiltered, "")
 	wp.start_index, wp.select_index = 1, 1
 	self:update_entries()
 	self.widget:get_children_by_id("text-input")[1]:focus()
+	self.visible = true
+	self:emit_signal("property::visible", self.visible)
 end
 
 function launcher:hide()
+	if not self.visible then return end
 	local wp = self._private
-	if not wp.shown then return end
-	wp.shown = false
 	wp.unfiltered = {}
 	wp.filtered = {}
 	wp.select_index, wp.select_index = 1, 1
 	self.widget:get_children_by_id("text-input")[1]:unfocus()
 	self.widget:get_children_by_id("entries-layout")[1]:reset()
 	self.visible = false
-	self:emit_signal("property::shown", wp.shown)
+	self:emit_signal("property::visible", self.visible)
 end
 
 function launcher:toggle()

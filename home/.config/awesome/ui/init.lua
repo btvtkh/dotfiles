@@ -63,8 +63,8 @@ capi.client.connect_signal("request::titlebars", function(c)
 	Titlebar(c)
 end)
 
-powermenu:connect_signal("property::shown", function(_, shown)
-	if shown == true then
+powermenu:connect_signal("property::visible", function(_, visible)
+	if visible == true then
 		launcher:hide()
 		control_panel:hide()
 		day_info_panel:hide()
@@ -72,23 +72,23 @@ powermenu:connect_signal("property::shown", function(_, shown)
 	end
 end)
 
-launcher:connect_signal("property::shown", function(_, shown)
-	if shown == true then
+launcher:connect_signal("property::visible", function(_, visible)
+	if visible == true then
 		powermenu:hide()
 		menu:hide()
 	end
 end)
 
-control_panel:connect_signal("property::shown", function(_, shown)
-	if shown == true then
+control_panel:connect_signal("property::visible", function(_, visible)
+	if visible == true then
 		powermenu:hide()
 		day_info_panel:hide()
 		menu:hide()
 	end
 end)
 
-day_info_panel:connect_signal("property::shown", function(_, shown)
-	if shown == true then
+day_info_panel:connect_signal("property::visible", function(_, visible)
+	if visible == true then
 		powermenu:hide()
 		control_panel:hide()
 		menu:hide()

@@ -55,23 +55,20 @@ function control_panel:setup_main_page()
 end
 
 function control_panel:show()
-	local wp = self._private
-	if wp.shown then return end
-	wp.shown = true
+	if self.visible then return end
 	audio:get_default_sink_data()
 	audio:get_default_source_data()
 	self:setup_main_page()
 	self.visible = true
-	self:emit_signal("property::shown", wp.shown)
+	self:emit_signal("property::visible", self.visible)
 end
 
 function control_panel:hide()
+	if not self.visible then return end
 	local wp = self._private
-	if not wp.shown then return end
-	wp.shown = false
 	wp.wifi_page:close_ap_menu()
 	self.visible = false
-	self:emit_signal("property::shown", wp.shown)
+	self:emit_signal("property::visible", self.visible)
 end
 
 function control_panel:toggle()
