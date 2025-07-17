@@ -1,6 +1,7 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local gtable = require("gears.table")
 local dpi = beautiful.xresources.apply_dpi
 local capi = { screen = screen }
@@ -99,7 +100,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = beautiful.rrect(dpi(22)),
+			shape = shape.rrect(dpi(22)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(12),

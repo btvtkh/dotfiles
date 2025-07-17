@@ -2,6 +2,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local gtable = require("gears.table")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 
@@ -139,7 +140,7 @@ local function new(args)
 						id = "title-background",
 						widget = wibox.container.background,
 						forced_height = dpi(30),
-						shape = args.day_shape or beautiful.rrect(dpi(6)),
+						shape = args.day_shape or shape.rrect(dpi(6)),
 						{
 							widget = wibox.container.margin,
 							margins = { left = dpi(7), right = dpi(7) },
@@ -164,7 +165,7 @@ local function new(args)
 							widget = wibox.container.background,
 							forced_width = dpi(30),
 							forced_height = dpi(30),
-							shape = args.day_shape or beautiful.rrect(dpi(6)),
+							shape = args.day_shape or shape.rrect(dpi(6)),
 							{
 								widget = wibox.container.place,
 								halign = "center",
@@ -180,7 +181,7 @@ local function new(args)
 							widget = wibox.container.background,
 							forced_width = dpi(30),
 							forced_height = dpi(30),
-							shape = args.day_shape or beautiful.rrect(dpi(6)),
+							shape = args.day_shape or shape.rrect(dpi(6)),
 							{
 								widget = wibox.container.place,
 								halign = "center",

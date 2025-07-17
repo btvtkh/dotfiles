@@ -3,6 +3,7 @@ local wibox = require("wibox")
 local gtimer = require("gears.timer")
 local beautiful = require("beautiful")
 local common = require("common")
+local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
 local capi = { screen = screen }
 local media_player = require("service.media_player").get_default()
@@ -24,7 +25,7 @@ local function create_player_widget(name, player)
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
 		forced_width = dpi(450),
-		shape = beautiful.rrect(dpi(10)),
+		shape = shape.rrect(dpi(10)),
 		{
 			widget = wibox.container.margin,
 			margins = dpi(10),
@@ -34,7 +35,7 @@ local function create_player_widget(name, player)
 				spacing = dpi(10),
 				{
 					widget = wibox.container.background,
-					shape = beautiful.rrect(dpi(6)),
+					shape = shape.rrect(dpi(6)),
 					{
 						id = "preview",
 						widget = wibox.widget.imagebox,
@@ -100,25 +101,25 @@ local function create_player_widget(name, player)
 										spacing = dpi(5),
 										{
 											id = "previous",
-											widget = common.hover_button {
+											widget = common.button {
 												label = "",
 												margins = dpi(4),
-												shape = beautiful.rrect(dpi(6))
+												shape = shape.rrect(dpi(6))
 											}
 										},
 										{
 											id = "play-pause",
-											widget = common.hover_button {
+											widget = common.button {
 												margins = dpi(4),
-												shape = beautiful.rrect(dpi(6))
+												shape = shape.rrect(dpi(6))
 											}
 										},
 										{
 											id = "next",
-											widget = common.hover_button {
+											widget = common.button {
 												label = "",
 												margins = dpi(4),
-												shape = beautiful.rrect(dpi(6))
+												shape = shape.rrect(dpi(6))
 											}
 										}
 									}
@@ -153,8 +154,8 @@ local function create_player_widget(name, player)
 									bar_active_color = beautiful.ac,
 									handle_color = beautiful.bg_alt,
 									handle_border_color = beautiful.ac,
-									handle_shape = beautiful.crcl(5),
-									bar_shape = beautiful.rbar()
+									handle_shape = shape.crcl(5),
+									bar_shape = shape.rbar()
 								}
 							}
 						}
@@ -316,7 +317,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = beautiful.rrect(dpi(20)),
+			shape = shape.rrect(dpi(20)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(10),

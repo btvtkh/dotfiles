@@ -6,6 +6,7 @@ local beautiful = require("beautiful")
 local gtable = require("gears.table")
 local gfs = require("gears.filesystem")
 local common = require("common")
+local shape = require("lib.shape")
 local user = require("user")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
@@ -109,7 +110,7 @@ function launcher:update_entries()
 				local entry_widget = wibox.widget {
 					widget = wibox.container.background,
 					forced_height = dpi(60),
-					shape = beautiful.rrect(dpi(10)),
+					shape = shape.rrect(dpi(10)),
 					{
 						widget = wibox.container.margin,
 						margins = { left = dpi(15), right = dpi(15) },
@@ -247,7 +248,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = beautiful.rrect(dpi(18)),
+			shape = shape.rrect(dpi(18)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(10),
@@ -259,18 +260,18 @@ local function new()
 						widget = wibox.container.background,
 						forced_width = dpi(50),
 						bg = beautiful.bg_alt,
-						shape = beautiful.rrect(dpi(10)),
+						shape = shape.rrect(dpi(10)),
 						{
 							layout = wibox.layout.align.vertical,
 							{
 								id = "powermenu-button",
-								widget = common.hover_button {
+								widget = common.button {
 									label = text_icons.poweroff,
 									forced_width = dpi(50),
 									forced_height = dpi(50),
 									fg_normal = beautiful.red,
 									bg_hover = beautiful.red,
-									shape = beautiful.rrect(dpi(10))
+									shape = shape.rrect(dpi(10))
 								}
 							},
 							nil,
@@ -287,20 +288,20 @@ local function new()
 								},
 								{
 									id = "wallpaper-button",
-									widget = common.hover_button {
+									widget = common.button {
 										label = text_icons.image,
 										forced_width = dpi(50),
 										forced_height = dpi(50),
-										shape = beautiful.rrect(dpi(10))
+										shape = shape.rrect(dpi(10))
 									}
 								},
 								{
 									id = "home-button",
-									widget = common.hover_button {
+									widget = common.button {
 										label = text_icons.home,
 										forced_width = dpi(50),
 										forced_height = dpi(50),
-										shape = beautiful.rrect(dpi(10))
+										shape = shape.rrect(dpi(10))
 									}
 								}
 							}

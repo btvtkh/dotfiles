@@ -2,6 +2,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local common = require("common")
+local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local has_common = require("lib.table").has_common
 local dpi = beautiful.xresources.apply_dpi
@@ -17,7 +18,7 @@ local control_panel = require("ui.control_panel").get_default()
 local bar = {}
 
 local function Launcher_button()
-	return common.hover_button {
+	return common.button {
 		buttons = {
 			awful.button({}, 1, function()
 				launcher:toggle()
@@ -28,13 +29,13 @@ local function Launcher_button()
 		bg_hover = beautiful.bg_urg,
 		fg_normal = beautiful.fg,
 		fg_hover = beautiful.fg,
-		shape = beautiful.rrect(dpi(8)),
+		shape = shape.rrect(dpi(8)),
 		label = text_icons.menu,
 	}
 end
 
 local function Control_panel_button()
-	return common.hover_button {
+	return common.button {
 		buttons = {
 			awful.button({}, 1, function()
 				control_panel:toggle()
@@ -45,7 +46,7 @@ local function Control_panel_button()
 		bg_hover = beautiful.bg_urg,
 		fg_normal = beautiful.fg,
 		fg_hover = beautiful.fg,
-		shape = beautiful.rrect(dpi(8)),
+		shape = shape.rrect(dpi(8)),
 		label = text_icons.sliders,
 	}
 end

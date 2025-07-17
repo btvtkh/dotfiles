@@ -2,6 +2,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local gtimer = require("gears.timer")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local capi = { client = client }
@@ -41,7 +42,7 @@ local function new(c)
 		},
 		bg = c.active and beautiful.red or beautiful.bg_urg,
 		fg = beautiful.bg,
-		shape = beautiful.crcl(),
+		shape = shape.crcl(),
 		{
 			widget = wibox.container.margin,
 			margins = dpi(3),
@@ -64,7 +65,7 @@ local function new(c)
 		},
 		bg = c.active and beautiful.yellow or beautiful.bg_urg,
 		fg = beautiful.bg,
-		shape = beautiful.crcl(),
+		shape = shape.crcl(),
 		{
 			widget = wibox.container.margin,
 			margins = dpi(3),
@@ -88,7 +89,7 @@ local function new(c)
 		},
 		bg = c.active and beautiful.green or beautiful.bg_urg,
 		fg = beautiful.bg,
-		shape = beautiful.crcl(),
+		shape = shape.crcl(),
 		{
 			widget = wibox.container.margin,
 			margins = dpi(3),

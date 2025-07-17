@@ -1,6 +1,7 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
 local capi = { client = client }
 local mod = "Mod4"
@@ -9,7 +10,7 @@ local function new(s)
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
-		shape = beautiful.rrect(dpi(8)),
+		shape = shape.rrect(dpi(8)),
 		{
 			widget = wibox.container.margin,
 			margins = dpi(4),
@@ -49,7 +50,7 @@ local function new(s)
 					widget_template = {
 						id = "t-background",
 						widget = wibox.container.background,
-						shape = beautiful.rrect(dpi(5)),
+						shape = shape.rrect(dpi(5)),
 						{
 							widget = wibox.container.margin,
 							margins = { left = dpi(7), right = dpi(7) },

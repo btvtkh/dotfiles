@@ -1,5 +1,6 @@
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local gtable = require("gears.table")
 local text_icons = require("beautiful").text_icons
 local dpi = beautiful.xresources.apply_dpi
@@ -309,7 +310,7 @@ local function new()
 		widget = wibox.container.background,
 		forced_width = dpi(370),
 		bg = beautiful.bg_alt,
-		shape = beautiful.rrect(dpi(10)),
+		shape = shape.rrect(dpi(10)),
 		{
 			id = "main-layout",
 			layout = wibox.layout.fixed.vertical

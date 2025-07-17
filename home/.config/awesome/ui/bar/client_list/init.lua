@@ -1,6 +1,7 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
 local menu = require("ui.menu").get_default()
 
@@ -24,7 +25,7 @@ local function new(s)
 		widget_template = {
 			id = "c-background",
 			widget = wibox.container.background,
-			shape = beautiful.rrect(dpi(8)),
+			shape = shape.rrect(dpi(8)),
 			{
 				layout = wibox.layout.stack,
 				{
@@ -51,7 +52,7 @@ local function new(s)
 						{
 							id = "c-pointer",
 							widget = wibox.container.background,
-							shape = beautiful.prrect(true, true, false, false, dpi(2)),
+							shape = shape.prrect(true, true, false, false, dpi(2)),
 							bg = beautiful.ac
 						}
 					}

@@ -1,6 +1,7 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local bt_adapter = require("service.bluetooth").get_default()
@@ -11,7 +12,7 @@ local function new()
 		forced_height = dpi(60),
 		bg = beautiful.bg_alt,
 		fg = beautiful.fg,
-		shape = beautiful.rrect(dpi(10)),
+		shape = shape.rrect(dpi(10)),
 		{
 			widget = wibox.container.margin,
 			margins = { left = dpi(15) },

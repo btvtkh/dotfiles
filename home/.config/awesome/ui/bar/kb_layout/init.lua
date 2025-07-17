@@ -1,13 +1,14 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
 
 local function new()
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
-		shape = beautiful.rrect(dpi(8)),
+		shape = shape.rrect(dpi(8)),
 		{
 			widget = awful.widget.keyboardlayout {}
 		}

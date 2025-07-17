@@ -3,6 +3,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local gtable = require("gears.table")
 local common = require("common")
+local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local network = require("service.network")
@@ -13,7 +14,7 @@ local wifi_page = {}
 local function create_ap_widget(self, ap)
 	local ret = wibox.widget {
 		widget = wibox.container.background,
-		shape = beautiful.rrect(dpi(10)),
+		shape = shape.rrect(dpi(10)),
 		{
 			widget = wibox.container.margin,
 			forced_height = dpi(50),
@@ -166,7 +167,7 @@ function wifi_page:close_ap_menu()
 		password_input:set_obscure(true)
 		aps_layout:reset()
 		for _, ap_widget in ipairs(wp.ap_widgets) do
-			if ap_widget.active then
+			if ap_widget._private.is_active then
 				aps_layout:insert(1, ap_widget)
 			else
 				aps_layout:add(ap_widget)
@@ -203,7 +204,7 @@ local function new()
 				widget = wibox.container.background,
 				forced_height = dpi(50),
 				bg = beautiful.bg_alt,
-				shape = beautiful.rrect(dpi(10)),
+				shape = shape.rrect(dpi(10)),
 				{
 					layout = wibox.layout.align.horizontal,
 					{
@@ -218,31 +219,38 @@ local function new()
 							}
 						},
 						{
-							id = "bottombar-toggle-button",
-							widget = common.hover_button {
+							id = "bottombar-close-button",
+							widget = common.button {
+								label = text_icons.arrow_left,
 								forced_width = dpi(50),
 								forced_height = dpi(50),
-								shape = beautiful.rrect(dpi(10))
+								shape = shape.rrect(dpi(10))
 							}
 						},
 						{
 							id = "bottombar-refresh-button",
-							widget = common.hover_button {
+							widget = common.button {
 								label = text_icons.reboot,
 								forced_width = dpi(50),
 								forced_height = dpi(50),
-								shape = beautiful.rrect(dpi(10))
+								shape = shape.rrect(dpi(10))
 							}
 						}
 					},
 					nil,
 					{
-						id = "bottombar-close-button",
-						widget = common.hover_button {
-							label = text_icons.arrow_left,
-							forced_width = dpi(50),
-							forced_height = dpi(50),
-							shape = beautiful.rrect(dpi(10))
+						widget = wibox.container.margin,
+						margins = { right = dpi(12) },
+						{
+							widget = wibox.container.place,
+							halign = "center",
+							{
+								id = "bottombar-toggle-switch",
+								widget = common.switch {
+									forced_width = dpi(40),
+									forced_height = dpi(22),
+								}
+							}
 						}
 					}
 				}
@@ -282,7 +290,7 @@ local function new()
 				id = "password-widget",
 				widget = wibox.container.background,
 				bg = beautiful.bg_alt,
-				shape = beautiful.rrect(dpi(10)),
+				shape = shape.rrect(dpi(10)),
 				{
 					widget = wibox.container.margin,
 					margins = dpi(15),
@@ -347,22 +355,23 @@ local function new()
 			},
 			{
 				id = "connect-disconnect-button",
-				widget = common.hover_button {
+				widget = common.button {
 					margins = dpi(10),
-					shape = beautiful.rrect(dpi(10))
+					shape = shape.rrect(dpi(10))
 				}
 			}
 		}
 	}
 
 	local aps_layout = ret:get_children_by_id("access-points-layout")[1]
-	local bottombar_toggle_button = ret:get_children_by_id("bottombar-toggle-button")[1]
+	local bottombar_toggle_switch = ret:get_children_by_id("bottombar-toggle-switch")[1]
 	local bottombar_refresh_button = ret:get_children_by_id("bottombar-refresh-button")[1]
 	local password_input = wp.ap_menu:get_children_by_id("password-input")[1]
 
 	wp.on_wireless_enabled = function(_, enabled)
+		bottombar_toggle_switch:set_checked(enabled)
+
 		if enabled then
-			bottombar_toggle_button:set_label(text_icons.switch_on)
 			aps_layout:reset()
 			aps_layout:add(wibox.widget {
 				widget = wibox.container.background,
@@ -377,7 +386,6 @@ local function new()
 			})
 		else
 			wp.ap_widgets = {}
-			bottombar_toggle_button:set_label(text_icons.switch_off)
 			aps_layout:reset()
 
 			aps_layout:add(wibox.widget {
@@ -429,7 +437,7 @@ local function new()
 	nm_client.wireless:connect_signal("property::state", wp.on_wireless_state)
 	nm_client:connect_signal("property::wireless-enabled", wp.on_wireless_enabled)
 
-	bottombar_toggle_button:buttons {
+	bottombar_toggle_switch:buttons {
 		awful.button({}, 1, function()
 			nm_client:set_wireless_enabled(not nm_client:get_wireless_enabled())
 		end)

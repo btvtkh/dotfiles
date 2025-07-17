@@ -1,6 +1,5 @@
 local beautiful = require("beautiful")
 local gfs = require("gears.filesystem")
-local gshape = require("gears.shape")
 local gcolor = require("gears.color")
 local dpi = beautiful.xresources.apply_dpi
 
@@ -119,29 +118,5 @@ theme.layout_tile = gcolor.recolor_image(icons_path .. "layout_tile.png", theme.
 
 theme.systray_icon_spacing = dpi(6)
 theme.bg_systray = theme.bg_alt
-
-function theme.rrect(rad)
-	return theme.rounded and function(cr, w, h)
-		gshape.rounded_rect(cr, w, h, rad)
-	end
-end
-
-function theme.rbar()
-	return theme.rounded and function(cr, w, h)
-		gshape.rounded_bar(cr, w, h)
-	end
-end
-
-function theme.prrect(tl, tr, br, bl, rad)
-	return theme.rounded and function(cr, w, h)
-		gshape.partially_rounded_rect(cr, w, h, tl, tr, br, bl, rad)
-	end
-end
-
-function theme.crcl(rad)
-	return theme.rounded and function(cr, w, h)
-		gshape.circle(cr, w, h, rad)
-	end
-end
 
 return theme

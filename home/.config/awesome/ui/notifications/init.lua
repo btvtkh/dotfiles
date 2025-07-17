@@ -4,6 +4,7 @@ local wibox = require("wibox")
 local gtimer = require("gears.timer")
 local common = require("common")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local ncr = naughty.notification_closed_reason
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
@@ -39,13 +40,13 @@ local function create_actions_widget(n)
 
 	local main_layout = actions_widget:get_children_by_id("buttons-layout")[1]
 	for _, action in ipairs(n.actions) do
-		local action_hover_button = common.hover_button {
+		local action_button = common.button {
 			label = action.name,
 			margins = {
 				left = dpi(10), right = dpi(10),
 				top = dpi(5), bottom = dpi(5)
 			},
-			shape = beautiful.rrect(dpi(8)),
+			shape = shape.rrect(dpi(8)),
 			buttons = {
 				awful.button({}, 1, function()
 					action:invoke()
@@ -57,7 +58,7 @@ local function create_actions_widget(n)
 			widget = wibox.container.constraint,
 			strategy = "max",
 			height = dpi(40),
-			action_hover_button
+			action_button
 		})
 	end
 
@@ -82,7 +83,7 @@ local function create_notification_popup(self, n)
 			fg = beautiful.fg,
 			border_color = beautiful.border_color_normal,
 			border_width = beautiful.border_width,
-			shape = beautiful.rrect(dpi(20)),
+			shape = shape.rrect(dpi(20)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(15),
@@ -146,7 +147,7 @@ local function create_notification_popup(self, n)
 								resize = true,
 								halign = "center",
 								valign = "top",
-								clip_shape = beautiful.rrect(dpi(5)),
+								clip_shape = shape.rrect(dpi(5)),
 								image = n.icon
 							}
 						},

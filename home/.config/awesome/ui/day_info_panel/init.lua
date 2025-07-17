@@ -1,6 +1,7 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local gtable = require("gears.table")
 local common = require("common")
 local dpi = beautiful.xresources.apply_dpi
@@ -52,7 +53,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = beautiful.rrect(dpi(22)),
+			shape = shape.rrect(dpi(22)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(12),
@@ -64,8 +65,8 @@ local function new()
 						id = "calendar",
 						widget = common.calendar {
 							sun_start = false,
-							shape = beautiful.rrect(dpi(10)),
-							day_shape = beautiful.rrect(dpi(8))
+							shape = shape.rrect(dpi(10)),
+							day_shape = shape.rrect(dpi(8))
 						}
 					}
 				}

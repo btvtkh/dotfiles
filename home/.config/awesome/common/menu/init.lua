@@ -2,6 +2,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local gtable = require("gears.table")
+local shape = require("lib.shape")
 local capi = { mouse = mouse }
 local dpi = beautiful.xresources.apply_dpi
 local text_icons = beautiful.text_icons
@@ -135,11 +136,11 @@ local function entry(self, index, args)
 		})
 	end
 
-	ret._private.on_mouse_enter = function()
+	wp.on_mouse_enter = function()
 		on_enter(self, index, args, "mouse")
 	end
 
-	ret:connect_signal("mouse::enter", ret._private.on_mouse_enter)
+	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
 
 	ret:buttons {
 		awful.button({}, 1, function()
@@ -298,7 +299,7 @@ function menu.new(args, parent)
 			fg = beautiful.fg,
 			border_color = beautiful.border_color_normal,
 			border_width = beautiful.border_width,
-			shape = beautiful.rrect(dpi(10)),
+			shape = shape.rrect(dpi(10)),
 			margins = dpi(5),
 			item_bg = beautiful.bg,
 			item_fg = beautiful.fg,
@@ -306,7 +307,7 @@ function menu.new(args, parent)
 			item_hover_fg = beautiful.bg,
 			item_width = dpi(150),
 			item_height = dpi(25),
-			item_shape = beautiful.rrect(dpi(6)),
+			item_shape = shape.rrect(dpi(6)),
 			item_margins = { left = dpi(7), right = dpi(7) },
 			item_spacing = dpi(2),
 			item_font = beautiful.font

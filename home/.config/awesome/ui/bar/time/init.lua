@@ -1,6 +1,7 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
 local day_info_panel = require("ui.day_info_panel").get_default()
 
@@ -8,7 +9,7 @@ local function new()
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
-		shape = beautiful.rrect(dpi(8)),
+		shape = shape.rrect(dpi(8)),
 		buttons = {
 			awful.button({}, 1, function()
 				day_info_panel:toggle()

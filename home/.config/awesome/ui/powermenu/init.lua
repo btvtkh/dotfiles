@@ -1,6 +1,7 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local shape = require("lib.shape")
 local gtable = require("gears.table")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
@@ -69,7 +70,7 @@ function powermenu:update_elements()
 			widget = wibox.container.background,
 			forced_width = dpi(120),
 			forced_height = dpi(120),
-			shape = beautiful.rrect(dpi(15)),
+			shape = shape.rrect(dpi(15)),
 			buttons = {
 				awful.button({}, 1, function()
 					if wp.select_index == i then
@@ -147,7 +148,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = beautiful.rrect(dpi(25)),
+			shape = shape.rrect(dpi(25)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(12),

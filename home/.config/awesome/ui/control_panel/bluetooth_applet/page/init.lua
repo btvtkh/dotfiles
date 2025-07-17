@@ -2,6 +2,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local common = require("common")
+local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local bt_adapter = require("service.bluetooth").get_default()
@@ -9,7 +10,7 @@ local bt_adapter = require("service.bluetooth").get_default()
 local function create_device_widget(path, device)
 	local ret = wibox.widget {
 		widget = wibox.container.background,
-		shape = beautiful.rrect(dpi(10)),
+		shape = shape.rrect(dpi(10)),
 		forced_height = dpi(40),
 		{
 			widget = wibox.container.margin,
@@ -111,7 +112,7 @@ local function new()
 				widget = wibox.container.background,
 				forced_height = dpi(50),
 				bg = beautiful.bg_alt,
-				shape = beautiful.rrect(dpi(10)),
+				shape = shape.rrect(dpi(10)),
 				{
 					layout = wibox.layout.align.horizontal,
 					{
@@ -126,31 +127,38 @@ local function new()
 							}
 						},
 						{
-							id = "bottombar-toggle-button",
-							widget = common.hover_button {
+							id = "bottombar-close-button",
+							widget = common.button {
+								label = text_icons.arrow_left,
 								forced_width = dpi(50),
 								forced_height = dpi(50),
-								shape = beautiful.rrect(dpi(10))
+								shape = shape.rrect(dpi(10))
 							}
 						},
 						{
 							id = "bottombar-discover-button",
-							widget = common.hover_button {
+							widget = common.button {
 								label = text_icons.search,
 								forced_width = dpi(50),
 								forced_height = dpi(50),
-								shape = beautiful.rrect(dpi(10))
+								shape = shape.rrect(dpi(10))
 							}
 						}
 					},
 					nil,
 					{
-						id = "bottombar-close-button",
-						widget = common.hover_button {
-							label = text_icons.arrow_left,
-							forced_width = dpi(50),
-							forced_height = dpi(50),
-							shape = beautiful.rrect(dpi(10))
+						widget = wibox.container.margin,
+						margins = { right = dpi(12) },
+						{
+							widget = wibox.container.place,
+							halign = "center",
+							{
+								id = "bottombar-toggle-switch",
+								widget = common.switch {
+									forced_width = dpi(40),
+									forced_height = dpi(22),
+								}
+							}
 						}
 					}
 				}
@@ -160,7 +168,7 @@ local function new()
 
 	local wp = ret._private
 	local devices_layout = ret:get_children_by_id("devices-layout")[1]
-	local bottombar_toggle_button = ret:get_children_by_id("bottombar-toggle-button")[1]
+	local bottombar_toggle_switch = ret:get_children_by_id("bottombar-toggle-switch")[1]
 	local bottombar_discover_button = ret:get_children_by_id("bottombar-discover-button")[1]
 
 	wp.on_device_added = function(_, path, device)
@@ -217,9 +225,9 @@ local function new()
 
 	wp.on_powered = function(_, powered)
 		wp.on_discovering(nil, bt_adapter:get_discovering())
+		bottombar_toggle_switch:set_checked(powered)
 
 		if powered then
-			bottombar_toggle_button:set_label(text_icons.switch_on)
 			devices_layout:reset()
 			devices_layout:add(wibox.widget {
 				widget = wibox.container.background,
@@ -239,7 +247,6 @@ local function new()
 
 			bt_adapter:start_discovery()
 		else
-			bottombar_toggle_button:set_label(text_icons.switch_off)
 			bottombar_discover_button:set_fg(beautiful.fg)
 			bottombar_discover_button:set_bg(beautiful.bg_alt)
 			devices_layout:reset()
@@ -262,7 +269,7 @@ local function new()
 	bt_adapter:connect_signal("property::discovering", wp.on_discovering)
 	bt_adapter:connect_signal("property::powered", wp.on_powered)
 
-	bottombar_toggle_button:buttons {
+	bottombar_toggle_switch:buttons {
 		awful.button({}, 1, function()
 			bt_adapter:set_powered(not bt_adapter:get_powered())
 		end)

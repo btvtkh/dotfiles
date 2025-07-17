@@ -4,6 +4,7 @@ local naughty = require("naughty")
 local beautiful = require("beautiful")
 local gtable = require("gears.table")
 local common = require("common")
+local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local ncr = naughty.notification_closed_reason
 local dpi = beautiful.xresources.apply_dpi
@@ -26,14 +27,14 @@ local function create_actions_widget(n)
 
 	local main_layout = actions_widget:get_children_by_id("main-layout")[1]
 	for _, action in ipairs(n.actions) do
-		local action_hover_button = common.hover_button {
+		local action_button = common.button {
 			label = action.name,
 			margins = {
 				left = dpi(10), right = dpi(10),
 				top = dpi(5), bottom = dpi(5)
 			},
 			bg_normal = beautiful.bg_urg,
-			shape = beautiful.rrect(dpi(8)),
+			shape = shape.rrect(dpi(8)),
 			buttons = {
 				awful.button({}, 1, function()
 					action:invoke()
@@ -45,7 +46,7 @@ local function create_actions_widget(n)
 			widget = wibox.container.constraint,
 			strategy = "max",
 			height = dpi(40),
-			action_hover_button
+			action_button
 		})
 	end
 
@@ -60,7 +61,7 @@ local function create_notification_widget(n)
 		{
 			widget = wibox.container.background,
 			bg = beautiful.bg_alt,
-			shape = beautiful.rrect(dpi(10)),
+			shape = shape.rrect(dpi(10)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(15),
@@ -124,7 +125,7 @@ local function create_notification_widget(n)
 								resize = true,
 								halign = "center",
 								valign = "top",
-								clip_shape = beautiful.rrect(dpi(5)),
+								clip_shape = shape.rrect(dpi(5)),
 								image = n.icon
 							}
 						},
@@ -257,22 +258,22 @@ local function new()
 						},
 						{
 							id = "dnd-button",
-							widget = common.hover_button {
+							widget = common.button {
 								label = text_icons.bell_on,
 								bg_normal = beautiful.bg,
 								margins = { right = dpi(11), left = dpi(11) },
-								shape = beautiful.rrect(dpi(10))
+								shape = shape.rrect(dpi(10))
 							}
 						},
 						{
 							id = "clear-button",
-							widget = common.hover_button {
+							widget = common.button {
 								label = text_icons.trash,
 								fg_normal = beautiful.red,
 								bg_normal = beautiful.bg,
 								bg_hover = beautiful.red,
 								margins = { right = dpi(11), left = dpi(11) },
-								shape = beautiful.rrect(dpi(10))
+								shape = shape.rrect(dpi(10))
 							}
 						}
 					}
