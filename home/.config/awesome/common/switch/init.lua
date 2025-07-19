@@ -66,10 +66,25 @@ local function new(args)
 
 	wp.checked = args.checked or false
 
-	wp.bg_normal = args.bg_normal or beautiful.fg_alt
+	wp.bg_normal = args.bg_normal or beautiful.bg_urg
+	wp.bg_hover = args.bg_hover or beautiful.fg_alt
 	wp.bg_checked = args.bg_checked or beautiful.ac
 	wp.handle_bg_normal = args.handle_bg_normal or beautiful.bg_alt
+	wp.handle_bg_hover = args.handle_bg_hover or beautiful.bg_alt
 	wp.handle_bg_checked = args.handle_bg_checked or beautiful.bg_alt
+
+	wp.on_mouse_enter = function()
+		ret:set_bg(wp.bg_hover)
+		handle_background:set_bg(wp.handle_bg_hover)
+	end
+
+	wp.on_mouse_leave = function()
+		ret:set_bg(wp.checked and wp.bg_checked or wp.bg_normal)
+		handle_background:set_bg(wp.checked and wp.handle_bg_checked or wp.handle_bg_normal)
+	end
+
+	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
+	ret:connect_signal("mouse::leave", wp.on_mouse_leave)
 
 	ret:set_bg(wp.checked and wp.bg_checked or wp.bg_normal)
 	handle_background:set_bg(wp.checked and wp.handle_bg_checked or wp.handle_bg_normal)
