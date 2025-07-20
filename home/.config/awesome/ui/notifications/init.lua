@@ -40,25 +40,23 @@ local function create_actions_widget(n)
 
 	local main_layout = actions_widget:get_children_by_id("buttons-layout")[1]
 	for _, action in ipairs(n.actions) do
-		local action_button = common.button {
-			label = action.name,
-			margins = {
-				left = dpi(10), right = dpi(10),
-				top = dpi(5), bottom = dpi(5)
-			},
-			shape = shape.rrect(dpi(8)),
-			buttons = {
-				awful.button({}, 1, function()
-					action:invoke()
-				end)
-			}
-		}
-
 		main_layout:add(wibox.widget {
 			widget = wibox.container.constraint,
 			strategy = "max",
 			height = dpi(40),
-			action_button
+			common.button {
+				label = action.name,
+				margins = {
+					left = dpi(10), right = dpi(10),
+					top = dpi(5), bottom = dpi(5)
+				},
+				shape = shape.rrect(dpi(8)),
+				buttons = {
+					awful.button({}, 1, function()
+						action:invoke()
+					end)
+				}
+			}
 		})
 	end
 
