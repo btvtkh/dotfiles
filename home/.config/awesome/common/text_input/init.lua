@@ -11,14 +11,16 @@ local gcolor = require("gears.color")
 local text_input = {}
 
 local function create_markup(args)
+	local focused = args.focused or false
 	local text = args.text or ""
+	local placeholder = args.placeholder or ""
 	local cursor_pos = args.cursor_pos or 1
 	local selectall = args.selectall or false
-	local placeholder = args.placeholder or ""
 	local obscure = args.obscure or false
 	local obscure_char = args.obscure_char or "*"
 	local highlighter = args.highlighter or nil
-	local cursor_char, spacer, text_start, text_end, markup
+
+	local cursor_char, spacer, text_start, text_end
 
 	if obscure and text ~= "" then
 		text = utf8.gsub(text, "(.)", obscure_char)
@@ -46,20 +48,22 @@ local function create_markup(args)
 		spacer = " "
 	end
 
-	local cursor_bg = gcolor.ensure_pango_color(args.cursor_bg)
-	local cursor_fg = gcolor.ensure_pango_color(args.cursor_fg)
-	local placeholder_fg = gcolor.ensure_pango_color(args.placeholder_fg)
-
 	if text ~= "" and highlighter then
 		text_start, text_end = highlighter(text_start, text_end)
 	end
 
-	markup = text_start
-		.. "<span foreground='" .. cursor_fg .. "' background='" .. cursor_bg ..  "'>" .. cursor_char .. "</span>"
+	local cursor_bg = gcolor.ensure_pango_color(args.cursor_bg)
+	local cursor_fg = gcolor.ensure_pango_color(args.cursor_fg)
+	local placeholder_fg = gcolor.ensure_pango_color(args.placeholder_fg)
+	local unfocused_fg = gcolor.ensure_pango_color(args.unfocused_fg)
+
+	return focused and
+		text_start
+		.. ("<span foreground='" .. cursor_fg .. "' background='" .. cursor_bg .. "'>" .. cursor_char .. "</span>")
 		.. (text == "" and "<span foreground='" .. placeholder_fg .. "'>" .. text_end .. "</span>" or text_end)
 		.. spacer
-
-	return markup
+	or
+		"<span foreground='" .. unfocused_fg .. "'>" .. text_start .. cursor_char .. text_end .. "</span>" .. spacer
 end
 
 local function run_keygrabber(self)
@@ -190,6 +194,7 @@ end
 function text_input:update_textbox()
 	local wp = self._private
 	self:set_markup(create_markup {
+		focused = wp.focused,
 		text = wp.input,
 		cursor_pos = wp.cursor_index,
 		selectall = wp.selectall,
@@ -197,6 +202,7 @@ function text_input:update_textbox()
 		cursor_bg = wp.cursor_bg,
 		cursor_fg = wp.cursor_fg,
 		placeholder_fg = wp.placeholder_fg,
+		unfocused_fg = wp.unfocused_fg,
 		obscure_char = wp.obscure_char,
 		placeholder = wp.placeholder,
 		highlighter = wp.highlighter
@@ -317,6 +323,7 @@ local function new(args)
 	wp.cursor_bg = args.cursor_bg or "#ffffff"
 	wp.cursor_fg = args.cursor_fg or "#000000"
 	wp.placeholder_fg = args.placeholder_fg or "#373737"
+	wp.unfocused_fg = args.unfocused_fg or "#373737"
 	wp.highlighter = args.highlighter
 	wp.on_focused = args.on_focused
 	wp.on_unfocused = args.on_unfocused

@@ -58,6 +58,12 @@ local function create_ap_widget(self, ap)
 	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
 	ret:connect_signal("mouse::leave", wp.on_mouse_leave)
 
+	ret:buttons {
+		awful.button({}, 1, function()
+			self:open_ap_menu(ap)
+		end)
+	}
+
 	name:set_markup(is_active and text_icons.check .. " " .. ap_ssid or ap_ssid)
 
 	strength:set_markup(
@@ -66,12 +72,6 @@ local function create_ap_widget(self, ap)
 		or ap_strength > 20 and "▂▄"
 		or "▂"
 	)
-
-	ret:buttons {
-		awful.button({}, 1, function()
-			self:open_ap_menu(ap)
-		end)
-	}
 
 	return ret
 end

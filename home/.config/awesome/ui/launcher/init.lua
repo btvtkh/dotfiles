@@ -144,39 +144,43 @@ function launcher:update_entries()
 					}
 				}
 
-				entry_widget._private.is_entry = true
+				local ep = entry_widget._private
 
-				entry_widget._private.on_mouse_enter = function(w)
+				ep.is_entry = true
+
+				ep.on_mouse_enter = function(w)
 					if i ~= wp.select_index then
 						w:set_bg(beautiful.bg_urg)
 					end
 				end
 
-				entry_widget._private.on_mouse_leave = function(w)
+				ep.on_mouse_leave = function(w)
 					if i ~= wp.select_index then
 						w:set_bg(nil)
 					end
 				end
 
-				entry_widget:connect_signal("mouse::enter", entry_widget._private.on_mouse_enter)
-				entry_widget:connect_signal("mouse::leave", entry_widget._private.on_mouse_leave)
+				ep.on_clicked = function()
+					if wp.select_index == i then
+						launch_app(app)
+						self:hide()
+					else
+						wp.select_index = i
+						self:update_entries()
+					end
+				end
+
+				entry_widget:connect_signal("mouse::enter", ep.on_mouse_enter)
+				entry_widget:connect_signal("mouse::leave", ep.on_mouse_leave)
+
+				entry_widget:buttons {
+					awful.button({}, 1, ep.on_clicked)
+				}
 
 				if i == wp.select_index then
 					entry_widget:set_bg(beautiful.ac)
 					entry_widget:set_fg(beautiful.bg)
 				end
-
-				entry_widget:buttons {
-					awful.button({}, 1, function()
-						if wp.select_index == i then
-							launch_app(app)
-							self:hide()
-						else
-							wp.select_index = i
-							self:update_entries()
-						end
-					end)
-				}
 
 				entries_layout:add(entry_widget)
 			end
@@ -199,11 +203,13 @@ end
 function launcher:show()
 	if self.visible then return end
 	local wp = self._private
-	wp.unfiltered = Gio.AppInfo.get_all()
-	wp.filtered = filter_apps(wp.unfiltered, "")
+	local text_input = self.widget:get_children_by_id("text-input")[1]
+	text_input:set_input("")
+	text_input:set_cursor_index(1)
+	wp.filtered = filter_apps(Gio.AppInfo.get_all(), "")
 	wp.start_index, wp.select_index = 1, 1
 	self:update_entries()
-	self.widget:get_children_by_id("text-input")[1]:focus()
+	text_input:focus()
 	self.visible = true
 	self:emit_signal("property::visible", self.visible)
 end
@@ -211,11 +217,12 @@ end
 function launcher:hide()
 	if not self.visible then return end
 	local wp = self._private
-	wp.unfiltered = {}
+	local entries_layout = self.widget:get_children_by_id("entries-layout")[1]
+	local text_input = self.widget:get_children_by_id("text-input")[1]
 	wp.filtered = {}
 	wp.select_index, wp.select_index = 1, 1
-	self.widget:get_children_by_id("text-input")[1]:unfocus()
-	self.widget:get_children_by_id("entries-layout")[1]:reset()
+	text_input:unfocus()
+	entries_layout:reset()
 	self.visible = false
 	self:emit_signal("property::visible", self.visible)
 end
@@ -330,6 +337,7 @@ local function new()
 												cursor_bg = beautiful.fg,
 												cursor_fg = beautiful.bg,
 												placeholder_fg = beautiful.fg_alt,
+												unfocused_fg = beautiful.bg_urg
 											}
 										}
 									}
@@ -420,17 +428,12 @@ local function new()
 		end)
 	}
 
-	text_input:on_focused(function()
-		text_input:set_input("")
-		text_input:set_cursor_index(1)
-	end)
-
 	text_input:on_unfocused(function()
 		ret:hide()
 	end)
 
 	text_input:on_input_changed(function(_, input)
-		wp.filtered = filter_apps(wp.unfiltered, input)
+		wp.filtered = filter_apps(Gio.AppInfo.get_all(), input)
 		wp.start_index, wp.select_index = 1, 1
 		ret:update_entries()
 	end)

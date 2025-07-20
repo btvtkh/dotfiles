@@ -68,15 +68,6 @@ local function create_device_widget(path, device)
 	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
 	ret:connect_signal("mouse::leave", wp.on_mouse_leave)
 
-	name:set_markup(
-		(device:get_connected() and text_icons.check .. " " or "")
-		.. (device:get_name() or device:get_address())
-	)
-
-	percentage:set_markup(
-		device:get_percentage() and string.format("%.0f%%", device:get_percentage()) or ""
-	)
-
 	ret:buttons {
 		awful.button({}, 1, function()
 			if not device:get_connected() then
@@ -86,6 +77,15 @@ local function create_device_widget(path, device)
 			end
 		end)
 	}
+
+	name:set_markup(
+		(device:get_connected() and text_icons.check .. " " or "")
+		.. (device:get_name() or device:get_address())
+	)
+
+	percentage:set_markup(
+		device:get_percentage() and string.format("%.0f%%", device:get_percentage()) or ""
+	)
 
 	return ret
 end
