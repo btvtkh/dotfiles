@@ -25,7 +25,7 @@ local function create_player_widget(name, player)
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
 		forced_width = dpi(450),
-		shape = shape.rrect(dpi(10)),
+		shape = shape.rrect(dpi(13)),
 		{
 			widget = wibox.container.margin,
 			margins = dpi(10),
@@ -317,7 +317,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = shape.rrect(dpi(20)),
+			shape = shape.rrect(dpi(23)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(10),

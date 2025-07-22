@@ -10,7 +10,7 @@ local bt_adapter = require("service.bluetooth").get_default()
 local function create_device_widget(path, device)
 	local ret = wibox.widget {
 		widget = wibox.container.background,
-		shape = shape.rrect(dpi(10)),
+		shape = shape.rrect(dpi(13)),
 		forced_height = dpi(40),
 		{
 			widget = wibox.container.margin,
@@ -110,53 +110,57 @@ local function new()
 			},
 			{
 				widget = wibox.container.background,
-				forced_height = dpi(50),
+				forced_height = dpi(45),
 				bg = beautiful.bg_alt,
-				shape = shape.rrect(dpi(10)),
+				shape = shape.rrect(dpi(13)),
 				{
-					layout = wibox.layout.align.horizontal,
+					widget = wibox.container.margin,
+					margins = dpi(5),
 					{
-						layout = wibox.layout.fixed.horizontal,
-						spacing = beautiful.separator_thickness + dpi(2),
-						spacing_widget = {
+						layout = wibox.layout.align.horizontal,
+						{
+							layout = wibox.layout.fixed.horizontal,
+							spacing = beautiful.separator_thickness + dpi(2),
+							spacing_widget = {
+								widget = wibox.container.margin,
+								margins = { top = dpi(10), bottom = dpi(10) },
+								{
+									widget = wibox.widget.separator,
+									orientation = "vertical"
+								}
+							},
+							{
+								id = "bottombar-close-button",
+								widget = common.button {
+									label = text_icons.arrow_left,
+									forced_width = dpi(35),
+									forced_height = dpi(35),
+									shape = shape.rrect(dpi(8))
+								}
+							},
+							{
+								id = "bottombar-discover-button",
+								widget = common.button {
+									label = text_icons.search,
+									forced_width = dpi(35),
+									forced_height = dpi(35),
+									shape = shape.rrect(dpi(8))
+								}
+							}
+						},
+						nil,
+						{
 							widget = wibox.container.margin,
-							margins = { top = dpi(12), bottom = dpi(12) },
+							margins = { right = dpi(5) },
 							{
-								widget = wibox.widget.separator,
-								orientation = "vertical"
-							}
-						},
-						{
-							id = "bottombar-close-button",
-							widget = common.button {
-								label = text_icons.arrow_left,
-								forced_width = dpi(50),
-								forced_height = dpi(50),
-								shape = shape.rrect(dpi(10))
-							}
-						},
-						{
-							id = "bottombar-discover-button",
-							widget = common.button {
-								label = text_icons.search,
-								forced_width = dpi(50),
-								forced_height = dpi(50),
-								shape = shape.rrect(dpi(10))
-							}
-						}
-					},
-					nil,
-					{
-						widget = wibox.container.margin,
-						margins = { right = dpi(12) },
-						{
-							widget = wibox.container.place,
-							halign = "center",
-							{
-								id = "bottombar-toggle-switch",
-								widget = common.switch {
-									forced_width = dpi(40),
-									forced_height = dpi(22),
+								widget = wibox.container.place,
+								halign = "center",
+								{
+									id = "bottombar-toggle-switch",
+									widget = common.switch {
+										forced_width = dpi(40),
+										forced_height = dpi(20),
+									}
 								}
 							}
 						}

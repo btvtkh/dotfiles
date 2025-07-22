@@ -70,7 +70,7 @@ function powermenu:update_elements()
 			widget = wibox.container.background,
 			forced_width = dpi(120),
 			forced_height = dpi(120),
-			shape = shape.rrect(dpi(15)),
+			shape = shape.rrect(dpi(20)),
 			buttons = {
 				awful.button({}, 1, function()
 					if wp.select_index == i then
@@ -146,7 +146,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = shape.rrect(dpi(25)),
+			shape = shape.rrect(dpi(32)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(12),

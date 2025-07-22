@@ -12,7 +12,7 @@ local function new()
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
-		shape = shape.rrect(dpi(10)),
+		shape = shape.rrect(dpi(13)),
 		{
 			widget = wibox.container.margin,
 			margins = dpi(10),

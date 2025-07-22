@@ -310,7 +310,7 @@ local function new()
 		widget = wibox.container.background,
 		forced_width = dpi(370),
 		bg = beautiful.bg_alt,
-		shape = shape.rrect(dpi(10)),
+		shape = shape.rrect(dpi(13)),
 		{
 			id = "main-layout",
 			layout = wibox.layout.fixed.vertical

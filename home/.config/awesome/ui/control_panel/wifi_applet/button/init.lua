@@ -12,7 +12,7 @@ local function new()
 		forced_height = dpi(60),
 		bg = beautiful.bg_alt,
 		fg = beautiful.fg,
-		shape = shape.rrect(dpi(10)),
+		shape = shape.rrect(dpi(13)),
 		{
 			widget = wibox.container.margin,
 			margins = { left = dpi(15) },

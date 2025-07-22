@@ -110,7 +110,7 @@ function launcher:update_entries()
 				local entry_widget = wibox.widget {
 					widget = wibox.container.background,
 					forced_height = dpi(60),
-					shape = shape.rrect(dpi(10)),
+					shape = shape.rrect(dpi(13)),
 					{
 						widget = wibox.container.margin,
 						margins = { left = dpi(15), right = dpi(15) },
@@ -253,7 +253,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = shape.rrect(dpi(18)),
+			shape = shape.rrect(dpi(23)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(10),
@@ -263,50 +263,54 @@ local function new()
 					fill_space = true,
 					{
 						widget = wibox.container.background,
-						forced_width = dpi(50),
+						forced_width = dpi(45),
 						bg = beautiful.bg_alt,
-						shape = shape.rrect(dpi(10)),
+						shape = shape.rrect(dpi(13)),
 						{
-							layout = wibox.layout.align.vertical,
+							widget = wibox.container.margin,
+							margins = dpi(5),
 							{
-								id = "powermenu-button",
-								widget = common.button {
-									label = text_icons.poweroff,
-									forced_width = dpi(50),
-									forced_height = dpi(50),
-									fg_normal = beautiful.red,
-									bg_hover = beautiful.red,
-									shape = shape.rrect(dpi(10))
-								}
-							},
-							nil,
-							{
-								layout = wibox.layout.fixed.vertical,
-								spacing = beautiful.separator_thickness + dpi(2),
-								spacing_widget = {
-									widget = wibox.container.margin,
-									margins = { left = dpi(12), right = dpi(12) },
+								layout = wibox.layout.align.vertical,
+								{
+									id = "powermenu-button",
+									widget = common.button {
+										label = text_icons.poweroff,
+										forced_width = dpi(35),
+										forced_height = dpi(35),
+										fg_normal = beautiful.red,
+										bg_hover = beautiful.red,
+										shape = shape.rrect(dpi(8))
+									}
+								},
+								nil,
+								{
+									layout = wibox.layout.fixed.vertical,
+									spacing = beautiful.separator_thickness + dpi(2),
+									spacing_widget = {
+										widget = wibox.container.margin,
+										margins = { left = dpi(10), right = dpi(10) },
+										{
+											widget = wibox.widget.separator,
+											orientation = "horizontal"
+										}
+									},
 									{
-										widget = wibox.widget.separator,
-										orientation = "horizontal"
-									}
-								},
-								{
-									id = "wallpaper-button",
-									widget = common.button {
-										label = text_icons.image,
-										forced_width = dpi(50),
-										forced_height = dpi(50),
-										shape = shape.rrect(dpi(10))
-									}
-								},
-								{
-									id = "home-button",
-									widget = common.button {
-										label = text_icons.home,
-										forced_width = dpi(50),
-										forced_height = dpi(50),
-										shape = shape.rrect(dpi(10))
+										id = "wallpaper-button",
+										widget = common.button {
+											label = text_icons.image,
+											forced_width = dpi(35),
+											forced_height = dpi(35),
+											shape = shape.rrect(dpi(8))
+										}
+									},
+									{
+										id = "home-button",
+										widget = common.button {
+											label = text_icons.home,
+											forced_width = dpi(35),
+											forced_height = dpi(35),
+											shape = shape.rrect(dpi(8))
+										}
 									}
 								}
 							}

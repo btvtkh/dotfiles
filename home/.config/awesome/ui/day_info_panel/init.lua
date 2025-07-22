@@ -49,7 +49,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = shape.rrect(dpi(22)),
+			shape = shape.rrect(dpi(25)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(12),
@@ -61,7 +61,7 @@ local function new()
 						id = "calendar",
 						widget = common.calendar {
 							sun_start = false,
-							shape = shape.rrect(dpi(10)),
+							shape = shape.rrect(dpi(13)),
 							day_shape = shape.rrect(dpi(8))
 						}
 					}

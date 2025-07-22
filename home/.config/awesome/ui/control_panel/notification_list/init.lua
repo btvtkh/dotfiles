@@ -59,7 +59,7 @@ local function create_notification_widget(n)
 		{
 			widget = wibox.container.background,
 			bg = beautiful.bg_alt,
-			shape = shape.rrect(dpi(10)),
+			shape = shape.rrect(dpi(13)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(15),
@@ -229,49 +229,55 @@ local function new()
 			spacing = dpi(6),
 			{
 				widget = wibox.container.background,
-				forced_height = dpi(40),
+				forced_height = dpi(45),
 				{
-					layout = wibox.layout.align.horizontal,
+					widget = wibox.container.margin,
+					margins = dpi(5),
 					{
-						widget = wibox.container.margin,
-						margins = { left = dpi(7) },
+						layout = wibox.layout.align.horizontal,
 						{
-							id = "notifications-title",
-							widget = wibox.widget.textbox,
-							align = "center",
-							markup = "Notifications"
-						}
-					},
-					nil,
-					{
-						layout = wibox.layout.fixed.horizontal,
-						spacing = beautiful.separator_thickness + dpi(2),
-						spacing_widget = {
 							widget = wibox.container.margin,
-							margins = { top = dpi(8), bottom = dpi(8) },
+							margins = { left = dpi(7) },
 							{
-								widget = wibox.widget.separator,
-								orientation = "vertical"
+								id = "notifications-title",
+								widget = wibox.widget.textbox,
+								align = "center",
+								markup = "Notifications"
 							}
 						},
+						nil,
 						{
-							id = "dnd-button",
-							widget = common.button {
-								label = text_icons.bell_on,
-								bg_normal = beautiful.bg,
-								margins = { right = dpi(11), left = dpi(11) },
-								shape = shape.rrect(dpi(10))
-							}
-						},
-						{
-							id = "clear-button",
-							widget = common.button {
-								label = text_icons.trash,
-								fg_normal = beautiful.red,
-								bg_normal = beautiful.bg,
-								bg_hover = beautiful.red,
-								margins = { right = dpi(11), left = dpi(11) },
-								shape = shape.rrect(dpi(10))
+							layout = wibox.layout.fixed.horizontal,
+							spacing = beautiful.separator_thickness + dpi(2),
+							spacing_widget = {
+								widget = wibox.container.margin,
+								margins = { top = dpi(8), bottom = dpi(8) },
+								{
+									widget = wibox.widget.separator,
+									orientation = "vertical"
+								}
+							},
+							{
+								id = "dnd-button",
+								widget = common.button {
+									label = text_icons.bell_on,
+									bg_normal = beautiful.bg,
+									forced_width = dpi(35),
+									forced_height = dpi(35),
+									shape = shape.rrect(dpi(8))
+								}
+							},
+							{
+								id = "clear-button",
+								widget = common.button {
+									label = text_icons.trash,
+									fg_normal = beautiful.red,
+									bg_normal = beautiful.bg,
+									bg_hover = beautiful.red,
+									forced_width = dpi(35),
+									forced_height = dpi(35),
+									shape = shape.rrect(dpi(8))
+								}
 							}
 						}
 					}

@@ -36,7 +36,7 @@ local function new(args)
 		buttons = args.buttons,
 		forced_width = args.forced_width,
 		forced_height = args.forced_height,
-		border_width = args.border_width or 0,
+		border_width = args.border_width,
 		border_color = args.border_color_normal or
 			beautiful.bg_urg or "#3d3d3d",
 		bg = args.bg_normal or
@@ -45,7 +45,7 @@ local function new(args)
 			beautiful.fg or "#ffffff",
 		{
 			widget = wibox.container.margin,
-			margins = args.margins or 0,
+			margins = args.margins,
 			{
 				id = "label-role",
 				widget = wibox.widget.textbox,

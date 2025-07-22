@@ -97,7 +97,7 @@ local function new()
 			bg = beautiful.bg,
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_color_normal,
-			shape = shape.rrect(dpi(22)),
+			shape = shape.rrect(dpi(25)),
 			{
 				widget = wibox.container.margin,
 				margins = dpi(12),
