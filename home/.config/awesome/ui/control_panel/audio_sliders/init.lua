@@ -1,6 +1,5 @@
 local awful = require("awful")
 local wibox = require("wibox")
-local gtimer = require("gears.timer")
 local beautiful = require("beautiful")
 local common = require("common")
 local shape = require("lib.shape")
@@ -22,7 +21,6 @@ local function new()
 				{
 					layout = wibox.layout.fixed.horizontal,
 					fill_space = true,
-					spacing = dpi(10),
 					{
 						id = "speaker-mute-button",
 						widget = common.button {
@@ -35,20 +33,20 @@ local function new()
 					},
 					{
 						widget = wibox.container.background,
-						forced_width = dpi(310),
+						forced_width = dpi(330),
 						forced_height = dpi(40),
 						{
 							id = "speaker-slider",
-							widget = wibox.widget.slider,
-							maximum = 20,
-							bar_height = dpi(2),
-							handle_border_width = dpi(2),
-							handle_margins = { top = dpi(9), bottom = dpi(9) },
-							bar_color = beautiful.bg_urg,
-							handle_color = beautiful.bg_alt,
-							handle_border_color = beautiful.ac,
-							handle_shape = shape.crcl(9),
-							bar_shape = shape.rbar()
+							widget = common.scale,
+							trough_height = dpi(2),
+							trough_color = beautiful.bg_urg,
+							trough_shape = shape.rbar(),
+							highlight_height = dpi(2),
+							highlight_shape = shape.rbar(),
+							slider_color = beautiful.bg_alt,
+							slider_border_width = dpi(2),
+							slider_border_color = beautiful.ac,
+							slider_shape = shape.crcl(9)
 						}
 					},
 					{
@@ -60,7 +58,6 @@ local function new()
 				{
 					layout = wibox.layout.fixed.horizontal,
 					fill_space = true,
-					spacing = dpi(10),
 					{
 						id = "microphone-mute-button",
 						widget = common.button {
@@ -73,20 +70,20 @@ local function new()
 					},
 					{
 						widget = wibox.container.background,
-						forced_width = dpi(310),
+						forced_width = dpi(330),
 						forced_height = dpi(40),
 						{
 							id = "microphone-slider",
-							widget = wibox.widget.slider,
-							maximum = 20,
-							bar_height = dpi(2),
-							handle_border_width = dpi(2),
-							handle_margins = { top = dpi(9), bottom = dpi(9) },
-							bar_color = beautiful.bg_urg,
-							handle_color = beautiful.bg_alt,
-							handle_border_color = beautiful.ac,
-							handle_shape = shape.crcl(9),
-							bar_shape = shape.rbar()
+							widget = common.scale,
+							trough_height = dpi(2),
+							trough_color = beautiful.bg_urg,
+							trough_shape = shape.rbar(),
+							highlight_height = dpi(2),
+							highlight_shape = shape.rbar(),
+							slider_color = beautiful.bg_alt,
+							slider_border_width = dpi(2),
+							slider_border_color = beautiful.ac,
+							slider_shape = shape.crcl(9)
 						}
 					},
 					{
@@ -108,37 +105,53 @@ local function new()
 	local microphone_value_text = ret:get_children_by_id("microphone-volume-value")[1]
 
 	wp.on_sink_volume = function(_, val)
-		speaker_slider:set_value(tonumber(val) / 5)
+		speaker_slider:set_value(tonumber(val))
 		speaker_value_text:set_markup(val .. "%")
 	end
 
 	wp.on_sink_mute = function(_, mute)
 		if mute then
 			speaker_mute_button:set_label(text_icons.vol_off)
-			speaker_slider:set_bar_active_color(beautiful.fg_alt)
-			speaker_slider:set_handle_border_color(beautiful.fg_alt)
+			speaker_slider:set_highlight_color(beautiful.fg_alt)
+			speaker_slider:set_slider_border_color(beautiful.fg_alt)
 		else
 			speaker_mute_button:set_label(text_icons.vol_on)
-			speaker_slider:set_bar_active_color(beautiful.ac)
-			speaker_slider:set_handle_border_color(beautiful.ac)
+			speaker_slider:set_highlight_color(beautiful.ac)
+			speaker_slider:set_slider_border_color(beautiful.ac)
 		end
 	end
 
+	wp.on_speaker_slider_value = function()
+		speaker_value_text:set_markup(tostring(speaker_slider:get_value()) .. "%")
+	end
+
+	wp.on_speaker_slider_dragging_stopped = function()
+		audio:set_default_sink_volume(speaker_slider:get_value())
+	end
+
 	wp.on_source_volume = function(_, val)
-		microphone_slider:set_value(tonumber(val) / 5)
+		microphone_slider:set_value(tonumber(val))
 		microphone_value_text:set_markup(val .. "%")
 	end
 
 	wp.on_source_mute = function(_, mute)
 		if mute then
 			microphone_mute_button:set_label(text_icons.mic_off)
-			microphone_slider:set_bar_active_color(beautiful.fg_alt)
-			microphone_slider:set_handle_border_color(beautiful.fg_alt)
+			microphone_slider:set_highlight_color(beautiful.fg_alt)
+			microphone_slider:set_slider_border_color(beautiful.fg_alt)
 		else
 			microphone_mute_button:set_label(text_icons.mic_on)
-			microphone_slider:set_bar_active_color(beautiful.ac)
-			microphone_slider:set_handle_border_color(beautiful.ac)
+			microphone_slider:set_highlight_color(beautiful.ac)
+			microphone_slider:set_slider_border_color(beautiful.ac)
 		end
+	end
+
+	wp.on_microphone_slider_value = function()
+		microphone_value_text:set_markup(tostring(microphone_slider:get_value()) .. "%")
+	end
+
+	wp.on_microphone_slider_dragging_stopped = function()
+		audio:set_default_source_volume(microphone_slider:get_value())
 	end
 
 	audio:connect_signal("default-sink::volume", wp.on_sink_volume)
@@ -146,28 +159,15 @@ local function new()
 	audio:connect_signal("default-source::volume", wp.on_source_volume)
 	audio:connect_signal("default-source::mute", wp.on_source_mute)
 
-	speaker_slider:buttons {
-		awful.button({}, 1, function()
-			gtimer.delayed_call(function()
-				speaker_value_text:set_markup(tostring(speaker_slider:get_value() * 5) .. "%")
-				audio:set_default_sink_volume(speaker_slider:get_value() * 5)
-			end)
-		end)
-	}
+	speaker_slider:connect_signal("property::value", wp.on_speaker_slider_value)
+	speaker_slider:connect_signal("dragging-stopped", wp.on_speaker_slider_dragging_stopped)
+	microphone_slider:connect_signal("property::value", wp.on_microphone_slider_value)
+	microphone_slider:connect_signal("dragging-stopped", wp.on_microphone_slider_dragging_stopped)
 
 	speaker_mute_button:buttons {
 		awful.button({}, 1, function()
 			audio:toggle_default_sink_mute()
 			audio:get_default_sink_data()
-		end)
-	}
-
-	microphone_slider:buttons {
-		awful.button({}, 1, function()
-			gtimer.delayed_call(function()
-				microphone_value_text:set_markup(tostring(microphone_slider:get_value() * 5) .. "%")
-				audio:set_default_source_volume(microphone_slider:get_value() * 5)
-			end)
 		end)
 	}
 

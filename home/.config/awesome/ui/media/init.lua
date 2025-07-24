@@ -139,23 +139,21 @@ local function create_player_widget(name, player)
 								}
 							},
 							{
-								id = "slider-container",
 								widget = wibox.container.margin,
 								forced_height = dpi(20),
 								{
 									id = "timeline",
-									widget = wibox.widget.slider,
-									maximum = 100,
-									bar_height = dpi(2),
-									handle_width = dpi(20),
-									handle_border_width = dpi(2),
-									handle_margins = { top = dpi(7), bottom = dpi(7) },
-									bar_color = beautiful.bg_urg,
-									bar_active_color = beautiful.ac,
-									handle_color = beautiful.bg_alt,
-									handle_border_color = beautiful.ac,
-									handle_shape = shape.crcl(5),
-									bar_shape = shape.rbar()
+									widget = common.scale,
+									trough_height = dpi(2),
+									trough_color = beautiful.bg_urg,
+									trough_shape = shape.rbar(),
+									highlight_height = dpi(2),
+									highlight_color = beautiful.ac,
+									highlight_shape = shape.rbar(),
+									slider_border_width = dpi(2),
+									slider_color = beautiful.bg_alt,
+									slider_border_color = beautiful.ac,
+									slider_shape = shape.crcl(5)
 								}
 							}
 						}
@@ -188,7 +186,10 @@ local function create_player_widget(name, player)
 			local position = player:get_position()
 
 			position_text:set_markup(us_to_hms(position))
-			timeline_slider:set_value(position/length*100)
+
+			if not timeline_slider:get_is_dragging() then
+				timeline_slider:set_value(position/length*100)
+			end
 
 			if wp.timeline_timer then
 				wp.timeline_timer:again()
@@ -205,7 +206,10 @@ local function create_player_widget(name, player)
 		local length = metadata:get_length() or 1
 		position_text:set_markup(us_to_hms(position))
 		length_text:set_markup(us_to_hms(length))
-		timeline_slider:set_value(position/length*100)
+
+		if not timeline_slider:get_is_dragging() then
+			timeline_slider:set_value(position/length*100)
+		end
 
 		local title = metadata:get_title()
 		title_text:set_markup(title ~= nil and title ~= "" and title or "untitled")
@@ -213,7 +217,6 @@ local function create_player_widget(name, player)
 		local artist = metadata:get_artist()
 		local artist_string = artist ~= nil and artist ~= {} and tostring(table.unpack(artist)) or nil
 		artist_text:set_markup(artist_string ~= nil and artist_string ~= "" and artist_string or "unknown artist")
-
 	end
 
 	wp.on_playback_status = function(_, status)
@@ -231,12 +234,22 @@ local function create_player_widget(name, player)
 		local length = player:get_metadata():get_length()
 		position_text:set_markup(us_to_hms(position))
 		length_text:set_markup(us_to_hms(length))
-		timeline_slider:set_value(position/length*100)
+
+		if not timeline_slider:get_is_dragging() then
+			timeline_slider:set_value(position/length*100)
+		end
 
 		wp.timeline_timer:stop()
 		if player:get_playback_status() == "playing" then
 			wp.timeline_timer:start()
 		end
+	end
+
+	wp.on_timeline_slider_dragging_stopped = function()
+		player:set_position(
+			player:get_metadata():get_track_id(),
+			player:get_metadata():get_length() * timeline_slider:get_value()/100
+		)
 	end
 
 	player:connect_signal("property::metadata", wp.on_metadata)
@@ -280,17 +293,7 @@ local function create_player_widget(name, player)
 		end)
 	}
 
-	timeline_slider:buttons {
-		awful.button({}, 1, function()
-			gtimer.delayed_call(function()
-				player:set_position(
-					player:get_metadata():get_track_id(),
-					player:get_metadata():get_length()
-					* timeline_slider:get_value()/100
-				)
-			end)
-		end)
-	}
+	timeline_slider:connect_signal("dragging-stopped", wp.on_timeline_slider_dragging_stopped)
 
 	if player:get_playback_status() == "playing" then
 		wp.timeline_timer:start()

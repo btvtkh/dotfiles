@@ -25,12 +25,12 @@ local function launch_app(app)
 
 	awful.spawn(
 		term_needed and
-		term and string.format("%s -e %s", term:get_executable(), app:get_executable())
+			term and string.format("%s -e %s", term:get_executable(), app:get_executable())
 		or
-		string.match(app:get_executable(), "^env") and
-		string.gsub(app:get_commandline(), "%%%a", "")
+			string.match(app:get_executable(), "^env") and
+				string.gsub(app:get_commandline(), "%%%a", "")
 		or
-		app:get_executable()
+			app:get_executable()
 	)
 end
 
