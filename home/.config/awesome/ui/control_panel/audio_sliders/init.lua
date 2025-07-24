@@ -42,10 +42,12 @@ local function new()
 							trough_color = beautiful.bg_urg,
 							trough_shape = shape.rbar(),
 							highlight_height = dpi(2),
+							highlight_margins = dpi(8),
 							highlight_shape = shape.rbar(),
 							slider_color = beautiful.bg_alt,
 							slider_border_width = dpi(2),
 							slider_border_color = beautiful.ac,
+							slider_margins = beautiful.rounded and 0 or dpi(10),
 							slider_shape = shape.crcl(9)
 						}
 					},
@@ -83,6 +85,7 @@ local function new()
 							slider_color = beautiful.bg_alt,
 							slider_border_width = dpi(2),
 							slider_border_color = beautiful.ac,
+							slider_margins = beautiful.rounded and 0 or dpi(10),
 							slider_shape = shape.crcl(9)
 						}
 					},

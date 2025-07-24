@@ -151,15 +151,17 @@ local function new()
 						nil,
 						{
 							widget = wibox.container.margin,
-							margins = { right = dpi(5) },
+							forced_width = dpi(60),
+							margins = dpi(5),
 							{
 								widget = wibox.container.place,
 								halign = "center",
 								{
 									id = "bottombar-toggle-switch",
 									widget = common.switch {
-										forced_width = dpi(40),
-										forced_height = dpi(20),
+										trough_shape = shape.rbar(),
+										slider_margins = 4,
+										slider_shape = shape.rbar()
 									}
 								}
 							}
