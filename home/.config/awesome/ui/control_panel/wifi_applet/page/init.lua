@@ -243,9 +243,8 @@ local function new()
 						nil,
 						{
 							widget = wibox.container.margin,
-							forced_width = dpi(60),
-							forced_height = dpi(20),
-							margins = dpi(5),
+							forced_width = dpi(55),
+							margins = dpi(6),
 							{
 								widget = wibox.container.place,
 								halign = "center",
@@ -254,7 +253,7 @@ local function new()
 									widget = common.switch,
 									trough_color = beautiful.fg_alt,
 									slider_color = beautiful.bg_alt,
-									slider_margins = dpi(4),
+									slider_margins = dpi(2),
 									trough_shape = shape.rbar(),
 									slider_shape = shape.rbar()
 								}

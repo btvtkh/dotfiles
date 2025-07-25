@@ -33,7 +33,7 @@ local function new()
 					},
 					{
 						widget = wibox.container.background,
-						forced_width = dpi(330),
+						forced_width = dpi(320),
 						forced_height = dpi(40),
 						{
 							id = "speaker-slider",
@@ -41,11 +41,12 @@ local function new()
 							trough_margins = dpi(19),
 							trough_color = beautiful.bg_urg,
 							trough_shape = shape.rbar(),
-							highlight_margins = dpi(10),
+							highlight_margins = dpi(19),
 							highlight_shape = shape.rbar(),
 							slider_color = beautiful.bg_alt,
 							slider_border_color = beautiful.ac,
-							slider_margins = dpi(14),
+							slider_border_width = dpi(2),
+							slider_margins = dpi(10),
 							slider_shape = shape.rbar()
 						}
 					},
@@ -70,7 +71,7 @@ local function new()
 					},
 					{
 						widget = wibox.container.background,
-						forced_width = dpi(330),
+						forced_width = dpi(320),
 						forced_height = dpi(40),
 						{
 							id = "microphone-slider",
@@ -78,11 +79,12 @@ local function new()
 							trough_margins = dpi(19),
 							trough_color = beautiful.bg_urg,
 							trough_shape = shape.rbar(),
-							highlight_margins = dpi(10),
+							highlight_margins = dpi(19),
 							highlight_shape = shape.rbar(),
 							slider_color = beautiful.bg_alt,
 							slider_border_color = beautiful.ac,
-							slider_margins = dpi(14),
+							slider_border_width = dpi(2),
+							slider_margins = dpi(10),
 							slider_shape = shape.rbar()
 						}
 					},
