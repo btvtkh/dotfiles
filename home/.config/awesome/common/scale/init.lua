@@ -71,18 +71,14 @@ function scale:draw(_, cr, width, height)
 	local range = wp.max - wp.min
 	local rate = (wp.value - wp.min)/range
 
-	local slider_width = (wp.slider_width or height - wp.slider_margins*2) - wp.slider_border_width
-	local slider_height = (wp.slider_height or height - wp.slider_margins*2) - wp.slider_border_width
-
-	local highlight_width = width * rate + ((slider_width + wp.slider_margins*2
-		+ wp.slider_border_width) * (1 - rate))
-
-	local trough_offset = wp.trough_height and (height - wp.trough_height + wp.trough_border_width/2)/2
-		or wp.trough_margins + wp.trough_border_width/2
+	local trough_offset_x = wp.trough_border_width/2 + wp.trough_margins
+	local trough_offset_y = (height - ((wp.trough_height or height) - wp.trough_border_width - wp.trough_margins*2))/2
+	local trough_width = width - trough_offset_x*2
+	local trough_height = (wp.trough_height or height) - wp.trough_border_width - wp.trough_margins*2
 
 	cr:set_source(gcolor(wp.trough_color))
-	cr:translate(trough_offset, trough_offset)
-	wp.trough_shape(cr, width - trough_offset*2, height - trough_offset*2)
+	cr:translate(trough_offset_x, trough_offset_y)
+	wp.trough_shape(cr, trough_width, trough_height)
 
 	if wp.trough_border_width == 0 then
 		cr:fill()
@@ -99,14 +95,16 @@ function scale:draw(_, cr, width, height)
 		end
 	end
 
-	cr:translate(-trough_offset, -trough_offset)
+	cr:translate(-trough_offset_x, -trough_offset_y)
 
-	local highlight_offset = wp.highlight_height and (height - wp.highlight_height + wp.highlight_border_width/2)/2
-		or wp.highlight_margins + wp.highlight_border_width/2
+	local highlight_offset_x = wp.highlight_border_width/2 + wp.highlight_margins
+	local highlight_offset_y = (height - ((wp.highlight_height or height) - wp.highlight_border_width - wp.highlight_margins*2))/2
+	local highlight_width = width*rate + (wp.slider_width or height)*(1 - rate) - highlight_offset_x*2
+	local highlight_height = (wp.highlight_height or height) - wp.highlight_border_width - wp.highlight_margins*2
 
 	cr:set_source(gcolor(wp.highlight_color))
-	cr:translate(highlight_offset, highlight_offset)
-	wp.highlight_shape(cr, highlight_width - highlight_offset*2, height - highlight_offset*2)
+	cr:translate(highlight_offset_x, highlight_offset_y)
+	wp.highlight_shape(cr, highlight_width, highlight_height)
 
 	if wp.highlight_border_width == 0 then
 		cr:fill()
@@ -123,12 +121,12 @@ function scale:draw(_, cr, width, height)
 		end
 	end
 
-	cr:translate(-highlight_offset, -highlight_offset)
+	cr:translate(-highlight_offset_x, -highlight_offset_y)
 
-	local slider_x_offset = width * rate +
-		((slider_width + wp.slider_margins*2 + wp.slider_border_width) * (1 - rate)
-		- (slider_width + wp.slider_margins + wp.slider_border_width/2))
-	local slider_y_offset = (height - slider_height)/2
+	local slider_x_offset = width*rate + ((wp.slider_width or height)*(1 - rate) - ((wp.slider_width or height) - wp.slider_border_width/2 - wp.slider_margins))
+	local slider_y_offset = (height - ((wp.slider_height or height) - wp.slider_border_width - wp.slider_margins*2))/2
+	local slider_width = (wp.slider_width or height) - wp.slider_border_width - wp.slider_margins*2
+	local slider_height = (wp.slider_height or height) - wp.slider_border_width - wp.slider_margins*2
 
 	cr:set_source(gcolor(wp.slider_color))
 	cr:translate(slider_x_offset, slider_y_offset)

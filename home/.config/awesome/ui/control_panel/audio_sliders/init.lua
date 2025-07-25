@@ -38,17 +38,15 @@ local function new()
 						{
 							id = "speaker-slider",
 							widget = common.scale,
-							trough_height = dpi(2),
+							trough_margins = dpi(19),
 							trough_color = beautiful.bg_urg,
 							trough_shape = shape.rbar(),
-							highlight_height = dpi(2),
-							highlight_margins = dpi(8),
+							highlight_margins = dpi(10),
 							highlight_shape = shape.rbar(),
 							slider_color = beautiful.bg_alt,
-							slider_border_width = dpi(2),
 							slider_border_color = beautiful.ac,
-							slider_margins = beautiful.rounded and 0 or dpi(10),
-							slider_shape = shape.crcl(9)
+							slider_margins = dpi(14),
+							slider_shape = shape.rbar()
 						}
 					},
 					{
@@ -77,16 +75,15 @@ local function new()
 						{
 							id = "microphone-slider",
 							widget = common.scale,
-							trough_height = dpi(2),
+							trough_margins = dpi(19),
 							trough_color = beautiful.bg_urg,
 							trough_shape = shape.rbar(),
-							highlight_height = dpi(2),
+							highlight_margins = dpi(10),
 							highlight_shape = shape.rbar(),
 							slider_color = beautiful.bg_alt,
-							slider_border_width = dpi(2),
 							slider_border_color = beautiful.ac,
-							slider_margins = beautiful.rounded and 0 or dpi(10),
-							slider_shape = shape.crcl(9)
+							slider_margins = dpi(14),
+							slider_shape = shape.rbar()
 						}
 					},
 					{

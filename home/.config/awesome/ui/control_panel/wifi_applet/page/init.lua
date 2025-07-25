@@ -251,11 +251,12 @@ local function new()
 								halign = "center",
 								{
 									id = "bottombar-toggle-switch",
-									widget = common.switch {
-										trough_shape = shape.rbar(),
-										slider_margins = 4,
-										slider_shape = shape.rbar()
-									}
+									widget = common.switch,
+									trough_color = beautiful.fg_alt,
+									slider_color = beautiful.bg_alt,
+									slider_margins = dpi(4),
+									trough_shape = shape.rbar(),
+									slider_shape = shape.rbar()
 								}
 							}
 						}
