@@ -1,12 +1,16 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local gtimer = require("gears.timer")
+local gtable = require("gears.table")
 local beautiful = require("beautiful")
 local common = require("common")
 local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
+local text_icons = beautiful.text_icons
 local capi = { screen = screen }
 local media_player = require("service.media_player").get_default()
+
+local media = {}
 
 local function us_to_hms(us)
 	local total_s = us / 1000000
@@ -20,7 +24,7 @@ local function us_to_hms(us)
 		.. string.format("%02d", math.floor(s))
 end
 
-local function create_player_widget(name, player)
+local function create_player_widget(self, name, player)
 	local player_widget = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
@@ -102,7 +106,7 @@ local function create_player_widget(name, player)
 										{
 											id = "previous",
 											widget = common.button {
-												label = "",
+												label = text_icons.go_previous,
 												margins = dpi(4),
 												shape = shape.rrect(dpi(6))
 											}
@@ -117,7 +121,7 @@ local function create_player_widget(name, player)
 										{
 											id = "next",
 											widget = common.button {
-												label = "",
+												label = text_icons.go_next,
 												margins = dpi(4),
 												shape = shape.rrect(dpi(6))
 											}
@@ -144,16 +148,17 @@ local function create_player_widget(name, player)
 								{
 									id = "timeline",
 									widget = common.scale,
-									trough_height = dpi(2),
+									trough_margins = dpi(9),
 									trough_color = beautiful.bg_urg,
 									trough_shape = shape.rbar(),
-									highlight_height = dpi(2),
+									highlight_margins = dpi(9),
 									highlight_color = beautiful.ac,
 									highlight_shape = shape.rbar(),
+									slider_margins = dpi(4),
 									slider_border_width = dpi(2),
 									slider_color = beautiful.bg_alt,
 									slider_border_color = beautiful.ac,
-									slider_shape = shape.crcl(5)
+									slider_shape = shape.rbar()
 								}
 							}
 						}
@@ -220,12 +225,14 @@ local function create_player_widget(name, player)
 	end
 
 	wp.on_playback_status = function(_, status)
-		play_pause_button:set_label(status == "playing" and "" or "")
+		play_pause_button:set_label(status == "playing" and text_icons.pause or text_icons.play)
 
-		if status ~= "playing" then
-			wp.timeline_timer:stop()
-		else
-			wp.timeline_timer:start()
+		if self.visible then
+			if status ~= "playing" then
+				wp.timeline_timer:stop()
+			else
+				wp.timeline_timer:start()
+			end
 		end
 	end
 
@@ -239,9 +246,11 @@ local function create_player_widget(name, player)
 			timeline_slider:set_value(position/length*100)
 		end
 
-		wp.timeline_timer:stop()
-		if player:get_playback_status() == "playing" then
-			wp.timeline_timer:start()
+		if self.visible then
+			wp.timeline_timer:stop()
+			if player:get_playback_status() == "playing" then
+				wp.timeline_timer:start()
+			end
 		end
 	end
 
@@ -273,7 +282,7 @@ local function create_player_widget(name, player)
 	length_text:set_markup(us_to_hms(length))
 	timeline_slider:set_value(position/length*100)
 
-	play_pause_button:set_label(player:get_playback_status() == "playing" and "" or "")
+	play_pause_button:set_label(player:get_playback_status() == "playing" and text_icons.pause or text_icons.play)
 
 	previous_button:buttons {
 		awful.button({}, 1, function()
@@ -295,11 +304,56 @@ local function create_player_widget(name, player)
 
 	timeline_slider:connect_signal("dragging-stopped", wp.on_timeline_slider_dragging_stopped)
 
-	if player:get_playback_status() == "playing" then
-		wp.timeline_timer:start()
+	if self.visible then
+		if player:get_playback_status() == "playing" then
+			wp.timeline_timer:start()
+		end
 	end
 
 	return player_widget
+end
+
+function media:show()
+	if self.visible then return end
+	local players_layout = self.widget:get_children_by_id("players-layout")[1]
+	for _, player_widget in ipairs(players_layout.children) do
+		local pp = player_widget._private
+		local player = media_player:get_player(pp.player_name)
+		local position_text = player_widget:get_children_by_id("position")[1]
+		local length_text = player_widget:get_children_by_id("length")[1]
+		local timeline_slider = player_widget:get_children_by_id("timeline")[1]
+
+		local position = player:get_position() or 0
+		local length = player:get_metadata():get_length() or 1
+		position_text:set_markup(us_to_hms(position))
+		length_text:set_markup(us_to_hms(length))
+		timeline_slider:set_value(position/length*100)
+
+		if player:get_playback_status() == "playing" then
+			pp.timeline_timer:start()
+		end
+	end
+	self.visible = true
+	self:emit_signal("property::visible", self.visible)
+end
+
+function media:hide()
+	if not self.visible then return end
+	local players_layout = self.widget:get_children_by_id("players-layout")[1]
+	for _, player_widget in ipairs(players_layout.children) do
+		local pp = player_widget._private
+		pp.timeline_timer:stop()
+	end
+	self.visible = false
+	self:emit_signal("property::visible", self.visible)
+end
+
+function media:toggle()
+	if not self.visible then
+		self:show()
+	else
+		self:hide()
+	end
 end
 
 local function new()
@@ -345,6 +399,7 @@ local function new()
 		}
 	}
 
+	gtable.crush(ret, media, true)
 	local wp = ret._private
 	local players_layout = ret.widget:get_children_by_id("players-layout")[1]
 
@@ -353,7 +408,7 @@ local function new()
 			players_layout:remove(1)
 		end
 
-		players_layout:insert(1, create_player_widget(name, player))
+		players_layout:insert(1, create_player_widget(ret, name, player))
 	end
 
 	wp.on_player_removed = function(_, name, player)

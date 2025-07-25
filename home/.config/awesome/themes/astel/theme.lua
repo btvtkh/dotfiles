@@ -65,7 +65,11 @@ theme.text_icons = {
 	shower_rain = "",
 	thunder = "",
 	snow = "",
-	mist = ""
+	mist = "",
+	play = "",
+	pause = "",
+	go_next = "",
+	go_previous = ""
 }
 
 theme.red = "#F9AEAE"
