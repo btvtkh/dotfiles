@@ -107,6 +107,7 @@ local function entry(self, index, args)
 		}
 	}
 
+	local rp = ret._private
 	local item_content = ret:get_children_by_id("item-content")[1]
 
 	if args.items then
@@ -136,11 +137,11 @@ local function entry(self, index, args)
 		})
 	end
 
-	wp.on_mouse_enter = function()
+	rp.on_mouse_enter = function()
 		on_enter(self, index, args, "mouse")
 	end
 
-	ret:connect_signal("mouse::enter", wp.on_mouse_enter)
+	ret:connect_signal("mouse::enter", rp.on_mouse_enter)
 
 	ret:buttons {
 		awful.button({}, 1, function()
