@@ -72,10 +72,10 @@ $ gio mime x-scheme-handler/terminal Alacritty.desktop
 1. Install `themix-full-git` from aur
 2. Export icons and theme from user presets
 
-#### 10. Install cursors ([source](https://github.com/charakterziffer/cursor-toolbox))
+#### 10. Install cursors ([source](https://github.com/charakterziffer/cursor-toolbox)), if `xorg-xcursorgen` not installed with `xorg` package, you need this to install it manualy
 ```
 $ cd ~/dotfiles/extra/cursor-toolbox
-$ ./make_dark.sh
+$ ./make.sh
 $ cp -r Sharp-Cursors ~/.icons
 ```
 
