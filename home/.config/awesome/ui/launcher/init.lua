@@ -11,7 +11,7 @@ local user = require("user")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
 local lua_escape = require("lib.string").lua_escape
-local table_to_file = require("lib.file").table_to_file
+local dump_table = require("lib.file").dump
 local capi = { screen = screen }
 local powermenu = require("ui.powermenu").get_default()
 
@@ -398,7 +398,7 @@ local function new()
 							s.wallpaper:set_image(stdout)
 						end
 						user.wallpaper = stdout
-						table_to_file(user, gfs.get_configuration_dir() .. "/user.lua")
+						dump_table(user, gfs.get_configuration_dir() .. "/user.lua")
 					end
 				end
 			)

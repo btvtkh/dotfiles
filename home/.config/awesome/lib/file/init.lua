@@ -12,7 +12,7 @@ function M.exists(file)
 	end
 end
 
-function M.table_to_file(tbl, file)
+function M.dump(tbl, file)
 	if not file or not tbl then return end
 	local inspected = assert(inspect(tbl, { indent = "\t" }))
 	local wfile = assert(io.open(file, "w"))

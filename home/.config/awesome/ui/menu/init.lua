@@ -5,7 +5,7 @@ local gtable = require("gears.table")
 local gfs = require("gears.filesystem")
 local common = require("common")
 local user = require("user")
-local table_to_file = require("lib.file").table_to_file
+local dump_table = require("lib.file").dump
 local capi = { awesome = awesome, screen = screen, client = client }
 local screenshot = require("service.screenshot").get_default()
 local powermenu = require("ui.powermenu").get_default()
@@ -46,7 +46,7 @@ local function create_desktop_menu()
 											s.wallpaper:set_image(stdout)
 										end
 										user.wallpaper = stdout
-										table_to_file(user, gfs.get_configuration_dir() .. "/user.lua")
+										dump_table(user, gfs.get_configuration_dir() .. "/user.lua")
 									end
 								end
 							)
