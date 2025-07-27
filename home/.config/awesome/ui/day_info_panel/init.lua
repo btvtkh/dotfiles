@@ -3,9 +3,9 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local shape = require("lib.shape")
 local gtable = require("gears.table")
-local common = require("common")
 local dpi = beautiful.xresources.apply_dpi
 local capi = { screen = screen }
+local Calendar = require("ui.day_info_panel.calendar")
 local Weather_applet = require("ui.day_info_panel.weather_applet")
 
 local day_info = {}
@@ -59,11 +59,7 @@ local function new()
 					Weather_applet(),
 					{
 						id = "calendar",
-						widget = common.calendar {
-							sun_start = false,
-							shape = shape.rrect(dpi(13)),
-							day_shape = shape.rrect(dpi(8))
-						}
+						widget = Calendar()
 					}
 				}
 			}

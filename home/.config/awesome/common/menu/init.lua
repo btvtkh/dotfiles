@@ -356,11 +356,4 @@ function menu.new(args, parent)
 	return ret
 end
 
-return setmetatable(
-	{ new = menu.new },
-	{
-		__call = function(_, ...)
-			return menu.new(...)
-		end
-	}
-)
+return setmetatable({ new = menu.new }, { __call = function(_, ...) return menu.new(...) end })

@@ -11,11 +11,13 @@ end
 function button:set_bg_normal(color)
 	local wp = self._private
 	wp.bg_normal = color
+	self:set_bg(color)
 end
 
 function button:set_fg_normal(color)
 	local wp = self._private
 	wp.fg_normal = color
+	self:set_fg(color)
 end
 
 function button:set_bg_hover(color)
@@ -30,6 +32,17 @@ end
 
 local function new(args)
 	args = args or {}
+
+	args.border_normal = args.border_color or beautiful.bg_urg
+	args.border_hover = args.border_hover or beautiful.fg_alt
+	args.bg_hover = args.bg_hover or beautiful.ac
+	args.fg_hover = args.fg_hover or beautiful.bg
+	args.bg_normal = args.bg_normal or beautiful.bg_alt
+	args.fg_normal = args.fg_normal or beautiful.fg
+	args.align = args.align or "center"
+	args.font = args.font or beautiful.font
+	args.label = args.label or ""
+
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		shape = args.shape,
@@ -37,40 +50,26 @@ local function new(args)
 		forced_width = args.forced_width,
 		forced_height = args.forced_height,
 		border_width = args.border_width,
-		border_color = args.border_color_normal or
-			beautiful.bg_urg or "#3d3d3d",
-		bg = args.bg_normal or
-			beautiful.bg_alt or "#272727",
-		fg = args.fg_normal or
-			beautiful.fg or "#ffffff",
+		border_color = args.border_color_normal,
+		bg = args.bg_normal,
+		fg = args.fg_normal,
 		{
 			widget = wibox.container.margin,
 			margins = args.margins,
 			{
 				id = "label-role",
 				widget = wibox.widget.textbox,
-				font = args.font or beautiful.font,
-				align = args.align or "center",
-				markup = args.label or ""
+				font = args.font,
+				align = args.align,
+				markup = args.label
 			}
 		}
 	}
 
+	gtable.crush(ret._private, args)
 	gtable.crush(ret, button, true)
-	local wp = ret._private
 
-	wp.border_normal = args.border_color or
-		beautiful.bg_urg or "#3d3d3d"
-	wp.border_hover = args.border_hover or
-		beautiful.fg_alt or "#ffffff"
-	wp.bg_hover = args.bg_hover or
-		beautiful.ac or "#bcbcbc"
-	wp.fg_hover = args.fg_hover or
-		beautiful.bg or "#000000"
-	wp.bg_normal = args.bg_normal or
-		beautiful.bg_alt or "#272727"
-	wp.fg_normal = args.fg_normal or
-		beautiful.fg or "#ffffff"
+	local wp = ret._private
 
 	wp.on_mouse_enter = function(w)
 		w:set_border_color(wp.border_hover)
@@ -90,11 +89,4 @@ local function new(args)
 	return ret
 end
 
-return setmetatable(
-	{ new = new },
-	{
-		__call = function(_, ...)
-			return new(...)
-		end
-	}
-)
+return setmetatable({ new = new }, { __call = function(_, ...) return new(...) end })

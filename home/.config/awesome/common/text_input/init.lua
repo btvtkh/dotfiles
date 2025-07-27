@@ -297,6 +297,23 @@ end
 
 local function new(args)
 	args = args or {}
+
+	args.obscure = args.obscure or false
+	args.placeholder = args.placeholder or ""
+	args.obscure_char = args.obscure_char or "*"
+	args.cursor_bg = args.cursor_bg or "#ffffff"
+	args.cursor_fg = args.cursor_fg or "#000000"
+	args.placeholder_fg = args.placeholder_fg or "#373737"
+	args.unfocused_fg = args.unfocused_fg or "#373737"
+	args.highlighter = args.highlighter
+	args.on_focused = args.on_focused
+	args.on_unfocused = args.on_unfocused
+	args.on_input_changed = args.on_input_changed
+	args.on_executed = args.on_executed
+	args.on_key_pressed = args.on_key_pressed
+	args.on_key_released = args.on_key_released
+	args.ellipsize = args.ellipsize or "start"
+
 	local ret = wibox.widget {
 		widget = wibox.widget.textbox,
 		font = args.font,
@@ -304,42 +321,21 @@ local function new(args)
 		valign = args.valign,
 		wrap = args.wrap,
 		justify = args.justify,
-		ellipsize = args.ellipsize or "start"
+		ellipsize = args.ellipsize
 	}
 
+	gtable.crush(ret._private, args)
 	gtable.crush(ret, text_input, true)
+
 	local wp = ret._private
 
 	wp.focused = false
-
 	wp.input = ""
 	wp.cursor_index = 1
 	wp.selectall = false
-	wp.obscure = args.obscure or false
 	wp.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-
-	wp.placeholder = args.placeholder or ""
-	wp.obscure_char = args.obscure_char or "*"
-	wp.cursor_bg = args.cursor_bg or "#ffffff"
-	wp.cursor_fg = args.cursor_fg or "#000000"
-	wp.placeholder_fg = args.placeholder_fg or "#373737"
-	wp.unfocused_fg = args.unfocused_fg or "#373737"
-	wp.highlighter = args.highlighter
-	wp.on_focused = args.on_focused
-	wp.on_unfocused = args.on_unfocused
-	wp.on_input_changed = args.on_input_changed
-	wp.on_executed = args.on_executed
-	wp.on_key_pressed = args.on_key_pressed
-	wp.on_key_released = args.on_key_released
 
 	return ret
 end
 
-return setmetatable(
-	{ new = new },
-	{
-		__call = function(_, ...)
-			return new(...)
-		end
-	}
-)
+return setmetatable({ new = new }, { __call = function(_, ...) return new(...) end })
