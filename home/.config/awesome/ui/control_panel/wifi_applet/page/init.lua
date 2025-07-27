@@ -139,7 +139,7 @@ function wifi_page:open_ap_menu(ap)
 			self:close_ap_menu()
 		end)
 
-		password_widget.visible = true
+		password_widget:set_visible(true)
 		password_input:focus()
 	else
 		connect_disconnect_button:set_label("Disconnect")
@@ -150,7 +150,7 @@ function wifi_page:open_ap_menu(ap)
 			end)
 		}
 
-		password_widget.visible = false
+		password_widget:set_visible(false)
 	end
 
 	aps_layout:reset()

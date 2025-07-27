@@ -106,24 +106,33 @@ local function create_player_widget(self, name, player)
 										{
 											id = "previous",
 											widget = common.button {
-												label = text_icons.go_previous,
 												margins = dpi(4),
-												shape = shape.rrect(dpi(6))
+												shape = shape.rrect(dpi(6)),
+												bg_normal = nil,
+												bg_hover = beautiful.bg_urg,
+												fg_hover = beautiful.fg,
+												label = text_icons.go_previous,
 											}
 										},
 										{
 											id = "play-pause",
 											widget = common.button {
 												margins = dpi(4),
-												shape = shape.rrect(dpi(6))
+												shape = shape.rrect(dpi(6)),
+												bg_normal = nil,
+												bg_hover = beautiful.bg_urg,
+												fg_hover = beautiful.fg
 											}
 										},
 										{
 											id = "next",
 											widget = common.button {
-												label = text_icons.go_next,
 												margins = dpi(4),
-												shape = shape.rrect(dpi(6))
+												shape = shape.rrect(dpi(6)),
+												bg_normal = nil,
+												bg_hover = beautiful.bg_urg,
+												fg_hover = beautiful.fg,
+												label = text_icons.go_next
 											}
 										}
 									}
@@ -318,19 +327,21 @@ function media:show()
 	local players_layout = self.widget:get_children_by_id("players-layout")[1]
 	for _, player_widget in ipairs(players_layout.children) do
 		local pp = player_widget._private
-		local player = media_player:get_player(pp.player_name)
-		local position_text = player_widget:get_children_by_id("position")[1]
-		local length_text = player_widget:get_children_by_id("length")[1]
-		local timeline_slider = player_widget:get_children_by_id("timeline")[1]
+		if pp.player_name then
+			local player = media_player:get_player(pp.player_name)
+			local position_text = player_widget:get_children_by_id("position")[1]
+			local length_text = player_widget:get_children_by_id("length")[1]
+			local timeline_slider = player_widget:get_children_by_id("timeline")[1]
 
-		local position = player:get_position() or 0
-		local length = player:get_metadata():get_length() or 1
-		position_text:set_markup(us_to_hms(position))
-		length_text:set_markup(us_to_hms(length))
-		timeline_slider:set_value(position/length*100)
+			local position = player:get_position() or 0
+			local length = player:get_metadata():get_length() or 1
+			position_text:set_markup(us_to_hms(position))
+			length_text:set_markup(us_to_hms(length))
+			timeline_slider:set_value(position/length*100)
 
-		if player:get_playback_status() == "playing" then
-			pp.timeline_timer:start()
+			if player:get_playback_status() == "playing" then
+				pp.timeline_timer:start()
+			end
 		end
 	end
 	self.visible = true
@@ -342,7 +353,9 @@ function media:hide()
 	local players_layout = self.widget:get_children_by_id("players-layout")[1]
 	for _, player_widget in ipairs(players_layout.children) do
 		local pp = player_widget._private
-		pp.timeline_timer:stop()
+		if pp.player_name then
+			pp.timeline_timer:stop()
+		end
 	end
 	self.visible = false
 	self:emit_signal("property::visible", self.visible)
@@ -379,19 +392,59 @@ local function new()
 				widget = wibox.container.margin,
 				margins = dpi(10),
 				{
-					id = "players-layout",
 					layout = wibox.layout.stack,
-					top_only = true,
 					{
-						widget = wibox.container.background,
-						forced_width = dpi(300),
-						forced_height = dpi(100),
-						fg = beautiful.fg_alt,
+						id = "players-layout",
+						layout = wibox.layout.stack,
+						top_only = true,
 						{
-							widget = wibox.widget.textbox,
-							align = "center",
-							font = beautiful.font_h2,
-							text = "Nothing playing"
+							widget = wibox.container.background,
+							forced_width = dpi(300),
+							forced_height = dpi(100),
+							fg = beautiful.fg_alt,
+							{
+								widget = wibox.widget.textbox,
+								align = "center",
+								font = beautiful.font_h2,
+								text = "Nothing playing"
+							}
+						}
+					},
+					{
+						id = "players-switcher",
+						widget = wibox.container.place,
+						visible = false,
+						halign = "right",
+						valign = "top",
+						{
+							widget = wibox.container.margin,
+							margins = dpi(6),
+							{
+								layout = wibox.layout.fixed.horizontal,
+								spacing = dpi(3),
+								{
+									id = "previous-player-button",
+									widget = common.button {
+										forced_width = dpi(20),
+										forced_height = dpi(20),
+										shape = shape.rrect(6),
+										bg_normal = beautiful.bg_urg,
+										font = beautiful.font_h0,
+										label = text_icons.arrow_left
+									}
+								},
+								{
+									id = "next-player-button",
+									widget = common.button {
+										forced_width = dpi(20),
+										forced_height = dpi(20),
+										shape = shape.rrect(6),
+										bg_normal = beautiful.bg_urg,
+										font = beautiful.font_h0,
+										label = text_icons.arrow_right
+									}
+								}
+							}
 						}
 					}
 				}
@@ -402,6 +455,9 @@ local function new()
 	gtable.crush(ret, media, true)
 	local wp = ret._private
 	local players_layout = ret.widget:get_children_by_id("players-layout")[1]
+	local players_switcher = ret.widget:get_children_by_id("players-switcher")[1]
+	local previous_player_button = ret.widget:get_children_by_id("previous-player-button")[1]
+	local next_player_button = ret.widget:get_children_by_id("next-player-button")[1]
 
 	wp.on_player_added = function(_, name, player)
 		if not players_layout.children[1]._private.player_name then
@@ -409,6 +465,10 @@ local function new()
 		end
 
 		players_layout:insert(1, create_player_widget(ret, name, player))
+
+		if #players_layout.children > 1 then
+			players_switcher:set_visible(true)
+		end
 	end
 
 	wp.on_player_removed = function(_, name, player)
@@ -421,6 +481,10 @@ local function new()
 				player_widget._private.timeline_timer = nil
 
 				players_layout:remove_widgets(player_widget)
+
+				if #players_layout.children <= 1 then
+					players_switcher:set_visible(false)
+				end
 
 				if #players_layout.children == 0 then
 					players_layout:add(wibox.widget {
@@ -447,16 +511,19 @@ local function new()
 		wp.on_player_added(nil, name, player)
 	end
 
-	players_layout:buttons {
-		awful.button({}, 4, function()
-			if #players_layout.children > 1 then
-				players_layout:raise(#players_layout.children)
-			end
-		end),
-		awful.button({}, 5, function()
+	previous_player_button:buttons {
+		awful.button({}, 1, function()
 			if #players_layout.children > 1 then
 				players_layout:add(players_layout.children[1])
 				players_layout:remove(1)
+			end
+		end)
+	}
+
+	next_player_button:buttons {
+		awful.button({}, 1, function()
+			if #players_layout.children > 1 then
+				players_layout:raise(#players_layout.children)
 			end
 		end)
 	}

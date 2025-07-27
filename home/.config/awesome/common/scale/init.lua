@@ -123,13 +123,13 @@ function scale:draw(_, cr, width, height)
 
 	cr:translate(-highlight_offset_x, -highlight_offset_y)
 
-	local slider_x_offset = width*rate + ((wp.slider_width or height)*(1 - rate) - ((wp.slider_width or height) - wp.slider_border_width/2 - wp.slider_margins))
-	local slider_y_offset = (height - ((wp.slider_height or height) - wp.slider_border_width - wp.slider_margins*2))/2
+	local slider_offset_x = width*rate + ((wp.slider_width or height)*(1 - rate) - ((wp.slider_width or height) - wp.slider_border_width/2 - wp.slider_margins))
+	local slider_offset_y = (height - ((wp.slider_height or height) - wp.slider_border_width - wp.slider_margins*2))/2
 	local slider_width = (wp.slider_width or height) - wp.slider_border_width - wp.slider_margins*2
 	local slider_height = (wp.slider_height or height) - wp.slider_border_width - wp.slider_margins*2
 
 	cr:set_source(gcolor(wp.slider_color))
-	cr:translate(slider_x_offset, slider_y_offset)
+	cr:translate(slider_offset_x, slider_offset_y)
 	wp.slider_shape(cr, slider_width, slider_height)
 
 	if wp.slider_border_width == 0 then
