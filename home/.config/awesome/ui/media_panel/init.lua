@@ -8,7 +8,7 @@ local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
 local text_icons = beautiful.text_icons
 local capi = { screen = screen }
-local media_player = require("service.media_player").get_default()
+local Media_player = require("service.media_player")
 
 local media = {}
 
@@ -321,6 +321,7 @@ end
 
 function media:show()
 	if self.visible then return end
+	local media_player = Media_player.get_default()
 	local players_layout = self.widget:get_children_by_id("players-layout")[1]
 	for _, player_widget in ipairs(players_layout.children) do
 		local pp = player_widget._private
@@ -367,6 +368,8 @@ function media:toggle()
 end
 
 local function new()
+	local media_player = Media_player.get_default()
+
 	local ret = awful.popup {
 		visible = false,
 		ontop = true,
