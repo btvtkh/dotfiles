@@ -208,6 +208,16 @@ local function new()
 					{
 						layout = wibox.layout.align.horizontal,
 						{
+							id = "bottombar-close-button",
+							widget = common.button {
+								label = text_icons.arrow_left,
+								forced_width = dpi(35),
+								forced_height = dpi(35),
+								shape = shape.rrect(dpi(8))
+							}
+						},
+						nil,
+						{
 							layout = wibox.layout.fixed.horizontal,
 							spacing = beautiful.separator_thickness + dpi(2),
 							spacing_widget = {
@@ -219,15 +229,6 @@ local function new()
 								}
 							},
 							{
-								id = "bottombar-close-button",
-								widget = common.button {
-									label = text_icons.arrow_left,
-									forced_width = dpi(35),
-									forced_height = dpi(35),
-									shape = shape.rrect(dpi(8))
-								}
-							},
-							{
 								id = "bottombar-refresh-button",
 								widget = common.button {
 									label = text_icons.reboot,
@@ -235,24 +236,26 @@ local function new()
 									forced_height = dpi(35),
 									shape = shape.rrect(dpi(8))
 								}
-							}
-						},
-						nil,
-						{
-							widget = wibox.container.margin,
-							forced_width = dpi(55),
-							margins = dpi(6),
+							},
 							{
-								widget = wibox.container.place,
-								halign = "center",
+								widget = wibox.container.margin,
+								forced_width = dpi(60),
+								margins = {
+									top = dpi(6), bottom = dpi(6),
+									left = dpi(10), right = dpi(6)
+								},
 								{
-									id = "bottombar-toggle-switch",
-									widget = common.switch,
-									trough_color = beautiful.fg_alt,
-									slider_color = beautiful.bg_alt,
-									slider_margins = dpi(2),
-									trough_shape = shape.rbar(),
-									slider_shape = shape.rbar()
+									widget = wibox.container.place,
+									halign = "center",
+									{
+										id = "bottombar-toggle-switch",
+										widget = common.switch,
+										trough_color = beautiful.fg_alt,
+										slider_color = beautiful.bg_alt,
+										slider_margins = dpi(2),
+										trough_shape = shape.rbar(),
+										slider_shape = shape.rbar()
+									}
 								}
 							}
 						}

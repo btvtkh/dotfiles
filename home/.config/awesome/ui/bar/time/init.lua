@@ -27,7 +27,7 @@ local function new()
 				},
 				{
 					widget = wibox.container.margin,
-					margins = { top = dpi(6), bottom = dpi(6) },
+					margins = { top = dpi(7), bottom = dpi(7) },
 					{
 						id = "separator",
 						widget = wibox.widget.separator,

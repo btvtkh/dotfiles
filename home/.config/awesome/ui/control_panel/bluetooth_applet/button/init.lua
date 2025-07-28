@@ -53,7 +53,7 @@ local function new()
 					layout = wibox.layout.fixed.horizontal,
 					{
 						widget = wibox.container.margin,
-						margins = { top = dpi(12), bottom = dpi(12) },
+						margins = { top = dpi(15), bottom = dpi(15) },
 						{
 							id = "separator",
 							widget = wibox.widget.separator,
