@@ -53,12 +53,12 @@ local function new()
 					layout = wibox.layout.fixed.horizontal,
 					{
 						widget = wibox.container.margin,
-						forced_height = 1,
-						forced_width = beautiful.separator_thickness,
 						margins = { top = dpi(12), bottom = dpi(12) },
 						{
 							id = "separator",
 							widget = wibox.widget.separator,
+							forced_height = 1,
+							forced_width = beautiful.separator_thickness,
 							orientation = "vertical"
 						}
 					},

@@ -98,7 +98,7 @@ function wifi_page:open_ap_menu(ap)
 
 	if ap:get_path() ~= nm_client.wireless:get_active_access_point_path() then
 		local obscure_icon = wp.ap_menu:get_children_by_id("obscure-icon")[1]
-		local auto_connect_icon = wp.ap_menu:get_children_by_id("auto-connect-icon")[1]
+		local auto_connect_check = wp.ap_menu:get_children_by_id("auto-connect-check")[1]
 
 		obscure_icon:set_markup(text_icons.eye_off)
 		obscure_icon:buttons {
@@ -109,11 +109,11 @@ function wifi_page:open_ap_menu(ap)
 			end)
 		}
 
-		auto_connect_icon:set_markup(text_icons.check_on)
-		auto_connect_icon:buttons {
+		auto_connect_check:set_checked(auto_connect)
+		auto_connect_check:buttons {
 			awful.button({}, 1, function()
 				auto_connect = not auto_connect
-				auto_connect_icon:set_markup(auto_connect and text_icons.check_on or text_icons.check_off)
+				auto_connect_check:set_checked(auto_connect)
 			end)
 		}
 
@@ -189,16 +189,13 @@ local function new()
 			layout = wibox.layout.fixed.vertical,
 			spacing = dpi(8),
 			{
-				widget = wibox.container.background,
+				id = "access-points-layout",
+				layout = wibox.layout.overflow.vertical,
 				forced_height = dpi(400),
 				forced_width = dpi(400),
-				{
-					id = "access-points-layout",
-					layout = wibox.layout.overflow.vertical,
-					scrollbar_enabled = false,
-					step = 40,
-					spacing = dpi(3)
-				}
+				scrollbar_enabled = false,
+				step = 40,
+				spacing = dpi(3)
 			},
 			{
 				widget = wibox.container.background,
@@ -326,20 +323,19 @@ local function new()
 									}
 								},
 								nil,
-								{
-									id = "obscure-icon",
-									widget = wibox.widget.textbox
-								}
+									{
+										id = "obscure-icon",
+										widget = wibox.widget.textbox,
+										forced_width = dpi(25),
+										align = "center"
+									}
 							}
 						},
 						{
-							widget = wibox.container.background,
+							widget = wibox.widget.separator,
 							forced_width = 1,
 							forced_height = beautiful.separator_thickness,
-							{
-								widget = wibox.widget.separator,
-								orientation = "horizontal"
-							}
+							orientation = "horizontal"
 						},
 						{
 							widget = wibox.container.margin,
@@ -352,8 +348,12 @@ local function new()
 								},
 								nil,
 								{
-									id = "auto-connect-icon",
-									widget = wibox.widget.textbox
+									id = "auto-connect-check",
+									widget = common.check,
+									forced_height = dpi(25),
+									check_margins = dpi(8),
+									check_shape = shape.rbar(),
+									trough_shape = shape.rbar()
 								}
 							}
 						}

@@ -118,21 +118,15 @@ local function create_notification_popup(self, n)
 						}
 					},
 					{
-						widget = wibox.container.background,
+						widget = wibox.widget.separator,
 						forced_width = 1,
 						forced_height = beautiful.separator_thickness,
-						{
-							widget = wibox.widget.separator,
-							orientation = "horizontal"
-						}
+						orientation = "horizontal"
 					},
 					{
+						id = "body",
 						layout = wibox.layout.fixed.horizontal,
-						buttons = {
-							awful.button({}, 1, function()
-								n:destroy(ncr.dismissed_by_user)
-							end)
-						},
+
 						fill_space = true,
 						spacing = dpi(10),
 						{
@@ -180,6 +174,7 @@ local function create_notification_popup(self, n)
 	}
 
 	local wp = ret._private
+	local body = ret.widget:get_children_by_id("body")[1]
 	local close = ret.widget:get_children_by_id("close")[1]
 
 	wp.notification = n
@@ -199,6 +194,12 @@ local function create_notification_popup(self, n)
 			wp.display_timer = nil
 			ret = nil
 		end
+	}
+
+	body:buttons {
+		awful.button({}, 1, function()
+			n:destroy(ncr.dismissed_by_user)
+		end)
 	}
 
 	close:buttons {

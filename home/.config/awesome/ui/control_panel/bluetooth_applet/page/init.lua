@@ -97,16 +97,13 @@ local function new()
 			layout = wibox.layout.fixed.vertical,
 			spacing = dpi(8),
 			{
-				widget = wibox.container.background,
+				id = "devices-layout",
+				layout = wibox.layout.overflow.vertical,
 				forced_height = dpi(400),
 				forced_width = dpi(400),
-				{
-					id = "devices-layout",
-					layout = wibox.layout.overflow.vertical,
-					scrollbar_enabled = false,
-					step = 40,
-					spacing = dpi(3)
-				}
+				scrollbar_enabled = false,
+				step = 40,
+				spacing = dpi(3)
 			},
 			{
 				widget = wibox.container.background,

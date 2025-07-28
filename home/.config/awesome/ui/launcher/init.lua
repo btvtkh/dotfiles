@@ -123,7 +123,7 @@ function launcher:update_entries()
 								{
 									widget = wibox.container.constraint,
 									strategy = "max",
-									height = 25,
+									height = dpi(25),
 									{
 										widget = wibox.widget.textbox,
 										markup = app:get_name()
@@ -132,7 +132,7 @@ function launcher:update_entries()
 								app:get_description() and {
 									widget = wibox.container.constraint,
 									strategy = "max",
-									height = 25,
+									height = dpi(25),
 									{
 										widget = wibox.widget.textbox,
 										font = beautiful.font_h0,
@@ -348,20 +348,17 @@ local function new()
 								}
 							},
 							{
-								widget = wibox.container.background,
+								widget = wibox.widget.separator,
 								forced_width = 1,
 								forced_height = beautiful.separator_thickness,
-								{
-									widget = wibox.widget.separator,
-									orientation = "horizontal"
-								}
+								orientation = "horizontal"
 							}
 						},
 						{
 							id = "entries-layout",
 							layout = wibox.layout.fixed.vertical,
-							spacing = dpi(3),
-							forced_width = dpi(300)
+							forced_width = dpi(300),
+							spacing = dpi(3)
 						}
 					}
 				}

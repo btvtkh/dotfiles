@@ -96,21 +96,14 @@ local function create_notification_widget(n)
 						}
 					},
 					{
-						widget = wibox.container.background,
+						widget = wibox.widget.separator,
 						forced_width = 1,
 						forced_height = beautiful.separator_thickness,
-						{
-							widget = wibox.widget.separator,
-							orientation = "horizontal"
-						}
+						orientation = "horizontal"
 					},
 					{
+						id = "body",
 						layout = wibox.layout.fixed.horizontal,
-						buttons = {
-							awful.button({}, 1, function()
-								n:destroy(ncr.dismissed_by_user)
-							end)
-						},
 						fill_space = true,
 						spacing = dpi(10),
 						{
@@ -158,9 +151,16 @@ local function create_notification_widget(n)
 	}
 
 	local wp = ret._private
+	local body = ret:get_children_by_id("body")[1]
 	local close = ret:get_children_by_id("close")[1]
 
 	wp.notification = n
+
+	body:buttons {
+		awful.button({}, 1, function()
+			n:destroy(ncr.dismissed_by_user)
+		end)
+	}
 
 	close:buttons {
 		awful.button({}, 1, function()
@@ -228,56 +228,53 @@ local function new()
 			layout = wibox.layout.fixed.vertical,
 			spacing = dpi(6),
 			{
-				widget = wibox.container.background,
+				widget = wibox.container.margin,
 				forced_height = dpi(45),
+				margins = dpi(5),
 				{
-					widget = wibox.container.margin,
-					margins = dpi(5),
+					layout = wibox.layout.align.horizontal,
 					{
-						layout = wibox.layout.align.horizontal,
+						widget = wibox.container.margin,
+						margins = { left = dpi(7) },
 						{
+							id = "notifications-title",
+							widget = wibox.widget.textbox,
+							align = "center",
+							markup = "Notifications"
+						}
+					},
+					nil,
+					{
+						layout = wibox.layout.fixed.horizontal,
+						spacing = beautiful.separator_thickness + dpi(2),
+						spacing_widget = {
 							widget = wibox.container.margin,
-							margins = { left = dpi(7) },
+							margins = { top = dpi(8), bottom = dpi(8) },
 							{
-								id = "notifications-title",
-								widget = wibox.widget.textbox,
-								align = "center",
-								markup = "Notifications"
+								widget = wibox.widget.separator,
+								orientation = "vertical"
 							}
 						},
-						nil,
 						{
-							layout = wibox.layout.fixed.horizontal,
-							spacing = beautiful.separator_thickness + dpi(2),
-							spacing_widget = {
-								widget = wibox.container.margin,
-								margins = { top = dpi(8), bottom = dpi(8) },
-								{
-									widget = wibox.widget.separator,
-									orientation = "vertical"
-								}
-							},
-							{
-								id = "dnd-button",
-								widget = common.button {
-									label = text_icons.bell_on,
-									bg_normal = beautiful.bg,
-									forced_width = dpi(35),
-									forced_height = dpi(35),
-									shape = shape.rrect(dpi(8))
-								}
-							},
-							{
-								id = "clear-button",
-								widget = common.button {
-									label = text_icons.trash,
-									fg_normal = beautiful.red,
-									bg_normal = beautiful.bg,
-									bg_hover = beautiful.red,
-									forced_width = dpi(35),
-									forced_height = dpi(35),
-									shape = shape.rrect(dpi(8))
-								}
+							id = "dnd-button",
+							widget = common.button {
+								label = text_icons.bell_on,
+								bg_normal = beautiful.bg,
+								forced_width = dpi(35),
+								forced_height = dpi(35),
+								shape = shape.rrect(dpi(8))
+							}
+						},
+						{
+							id = "clear-button",
+							widget = common.button {
+								label = text_icons.trash,
+								fg_normal = beautiful.red,
+								bg_normal = beautiful.bg,
+								bg_hover = beautiful.red,
+								forced_width = dpi(35),
+								forced_height = dpi(35),
+								shape = shape.rrect(dpi(8))
 							}
 						}
 					}

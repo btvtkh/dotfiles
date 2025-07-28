@@ -27,12 +27,12 @@ local function new()
 				},
 				{
 					widget = wibox.container.margin,
-					forced_height = 1,
-					forced_width = beautiful.separator_thickness,
 					margins = { top = dpi(6), bottom = dpi(6) },
 					{
 						id = "separator",
 						widget = wibox.widget.separator,
+						forced_height = 1,
+						forced_width = beautiful.separator_thickness,
 						orientation = "vertical"
 					}
 				},

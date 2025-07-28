@@ -178,28 +178,25 @@ local function create_hourly(data)
 			scrollbar_enabled = false,
 			step = 40,
 			{
-				widget = wibox.container.background,
+				layout = wibox.layout.fixed.vertical,
 				forced_width = dpi(24 * step_width + 23 * step_spacing),
+				spacing = dpi(5),
 				{
-					layout = wibox.layout.fixed.vertical,
-					spacing = dpi(5),
-					{
-						id = "times",
-						layout = wibox.layout.flex.horizontal
-					},
-					{
-						id = "graph",
-						widget = wibox.widget.graph,
-						forced_height = dpi(40),
-						step_spacing = step_spacing,
-						step_width = step_width,
-						color = beautiful.ac,
-						background_color = beautiful.bg_alt
-					},
-					{
-						id = "temps",
-						layout = wibox.layout.flex.horizontal
-					}
+					id = "times",
+					layout = wibox.layout.flex.horizontal
+				},
+				{
+					id = "graph",
+					widget = wibox.widget.graph,
+					forced_height = dpi(40),
+					step_spacing = step_spacing,
+					step_width = step_width,
+					color = beautiful.ac,
+					background_color = beautiful.bg_alt
+				},
+				{
+					id = "temps",
+					layout = wibox.layout.flex.horizontal
 				}
 			}
 		}
@@ -270,32 +267,29 @@ local function create_daily(data)
 		)
 
 		day_layout:add(wibox.widget {
-			widget = wibox.container.background,
+			widget = wibox.container.place,
 			forced_width = dpi(110),
+			halign = "center",
 			{
-				widget = wibox.container.place,
-				halign = "center",
+				layout = wibox.layout.fixed.vertical,
 				{
-					layout = wibox.layout.fixed.vertical,
+					widget = wibox.widget.textbox,
+					align = "center",
+					font = beautiful.font_h0,
+					markup = create_markup(time_str, { fg = beautiful.fg_alt })
+				},
+				{
+					layout = wibox.layout.fixed.horizontal,
+					spacing = dpi(7),
 					{
 						widget = wibox.widget.textbox,
 						align = "center",
-						font = beautiful.font_h0,
-						markup = create_markup(time_str, { fg = beautiful.fg_alt })
+						markup = create_markup(icon_str, { size = "20pt" })
 					},
 					{
-						layout = wibox.layout.fixed.horizontal,
-						spacing = dpi(7),
-						{
-							widget = wibox.widget.textbox,
-							align = "center",
-							markup = create_markup(icon_str, { size = "20pt" })
-						},
-						{
-							widget = wibox.widget.textbox,
-							align = "center",
-							markup = temp_str
-						}
+						widget = wibox.widget.textbox,
+						align = "center",
+						markup = temp_str
 					}
 				}
 			}
@@ -331,11 +325,11 @@ local function new()
 				create_hourly(data),
 				wibox.widget {
 					widget = wibox.container.margin,
-					forced_width = 1,
-					forced_height = beautiful.separator_thickness,
 					margins = { left = dpi(10), right = dpi(10) },
 					{
 						widget = wibox.widget.separator,
+						forced_width = 1,
+						forced_height = beautiful.separator_thickness,
 						orientation = "horizontal"
 					}
 				},

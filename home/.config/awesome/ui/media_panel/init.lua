@@ -152,23 +152,20 @@ local function create_player_widget(self, name, player)
 								}
 							},
 							{
-								widget = wibox.container.margin,
+								id = "timeline",
+								widget = common.scale,
 								forced_height = dpi(20),
-								{
-									id = "timeline",
-									widget = common.scale,
-									trough_margins = dpi(9),
-									trough_color = beautiful.bg_urg,
-									trough_shape = shape.rbar(),
-									highlight_margins = dpi(9),
-									highlight_color = beautiful.ac,
-									highlight_shape = shape.rbar(),
-									slider_margins = dpi(4),
-									slider_border_width = dpi(2),
-									slider_color = beautiful.bg_alt,
-									slider_border_color = beautiful.ac,
-									slider_shape = shape.rbar()
-								}
+								trough_margins = dpi(9),
+								trough_color = beautiful.bg_urg,
+								trough_shape = shape.rbar(),
+								highlight_margins = dpi(9),
+								highlight_color = beautiful.ac,
+								highlight_shape = shape.rbar(),
+								slider_margins = dpi(4),
+								slider_border_width = dpi(2),
+								slider_color = beautiful.bg_alt,
+								slider_border_color = beautiful.ac,
+								slider_shape = shape.rbar()
 							}
 						}
 					}
@@ -482,11 +479,9 @@ local function new()
 
 				players_layout:remove_widgets(player_widget)
 
-				if #players_layout.children <= 1 then
+				if #players_layout.children == 1 then
 					players_switcher:set_visible(false)
-				end
-
-				if #players_layout.children == 0 then
+				elseif #players_layout.children == 0 then
 					players_layout:add(wibox.widget {
 						widget = wibox.container.background,
 						forced_width = dpi(300),

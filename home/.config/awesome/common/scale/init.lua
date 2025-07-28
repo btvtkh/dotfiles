@@ -26,6 +26,7 @@ local properties = {
 	"slider_shape",
 	"slider_color",
 	"slider_height",
+	"slider_width",
 	"slider_margins",
 	"slider_border_color",
 	"slider_border_width"
@@ -73,7 +74,7 @@ function scale:draw(_, cr, width, height)
 
 	local trough_offset_x = wp.trough_border_width/2 + wp.trough_margins
 	local trough_offset_y = (height - ((wp.trough_height or height) - wp.trough_border_width - wp.trough_margins*2))/2
-	local trough_width = width - trough_offset_x*2
+	local trough_width = width - wp.trough_border_width - wp.trough_margins*2
 	local trough_height = (wp.trough_height or height) - wp.trough_border_width - wp.trough_margins*2
 
 	cr:set_source(gcolor(wp.trough_color))
@@ -99,7 +100,7 @@ function scale:draw(_, cr, width, height)
 
 	local highlight_offset_x = wp.highlight_border_width/2 + wp.highlight_margins
 	local highlight_offset_y = (height - ((wp.highlight_height or height) - wp.highlight_border_width - wp.highlight_margins*2))/2
-	local highlight_width = width*rate + (wp.slider_width or height)*(1 - rate) - highlight_offset_x*2
+	local highlight_width = width*rate + (wp.slider_width or height)*(1 - rate) - wp.highlight_border_width - wp.highlight_margins*2
 	local highlight_height = (wp.highlight_height or height) - wp.highlight_border_width - wp.highlight_margins*2
 
 	cr:set_source(gcolor(wp.highlight_color))
