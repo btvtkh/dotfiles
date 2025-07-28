@@ -219,7 +219,7 @@ function notification_list:toggle_dnd()
 	end
 end
 
-local function new()
+return function()
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		forced_height = dpi(50) + dpi(560),
@@ -368,5 +368,3 @@ local function new()
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = new })

@@ -5,7 +5,7 @@ local gtable = require("gears.table")
 local text_icons = require("beautiful").text_icons
 local dpi = beautiful.xresources.apply_dpi
 local create_markup = require("lib.string").create_markup
-local weather = require("service.weather").get_default()
+local Weather = require("service.weather")
 
 local weather_applet = {}
 
@@ -299,7 +299,9 @@ local function create_daily(data)
 	return widget
 end
 
-local function new()
+return function()
+	local weather = Weather.get_default()
+
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		forced_width = dpi(370),
@@ -357,5 +359,3 @@ local function new()
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = new })

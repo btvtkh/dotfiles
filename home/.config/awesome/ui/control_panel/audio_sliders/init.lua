@@ -5,9 +5,11 @@ local common = require("common")
 local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
-local audio = require("service.audio").get_default()
+local Audio = require("service.audio")
 
-local function new()
+return function()
+	local audio = Audio.get_default()
+
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
@@ -176,5 +178,3 @@ local function new()
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = new })

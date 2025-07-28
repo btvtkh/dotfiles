@@ -4,9 +4,11 @@ local beautiful = require("beautiful")
 local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
-local bt_adapter = require("service.bluetooth").get_default()
+local Bluetooth = require("service.bluetooth")
 
-local function new()
+return function()
+	local bt_adapter = Bluetooth.get_default()
+
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		forced_height = dpi(60),
@@ -124,5 +126,3 @@ local function new()
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = new })

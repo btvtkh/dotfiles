@@ -10,7 +10,7 @@ local capi = { client = client }
 local menu = require("ui.menu").get_default()
 awful.titlebar.enable_tooltip = false
 
-local function new(c)
+return function(c)
 	if c.requests_no_titlebar then return end
 
 	local ret = awful.titlebar(c, {
@@ -146,5 +146,3 @@ local function new(c)
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = function(_, ...) return new(...) end })

@@ -5,7 +5,7 @@ local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
 local day_info_panel = require("ui.day_info_panel").get_default()
 
-local function new()
+return function()
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
@@ -62,5 +62,3 @@ local function new()
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = new })

@@ -13,7 +13,7 @@ local dpi = beautiful.xresources.apply_dpi
 local lua_escape = require("lib.string").lua_escape
 local dump_table = require("lib.file").dump
 local capi = { screen = screen }
-local powermenu = require("ui.powermenu").get_default()
+local Powermenu = require("ui.powermenu")
 
 local launcher = {}
 
@@ -379,7 +379,7 @@ local function new()
 	powermenu_button:buttons {
 		awful.button({}, 1, function()
 			ret:hide()
-			powermenu:show()
+			Powermenu.get_default():show()
 		end)
 	}
 

@@ -7,8 +7,8 @@ local common = require("common")
 local user = require("user")
 local dump_table = require("lib.file").dump
 local capi = { awesome = awesome, screen = screen, client = client }
-local screenshot = require("service.screenshot").get_default()
-local powermenu = require("ui.powermenu").get_default()
+local Screenshot = require("service.screenshot")
+local Powermenu = require("ui.powermenu")
 
 local menu = {}
 
@@ -61,7 +61,7 @@ local function create_desktop_menu()
 					{
 						label = "Powermenu",
 						exec = function()
-							powermenu:toggle()
+							Powermenu.get_default():toggle()
 						end
 					}
 				}
@@ -72,19 +72,19 @@ local function create_desktop_menu()
 					{
 						label = "Full",
 						exec = function()
-							screenshot:take_full()
+							Screenshot.get_default():take_full()
 						end
 					},
 					{
 						label = "Full 5s delay",
 						exec = function()
-							screenshot:take_delay(5)
+							Screenshot.get_default():take_delay(5)
 						end
 					},
 					{
 						label = "Select area",
 						exec = function()
-							screenshot:take_select()
+							Screenshot.get_default():take_select()
 						end
 					}
 				}

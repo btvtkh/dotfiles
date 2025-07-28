@@ -4,9 +4,11 @@ local beautiful = require("beautiful")
 local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
-local nm_client = require("service.network").get_default()
+local Network = require("service.network")
 
-local function new()
+return function()
+	local nm_client = Network.get_default()
+
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		forced_height = dpi(60),
@@ -124,5 +126,3 @@ local function new()
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = new })

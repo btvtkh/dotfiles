@@ -1,9 +1,6 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
-local common = require("common")
-local shape = require("lib.shape")
-local text_icons = beautiful.text_icons
 local has_common = require("lib.table").has_common
 local dpi = beautiful.xresources.apply_dpi
 local capi = { client = client }
@@ -12,46 +9,12 @@ local Tag_list = require("ui.bar.tag_list")
 local Tray = require("ui.bar.tray")
 local Time = require("ui.bar.time")
 local Kb_layout = require("ui.bar.kb_layout")
-local launcher = require("ui.launcher").get_default()
-local control_panel = require("ui.control_panel").get_default()
+local Launcher_button = require("ui.bar.launcher_button")
+local Control_button = require("ui.bar.control_button")
 
 local bar = {}
 
-local function Launcher_button()
-	return common.button {
-		buttons = {
-			awful.button({}, 1, function()
-				launcher:toggle()
-			end)
-		},
-		forced_width = dpi(31),
-		bg_normal = beautiful.bg_alt,
-		bg_hover = beautiful.bg_urg,
-		fg_normal = beautiful.fg,
-		fg_hover = beautiful.fg,
-		shape = shape.rrect(dpi(8)),
-		label = text_icons.menu,
-	}
-end
-
-local function Control_panel_button()
-	return common.button {
-		buttons = {
-			awful.button({}, 1, function()
-				control_panel:toggle()
-			end)
-		},
-		forced_width = dpi(31),
-		bg_normal = beautiful.bg_alt,
-		bg_hover = beautiful.bg_urg,
-		fg_normal = beautiful.fg,
-		fg_hover = beautiful.fg,
-		shape = shape.rrect(dpi(8)),
-		label = text_icons.sliders,
-	}
-end
-
-function bar.create_secondary(s)
+function bar.Secondary(s)
 	local ret = awful.wibar {
 		position = "bottom",
 		ontop = true,
@@ -122,7 +85,7 @@ function bar.create_secondary(s)
 	return ret
 end
 
-function bar.create_primary(s)
+function bar.Primary(s)
 	local ret = awful.wibar {
 		position = "bottom",
 		ontop = true,
@@ -165,7 +128,7 @@ function bar.create_primary(s)
 								Tray(),
 								Kb_layout(),
 								Time(),
-								Control_panel_button()
+								Control_button()
 							}
 						}
 					}

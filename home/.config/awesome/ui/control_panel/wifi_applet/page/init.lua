@@ -6,12 +6,13 @@ local common = require("common")
 local shape = require("lib.shape")
 local text_icons = beautiful.text_icons
 local dpi = beautiful.xresources.apply_dpi
-local network = require("service.network")
-local nm_client = network.get_default()
+local Network = require("service.network")
 
 local wifi_page = {}
 
 local function create_ap_widget(self, ap)
+	local nm_client = Network.get_default()
+
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		shape = shape.rrect(dpi(13)),
@@ -77,6 +78,7 @@ local function create_ap_widget(self, ap)
 end
 
 function wifi_page:open_ap_menu(ap)
+	local nm_client = Network.get_default()
 	local wp = self._private
 	local aps_layout = self:get_children_by_id("access-points-layout")[1]
 	local close_button = wp.ap_menu:get_children_by_id("close-button")[1]
@@ -158,6 +160,7 @@ function wifi_page:open_ap_menu(ap)
 end
 
 function wifi_page:close_ap_menu()
+	local nm_client = Network.get_default()
 	local wp = self._private
 	local aps_layout = self:get_children_by_id("access-points-layout")[1]
 	local password_input = wp.ap_menu:get_children_by_id("password-input")[1]
@@ -177,12 +180,15 @@ function wifi_page:close_ap_menu()
 end
 
 function wifi_page:refresh()
+	local nm_client = Network.get_default()
 	local wp = self._private
 	wp.on_ap_list(nil, nil, nm_client.wireless:get_access_points())
 	nm_client.wireless:request_scan()
 end
 
-local function new()
+return function()
+	local nm_client = Network.get_default()
+
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		{
@@ -437,8 +443,8 @@ local function new()
 	end
 
 	wp.on_wireless_state = function(_, state)
-		if state == network.DeviceState.ACTIVATED
-		or state == network.DeviceState.DISCONNECTED then
+		if state == Network.DeviceState.ACTIVATED
+		or state == Network.DeviceState.DISCONNECTED then
 			wp.on_ap_list(nil, nil, nm_client.wireless:get_access_points())
 		end
 	end
@@ -466,5 +472,3 @@ local function new()
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = new })

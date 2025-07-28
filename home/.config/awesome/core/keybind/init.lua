@@ -1,18 +1,18 @@
 local Gio = require("lgi").require("Gio")
 local awful = require("awful")
 local capi = { awesome = awesome, client = client }
-local screenshot = require("service.screenshot").get_default()
-local menu = require("ui.menu").get_default()
-local launcher = require("ui.launcher").get_default()
-local powermenu = require("ui.powermenu").get_default()
-local control_panel = require("ui.control_panel").get_default()
-local day_info_panel = require("ui.day_info_panel").get_default()
+local Screenshot = require("service.screenshot")
+local Menu = require("ui.menu")
+local Launcher = require("ui.launcher")
+local Powermenu = require("ui.powermenu")
+local Control_panel = require("ui.control_panel")
+local Day_info_panel = require("ui.day_info_panel")
 local mod = "Mod4"
 awful.mouse.snap.edge_enabled = false
 
 awful.mouse.append_global_mousebindings {
 	awful.button({}, 3, function()
-		menu:toggle_desktop_menu()
+		Menu.get_default():toggle_desktop_menu()
 	end),
 	awful.button({}, 4, awful.tag.viewprev),
 	awful.button({}, 5, awful.tag.viewnext)
@@ -132,22 +132,22 @@ awful.keyboard.append_global_keybindings {
 		if app then awful.spawn(app:get_executable()) end
 	end),
 	awful.key({ mod }, "d", function()
-		launcher:show()
+		Launcher.get_default():show()
 	end),
 	awful.key({ mod }, "f", function()
-		control_panel:toggle()
+		Control_panel.get_default():toggle()
 	end),
 	awful.key({ mod }, "g", function()
-		day_info_panel:toggle()
+		Day_info_panel.get_default():toggle()
 	end),
 	awful.key({ mod }, "q", function()
-		powermenu:show()
+		Powermenu.get_default():show()
 	end),
 	awful.key({}, "Print", function()
-		screenshot:take_full()
+		Screenshot.get_default():take_full()
 	end),
 	awful.key({"Shift"}, "Print", function()
-		screenshot:take_select()
+		Screenshot.get_default():take_select()
 	end)
 }
 
@@ -186,7 +186,7 @@ capi.client.connect_signal("request::default_keybindings", function()
 			c:raise()
 		end),
 		awful.key({ mod }, "m", function(c)
-			menu:toggle_client_menu(c)
+			Menu.get_default():toggle_client_menu(c)
 		end),
 		awful.key({ mod, "Control" }, "Return", function(c)
 			c:swap(awful.client.getmaster())

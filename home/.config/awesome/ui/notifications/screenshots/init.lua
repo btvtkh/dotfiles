@@ -1,7 +1,9 @@
 local Gio = require("lgi").require("Gio")
 local awful = require("awful")
 local naughty = require("naughty")
-local screenshot = require("service.screenshot").get_default()
+local Screenshot = require("service.screenshot")
+
+local screenshot = Screenshot.get_default()
 
 screenshot:connect_signal("saved", function(_, dir, name)
 	local view_file = naughty.action { name = "View" }

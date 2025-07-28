@@ -11,7 +11,7 @@ local Wifi_button = require("ui.control_panel.wifi_applet.button")
 local Wifi_page = require("ui.control_panel.wifi_applet.page")
 local Bluetooth_button = require("ui.control_panel.bluetooth_applet.button")
 local Bluetooth_page = require("ui.control_panel.bluetooth_applet.page")
-local audio = require("service.audio").get_default()
+local Audio = require("service.audio")
 
 local control_panel = {}
 
@@ -56,8 +56,8 @@ end
 
 function control_panel:show()
 	if self.visible then return end
-	audio:get_default_sink_data()
-	audio:get_default_source_data()
+	Audio.get_default():get_default_sink_data()
+	Audio.get_default():get_default_source_data()
 	self:setup_main_page()
 	self.visible = true
 	self:emit_signal("property::visible", self.visible)

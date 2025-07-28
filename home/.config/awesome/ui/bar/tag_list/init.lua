@@ -6,7 +6,7 @@ local dpi = beautiful.xresources.apply_dpi
 local capi = { client = client }
 local mod = "Mod4"
 
-local function new(s)
+return function(s)
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
@@ -136,12 +136,3 @@ local function new(s)
 
 	return ret
 end
-
-return setmetatable(
-	{ new = new },
-	{
-		__call = function(_, ...)
-			return new(...)
-		end
-	}
-)

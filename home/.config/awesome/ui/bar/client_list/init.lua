@@ -5,7 +5,7 @@ local shape = require("lib.shape")
 local dpi = beautiful.xresources.apply_dpi
 local menu = require("ui.menu").get_default()
 
-local function new(s)
+return function(s)
 	local ret = awful.widget.tasklist {
 		screen = s,
 		filter = awful.widget.tasklist.filter.currenttags,
@@ -117,12 +117,3 @@ local function new(s)
 
 	return ret
 end
-
-return setmetatable(
-	{ new = new },
-	{
-		__call = function(_, ...)
-			return new(...)
-		end
-	}
-)

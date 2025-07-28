@@ -109,7 +109,7 @@ function calendar:set_current_date()
 	self:set_date(os.date("*t"))
 end
 
-local function new()
+return function()
 	local ret = wibox.widget {
 		widget = wibox.container.background,
 		bg = beautiful.bg_alt,
@@ -216,5 +216,3 @@ local function new()
 
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = new })

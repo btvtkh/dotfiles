@@ -211,7 +211,7 @@ local function create_notification_popup(self, n)
 	return ret
 end
 
-local function new(s)
+return function(s)
 	if not s then return end
 	local ret = {}
 	ret._private = {}
@@ -250,12 +250,3 @@ local function new(s)
 
 	return ret
 end
-
-return setmetatable(
-	{ new = new },
-	{
-		__call = function(_, ...)
-			return new(...)
-		end
-	}
-)

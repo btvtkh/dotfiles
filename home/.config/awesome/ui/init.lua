@@ -7,11 +7,17 @@ local Bar = require("ui.bar")
 local Notifications = require("ui.notifications")
 local Wallpaper = require("ui.wallpaper")
 local Titlebar = require("ui.titlebar")
-local menu = require("ui.menu").get_default()
-local launcher = require("ui.launcher").get_default()
-local powermenu = require("ui.powermenu").get_default()
-local control_panel = require("ui.control_panel").get_default()
-local day_info_panel = require("ui.day_info_panel").get_default()
+local Menu = require("ui.menu")
+local Launcher = require("ui.launcher")
+local Powermenu = require("ui.powermenu")
+local Control_panel = require("ui.control_panel")
+local Day_info_panel = require("ui.day_info_panel")
+
+local menu = Menu.get_default()
+local launcher = Launcher.get_default()
+local powermenu = Powermenu.get_default()
+local control_panel = Control_panel.get_default()
+local day_info_panel = Day_info_panel.get_default()
 
 local function on_primary_bar_visible()
 	if control_panel.visible == true then
@@ -44,10 +50,10 @@ end
 
 awful.screen.connect_for_each_screen(function(s)
 	if s == capi.screen.primary then
-		s.bar = Bar.create_primary(s)
+		s.bar = Bar.Primary(s)
 		s.bar:connect_signal("property::visible", on_primary_bar_visible)
 	else
-		s.bar = Bar.create_secondary(s)
+		s.bar = Bar.Secondary(s)
 	end
 
 	s.notifications = Notifications(s)

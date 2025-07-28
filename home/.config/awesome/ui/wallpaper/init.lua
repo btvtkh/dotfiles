@@ -27,7 +27,7 @@ function wallpaper:unset()
 	self:repaint()
 end
 
-local function new(s)
+return function(s)
 	local ret = awful.wallpaper {
 		screen = s,
 		widget = {
@@ -39,5 +39,3 @@ local function new(s)
 	gtable.crush(ret, wallpaper, true)
 	return ret
 end
-
-return setmetatable({ new = new }, { __call = function(_, ...) return new(...) end })
