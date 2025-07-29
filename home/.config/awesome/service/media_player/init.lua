@@ -14,16 +14,6 @@ function media_player:get_player(name)
 	return self.players[name]
 end
 
-function media_player:match_players(match)
-	local p = {}
-	for n, o in pairs(self.players) do
-		if n:match(match) then
-			table.insert(p, o)
-		end
-	end
-	return p
-end
-
 function player:get_playback_status()
 	return string.lower(
 		self._private.properties_proxy:Get(
