@@ -105,15 +105,23 @@ local function create_notification_popup(self, n)
 						nil,
 						{
 							layout = wibox.layout.fixed.horizontal,
-							spacing = dpi(10),
+							spacing = dpi(5),
 							{
 								widget = wibox.widget.textbox,
 								markup = create_markup(os.date("%H:%M"), { fg = beautiful.fg_alt })
 							},
 							{
 								id = "close",
-								widget = wibox.widget.textbox,
-								markup = create_markup(text_icons.cross, { fg = beautiful.red })
+								widget = common.button {
+									forced_width = dpi(25),
+									forced_height = dpi(25),
+									shape = shape.rrect(dpi(5)),
+									bg_normal = beautiful.bg,
+									bg_hover = beautiful.red,
+									fg_normal = beautiful.red,
+									fg_hover = beautiful.bg,
+									label = text_icons.cross
+								}
 							}
 						}
 					},

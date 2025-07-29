@@ -120,5 +120,3 @@ end)
 awful.mouse.append_global_mousebinding(
 	awful.button({}, 1, click_hideaway)
 )
-
-require("ui.notifications.screenshots")
