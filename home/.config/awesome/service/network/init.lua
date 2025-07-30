@@ -290,12 +290,12 @@ function wireless:request_scan()
 end
 
 function access_point:get_ssid()
-	return NM.utils_ssid_to_utf8(
-		self._private.properties_proxy:Get(
-			self._private.access_point_proxy.interface,
-			"Ssid"
-		)
+	local ssid = self._private.properties_proxy:Get(
+		self._private.access_point_proxy.interface,
+		"Ssid"
 	)
+
+	return ssid ~= nil and NM.utils_ssid_to_utf8(ssid) or nil
 end
 
 function access_point:get_security()

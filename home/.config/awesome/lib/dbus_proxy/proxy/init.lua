@@ -208,7 +208,9 @@ local function call_async(proxy, interface, method, user_callback, context, args
 			local out, err = _proxy:call_finish(res)
 
 			if not out and err then
-				user_callback(proxy, context, out, err)
+				if user_callback then
+					user_callback(proxy, context, out, err)
+				end
 				return
 			end
 
@@ -217,7 +219,9 @@ local function call_async(proxy, interface, method, user_callback, context, args
 				result = result[1]
 			end
 
-			user_callback(proxy, context, result)
+			if user_callback then
+				user_callback(proxy, context, result)
+			end
 		end
 	)
 end
