@@ -75,15 +75,11 @@ local function run_keygrabber(self)
 		end
 
 		if event ~= "press" then
-			if wp.on_key_released then
-				wp.on_key_released(self, mod, key)
-			end
+			self:emit_signal("key-released", mod, key)
 			return
 		end
 
-		if wp.on_key_pressed then
-			wp.on_key_pressed(self, mod, key)
-		end
+		self:emit_signal("key-pressed", mod, key)
 
 		if mod.Control then
 			if key == "a" then
@@ -108,9 +104,7 @@ local function run_keygrabber(self)
 								text .. utf8.sub(wp.input, wp.cursor_index)
 						end
 						wp.cursor_index = wp.cursor_index + utf8.len(text)
-						if wp.on_input_changed then
-							wp.on_input_changed(self, wp.input)
-						end
+						self:emit_signal("input-changed", wp.input)
 						self:update_textbox()
 					end
 				end)
@@ -121,9 +115,7 @@ local function run_keygrabber(self)
 				self:unfocus()
 			elseif key == "Return" then
 				wp.selectall = false
-				if wp.on_executed then
-					wp.on_executed(self, wp.input)
-				end
+				self:emit_signal("executed", wp.input)
 				self:unfocus()
 			elseif key == "Home" then
 				wp.selectall = false
@@ -147,30 +139,22 @@ local function run_keygrabber(self)
 				if wp.selectall then
 					wp.input = ""
 					wp.selectall = false
-					if wp.on_input_changed then
-						wp.on_input_changed(self, wp.input)
-					end
+					self:emit_signal("input-changed", wp.input)
 				elseif wp.cursor_index < utf8.len(wp.input) + 1 then
 					wp.input = utf8.sub(wp.input, 1, wp.cursor_index - 1) ..
 						utf8.sub(wp.input, wp.cursor_index + 1)
-					if wp.on_input_changed then
-						wp.on_input_changed(self, wp.input)
-					end
+					self:emit_signal("input-changed", wp.input)
 				end
 			elseif key == "BackSpace" then
 				if wp.selectall then
 					wp.input = ""
 					wp.selectall = false
-					if wp.on_input_changed then
-						wp.on_input_changed(self, wp.input)
-					end
+					self:emit_signal("input-changed", wp.input)
 				elseif wp.cursor_index > 1 then
 					wp.input = utf8.sub(wp.input, 1, wp.cursor_index - 2) ..
 						utf8.sub(wp.input, wp.cursor_index)
 					wp.cursor_index = wp.cursor_index - 1
-					if wp.on_input_changed then
-						wp.on_input_changed(self, wp.input)
-					end
+					self:emit_signal("input-changed", wp.input)
 				end
 			elseif utf8.len(key) == 1 then
 				if wp.selectall then
@@ -181,9 +165,7 @@ local function run_keygrabber(self)
 						utf8.sub(wp.input, wp.cursor_index)
 					wp.cursor_index = wp.cursor_index + 1
 				end
-				if wp.on_input_changed then
-					wp.on_input_changed(self, wp.input)
-				end
+				self:emit_signal("input-changed", wp.input)
 			end
 		end
 
@@ -219,9 +201,7 @@ function text_input:focus()
 	wp.focused = true
 	run_keygrabber(self)
 	self:update_textbox()
-	if wp.on_focused then
-		wp.on_focused(self)
-	end
+	self:emit_signal("focused")
 end
 
 function text_input:unfocus()
@@ -229,9 +209,7 @@ function text_input:unfocus()
 	if not wp.focused then return end
 	wp.focused = false
 	awful.keygrabber.stop(wp.keygrabber)
-	if wp.on_unfocused then
-		wp.on_unfocused(self)
-	end
+	self:emit_signal("unfocused")
 end
 
 function text_input:get_input()
@@ -271,30 +249,6 @@ function text_input:set_obscure(obscure)
 	self:update_textbox()
 end
 
-function text_input:on_focused(callback)
-	self._private.on_focused = callback
-end
-
-function text_input:on_unfocused(callback)
-	self._private.on_unfocused = callback
-end
-
-function text_input:on_input_changed(callback)
-	self._private.on_input_changed = callback
-end
-
-function text_input:on_executed(callback)
-	self._private.on_executed = callback
-end
-
-function text_input:on_key_pressed(callback)
-	self._private.on_key_pressed = callback
-end
-
-function text_input:on_key_released(callback)
-	self._private.on_key_released = callback
-end
-
 local function new(args)
 	args = args or {}
 
@@ -306,12 +260,6 @@ local function new(args)
 	args.placeholder_fg = args.placeholder_fg or "#373737"
 	args.unfocused_fg = args.unfocused_fg or "#373737"
 	args.highlighter = args.highlighter
-	args.on_focused = args.on_focused
-	args.on_unfocused = args.on_unfocused
-	args.on_input_changed = args.on_input_changed
-	args.on_executed = args.on_executed
-	args.on_key_pressed = args.on_key_pressed
-	args.on_key_released = args.on_key_released
 	args.ellipsize = args.ellipsize or "start"
 
 	local ret = wibox.widget {

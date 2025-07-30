@@ -127,19 +127,11 @@ function wifi_page:open_ap_menu(ap)
 			end)
 		}
 
-		password_input:on_focused(function()
-			password_input:set_input("")
-			password_input:set_cursor_index(1)
-		end)
-
-		password_input:on_unfocused(function()
-			self:close_ap_menu()
-		end)
-
-		password_input:on_executed(function(_, input)
+		wp.on_password_input_executed = function(_, input)
 			nm_client:connect_access_point(ap, input, auto_connect)
-			self:close_ap_menu()
-		end)
+		end
+
+		password_input:connect_signal("executed", wp.on_password_input_executed)
 
 		password_widget:set_visible(true)
 		password_input:focus()
@@ -168,7 +160,14 @@ function wifi_page:close_ap_menu()
 	if nm_client:get_wireless_enabled() then
 		password_input:unfocus()
 		password_input:set_obscure(true)
+
+		if wp.on_password_input_executed then
+			password_input:disconnect_signal("executed", wp.on_password_input_executed)
+			wp.on_password_input_executed = nil
+		end
+
 		aps_layout:reset()
+
 		for _, ap_widget in ipairs(wp.ap_widgets) do
 			if ap_widget._private.is_active then
 				aps_layout:insert(1, ap_widget)
@@ -449,9 +448,21 @@ return function()
 		end
 	end
 
+	wp.on_password_input_focused = function()
+		password_input:set_input("")
+		password_input:set_cursor_index(1)
+	end
+
+	wp.on_password_input_unfocused = function()
+		ret:close_ap_menu()
+	end
+
 	nm_client.wireless:connect_signal("property::access-points", wp.on_ap_list)
 	nm_client.wireless:connect_signal("property::state", wp.on_wireless_state)
 	nm_client:connect_signal("property::wireless-enabled", wp.on_wireless_enabled)
+
+	password_input:connect_signal("focused", wp.on_password_input_focused)
+	password_input:connect_signal("unfocused", wp.on_password_input_unfocused)
 
 	bottombar_toggle_switch:buttons {
 		awful.button({}, 1, function()

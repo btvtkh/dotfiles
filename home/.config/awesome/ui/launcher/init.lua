@@ -429,22 +429,22 @@ local function new()
 		end)
 	}
 
-	text_input:on_unfocused(function()
+	wp.on_unfocused = function()
 		ret:hide()
-	end)
+	end
 
-	text_input:on_input_changed(function(_, input)
+	wp.on_input_changed = function(_, input)
 		wp.filtered = filter_apps(Gio.AppInfo.get_all(), input)
 		wp.start_index, wp.select_index = 1, 1
 		ret:update_entries()
-	end)
+	end
 
-	text_input:on_executed(function()
+	wp.on_executed = function()
 		local app = wp.filtered[wp.select_index]
 		if app then launch_app(app) end
-	end)
+	end
 
-	text_input:on_key_pressed(function(_, _, key)
+	wp.on_key_pressed = function(_, _, key)
 		if key == "Down" then
 			ret:next()
 			ret:update_entries()
@@ -452,7 +452,12 @@ local function new()
 			ret:back()
 			ret:update_entries()
 		end
-	end)
+	end
+
+	text_input:connect_signal("unfocused", wp.on_unfocused)
+	text_input:connect_signal("input-changed", wp.on_input_changed)
+	text_input:connect_signal("executed", wp.on_executed)
+	text_input:connect_signal("key-pressed", wp.on_key_pressed)
 
 	return ret
 end
