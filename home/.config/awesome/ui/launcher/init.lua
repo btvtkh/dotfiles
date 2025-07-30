@@ -203,13 +203,13 @@ end
 function launcher:show()
 	if self.visible then return end
 	local wp = self._private
-	local text_input = self.widget:get_children_by_id("text-input")[1]
-	text_input:set_input("")
-	text_input:set_cursor_index(1)
+	local search_input = self.widget:get_children_by_id("search-input")[1]
+	search_input:set_input("")
+	search_input:set_cursor_index(1)
 	wp.filtered = filter_apps(Gio.AppInfo.get_all(), "")
 	wp.start_index, wp.select_index = 1, 1
 	self:update_entries()
-	text_input:focus()
+	search_input:focus()
 	self.visible = true
 	self:emit_signal("property::visible", self.visible)
 end
@@ -218,10 +218,10 @@ function launcher:hide()
 	if not self.visible then return end
 	local wp = self._private
 	local entries_layout = self.widget:get_children_by_id("entries-layout")[1]
-	local text_input = self.widget:get_children_by_id("text-input")[1]
+	local search_input = self.widget:get_children_by_id("search-input")[1]
 	wp.filtered = {}
 	wp.select_index, wp.select_index = 1, 1
-	text_input:unfocus()
+	search_input:unfocus()
 	entries_layout:reset()
 	self.visible = false
 	self:emit_signal("property::visible", self.visible)
@@ -335,7 +335,7 @@ local function new()
 										strategy = "max",
 										height = dpi(25),
 										{
-											id = "text-input",
+											id = "search-input",
 											widget = common.text_input {
 												placeholder = "Search...",
 												cursor_bg = beautiful.fg,
@@ -372,9 +372,39 @@ local function new()
 	local wallpaper_button = ret.widget:get_children_by_id("wallpaper-button")[1]
 	local home_button = ret.widget:get_children_by_id("home-button")[1]
 	local entries_layout = ret.widget:get_children_by_id("entries-layout")[1]
-	local text_input = ret.widget:get_children_by_id("text-input")[1]
+	local search_input = ret.widget:get_children_by_id("search-input")[1]
 
 	wp.rows = 6
+
+	wp.on_unfocused = function()
+		ret:hide()
+	end
+
+	wp.on_input_changed = function(_, input)
+		wp.filtered = filter_apps(Gio.AppInfo.get_all(), input)
+		wp.start_index, wp.select_index = 1, 1
+		ret:update_entries()
+	end
+
+	wp.on_executed = function()
+		local app = wp.filtered[wp.select_index]
+		if app then launch_app(app) end
+	end
+
+	wp.on_key_pressed = function(_, _, key)
+		if key == "Down" then
+			ret:next()
+			ret:update_entries()
+		elseif key == "Up" then
+			ret:back()
+			ret:update_entries()
+		end
+	end
+
+	search_input:connect_signal("unfocused", wp.on_unfocused)
+	search_input:connect_signal("input-changed", wp.on_input_changed)
+	search_input:connect_signal("executed", wp.on_executed)
+	search_input:connect_signal("key-pressed", wp.on_key_pressed)
 
 	powermenu_button:buttons {
 		awful.button({}, 1, function()
@@ -416,8 +446,6 @@ local function new()
 		end)
 	}
 
-	entries_layout:set_forced_height(dpi(60) * wp.rows + dpi(3) * (wp.rows - 1))
-
 	entries_layout:buttons {
 		awful.button({}, 4, function()
 			ret:back()
@@ -429,35 +457,7 @@ local function new()
 		end)
 	}
 
-	wp.on_unfocused = function()
-		ret:hide()
-	end
-
-	wp.on_input_changed = function(_, input)
-		wp.filtered = filter_apps(Gio.AppInfo.get_all(), input)
-		wp.start_index, wp.select_index = 1, 1
-		ret:update_entries()
-	end
-
-	wp.on_executed = function()
-		local app = wp.filtered[wp.select_index]
-		if app then launch_app(app) end
-	end
-
-	wp.on_key_pressed = function(_, _, key)
-		if key == "Down" then
-			ret:next()
-			ret:update_entries()
-		elseif key == "Up" then
-			ret:back()
-			ret:update_entries()
-		end
-	end
-
-	text_input:connect_signal("unfocused", wp.on_unfocused)
-	text_input:connect_signal("input-changed", wp.on_input_changed)
-	text_input:connect_signal("executed", wp.on_executed)
-	text_input:connect_signal("key-pressed", wp.on_key_pressed)
+	entries_layout:set_forced_height(dpi(60) * wp.rows + dpi(3) * (wp.rows - 1))
 
 	return ret
 end

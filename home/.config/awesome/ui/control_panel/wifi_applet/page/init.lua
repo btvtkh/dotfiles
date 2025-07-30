@@ -133,6 +133,9 @@ function wifi_page:open_ap_menu(ap)
 
 		password_input:connect_signal("executed", wp.on_password_input_executed)
 
+		password_input:set_obscure(true)
+		password_input:set_input("")
+		password_input:set_cursor_index(1)
 		password_widget:set_visible(true)
 		password_input:focus()
 	else
@@ -159,7 +162,6 @@ function wifi_page:close_ap_menu()
 
 	if nm_client:get_wireless_enabled() then
 		password_input:unfocus()
-		password_input:set_obscure(true)
 
 		if wp.on_password_input_executed then
 			password_input:disconnect_signal("executed", wp.on_password_input_executed)
@@ -448,11 +450,6 @@ return function()
 		end
 	end
 
-	wp.on_password_input_focused = function()
-		password_input:set_input("")
-		password_input:set_cursor_index(1)
-	end
-
 	wp.on_password_input_unfocused = function()
 		ret:close_ap_menu()
 	end
@@ -461,7 +458,6 @@ return function()
 	nm_client.wireless:connect_signal("property::state", wp.on_wireless_state)
 	nm_client:connect_signal("property::wireless-enabled", wp.on_wireless_enabled)
 
-	password_input:connect_signal("focused", wp.on_password_input_focused)
 	password_input:connect_signal("unfocused", wp.on_password_input_unfocused)
 
 	bottombar_toggle_switch:buttons {
