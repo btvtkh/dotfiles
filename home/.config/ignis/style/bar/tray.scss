@@ -1,0 +1,36 @@
+.bar-window {
+  .tray-box {
+    all: unset;
+    transition: 200ms;
+    margin: 5px 3px 5px 0;
+    border-radius: 10px;
+    color: $fg;
+    background-color: $bg-alt;
+    padding: 4px;
+
+    .reveal-button {
+      all: unset;
+      transition: 200ms;
+      color: $fg;
+      border-radius: 6px;
+      padding: 0 6px;
+
+      &:hover {
+        background-color: $bg-urg;
+      }
+    }
+
+    .item-button {
+      all: unset;
+      transition: 200ms;
+      color: $fg;
+      border-radius: 6px;
+      margin: 0 0 0 2px;
+      padding: 0 6px;
+
+      &:hover {
+        background-color: $bg-urg;
+      }
+    }
+  }
+}

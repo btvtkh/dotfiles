@@ -1,0 +1,13 @@
+.notifications-window {
+  min-width: 29rem;
+
+  .notifications-box {
+
+    .notification-box {
+      min-width: 300px;
+      min-height: 100px;
+      background-color: $bg;
+      margin: 15px 15px 0 0;
+    }
+  }
+}
