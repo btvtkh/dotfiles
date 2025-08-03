@@ -1,4 +1,12 @@
+import time as Time
 from ignis import widgets as Widget
+
+UrgencyMap = {
+    "-1": "not-provided",
+    "0": "low",
+    "1": "normal",
+    "2": "critical"
+}
 
 class ActionButton(Widget.Button):
     def __init__(self, action):
@@ -8,7 +16,12 @@ class ActionButton(Widget.Button):
 
         super().__init__(
             css_classes = ["action-button"],
+            hexpand = True,
             child = Widget.Label(
+                halign = "center",
+                ellipsize = "end",
+                max_width_chars = 15,
+                hexpand = True,
                 label = action.label
             ),
             on_click = on_click
@@ -21,55 +34,76 @@ class NotificationWidget(Widget.Box):
             n.close()
 
         super().__init__(
-            css_classes = ["notification-box"],
+            css_classes = [
+                "notification-box",
+                f"{UrgencyMap[str(n.urgency)]}"
+            ],
             vertical = True,
-            hexpand = True,
             child = [
                 Widget.Box(
+                    css_classes = ["header-box"],
                     child = [
-                        Widget.Icon(
-                            image = n.icon and n.icon or "dialog-information-symbolic",
-                            pixel_size = 48,
+                        Widget.Label(
+                            css_classes = ["app-name-label"],
                             halign = "start",
-                            valign = "start",
+                            ellipsize = "end",
+                            label = n.app_name or "Unknown"
                         ),
-                        Widget.Box(
-                            vertical = True,
-                            style = "margin-left: 0.75rem;",
-                            child = [
-                                Widget.Label(
-                                    css_classes = ["summary-label"],
-                                    ellipsize = "end",
-                                    halign = "start",
-                                    label = n.summary,
-                                    visible = n.summary != "",
-                                ),
-                                Widget.Label(
-                                    css_classes = ["body-label"],
-                                    ellipsize = "end",
-                                    halign = "start",
-                                    label = n.body,
-                                    visible = n.body != "",
-                                ),
-                            ],
+                        Widget.Label(
+                            css_classes = ["time-label"],
+                            hexpand = True,
+                            halign = "end",
+                            label = Time.strftime('%H:%M', Time.gmtime(n.time))
                         ),
                         Widget.Button(
                             css_classes = ["close-button"],
-                            halign = "end",
-                            valign = "start",
-                            hexpand = True,
-                            child = Widget.Icon(
-                                image = "window-close-symbolic",
-                                pixel_size = 20
-                            ),
                             on_click = on_close_click,
-                        ),
-                    ],
+                            child = Widget.Icon(
+                                image = "window-close-symbolic"
+                            )
+                        )
+                    ]
                 ),
+                Widget.Separator(),
                 Widget.Box(
+                    css_classes = ["content-box"],
+                    child = [
+                        n.icon and Widget.Icon(
+                            css_classes = ["icon-image"],
+                            valign = "start",
+                            image = n.icon
+                        ) or None,
+                        Widget.Box(
+                            vertical = True,
+                            child = [
+                                Widget.Label(
+                                    css_classes = ["summary-label"],
+                                    halign = "start",
+                                    ellipsize = "end",
+                                    xalign = 0,
+                                    label = n.summary
+                                ),
+                                Widget.Label(
+                                    css_classes = ["body-label"],
+                                    use_markup = True,
+                                    wrap = True,
+                                    wrap_mode = "char",
+                                    halign = "start",
+                                    justify = "fill",
+                                    ellipsize = "end",
+                                    xalign = 0,
+                                    lines = 4,
+                                    label = n.body
+                                )
+                            ]
+                        )
+                    ]
+                ),
+                len(n.actions) > 0 and Widget.Box(
                     css_classes = ["actions-box"],
-                    homogeneous = True,
-                    child = [ActionButton(action) for action in n.actions]
+                    child = [
+                        ActionButton(action) for action in n.actions
+                    ]
                 )
             ]
         )

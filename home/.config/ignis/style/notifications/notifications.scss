@@ -5,9 +5,71 @@
 
     .notification-box {
       min-width: 300px;
-      min-height: 100px;
       background-color: $bg;
-      margin: 15px 15px 0 0;
+      margin: 20px 20px 0 0;
+      border: 1px solid $bg-urg;
+      padding: 10px;
+      border-radius: 20px;
+      color: $fg;
+
+      .header-box {
+        margin: 5px 5px 0 5px;
+
+        .app-name-label {
+          font-size: 12pt;
+          font-weight: bold;
+        }
+
+        .time-label {
+          font-size: 10pt;
+          color: $fg-alt;
+        }
+
+        .close-button {
+          all: unset;
+          transition: 200ms;
+          margin-left: 10px;
+          color: $ac-red;
+          padding: 0 3px;
+          border-radius: 5px;
+
+          &:hover {
+            color: $bg;
+            background-color: $ac-red;
+          }
+        }
+      }
+
+      separator {
+        margin-top: 5px;
+      }
+
+      .content-box {
+        margin: 5px 5px 0 5px;
+
+        .summary-label {
+          font-size: 12pt;
+          font-weight: bold;
+        }
+
+        .body-label {
+          font-size: 10pt;
+          margin-top: 3px;
+        }
+      }
+
+      .actions-box {
+        margin-top: 7px;
+
+        .action-button {
+          margin-left: 5px;
+          border-radius: 10px;
+
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+      }
     }
   }
 }
