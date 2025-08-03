@@ -79,20 +79,18 @@ class NotificationWidget(Widget.Box):
                                 Widget.Label(
                                     css_classes = ["summary-label"],
                                     halign = "start",
-                                    ellipsize = "end",
                                     xalign = 0,
+                                    ellipsize = "end",
+                                    max_width_chars = 35,
                                     label = n.summary
                                 ),
                                 Widget.Label(
                                     css_classes = ["body-label"],
                                     use_markup = True,
-                                    wrap = True,
-                                    wrap_mode = "char",
                                     halign = "start",
-                                    justify = "fill",
-                                    ellipsize = "end",
                                     xalign = 0,
-                                    lines = 4,
+                                    ellipsize = "end",
+                                    max_width_chars = 40,
                                     label = n.body
                                 )
                             ]
