@@ -70,6 +70,7 @@ class NotificationWidget(Widget.Box):
                     child = [
                         n.icon and Widget.Icon(
                             css_classes = ["icon-image"],
+                            pixel_size = 64,
                             valign = "start",
                             image = n.icon
                         ) or None,
@@ -81,7 +82,7 @@ class NotificationWidget(Widget.Box):
                                     halign = "start",
                                     xalign = 0,
                                     ellipsize = "end",
-                                    max_width_chars = 35,
+                                    max_width_chars = n.icon and 20 or 30,
                                     label = n.summary
                                 ),
                                 Widget.Label(
@@ -90,7 +91,7 @@ class NotificationWidget(Widget.Box):
                                     halign = "start",
                                     xalign = 0,
                                     ellipsize = "end",
-                                    max_width_chars = 40,
+                                    max_width_chars = n.icon and 30 or 40,
                                     label = n.body
                                 )
                             ]
