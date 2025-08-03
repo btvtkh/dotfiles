@@ -50,13 +50,17 @@ class TasksWidget(Widget.Box):
     def __init__(self):
 
         def on_windows(x, y):
-            self.set_child([TaskButton(i) for i in x.get_windows()])
+            self.set_child([
+                TaskButton(w) for w in x.get_windows()
+            ])
 
         def setup(x):
             hyprland.connect("notify::windows", on_windows)
 
         super().__init__(
             css_classes = ["tasks-box"],
-            child = [TaskButton(i) for i in hyprland.get_windows()],
+            child = [
+                TaskButton(w) for w in hyprland.get_windows()
+            ],
             setup = setup
         )

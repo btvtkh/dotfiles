@@ -100,7 +100,7 @@ class NotificationWidget(Widget.Box):
                 len(n.actions) > 0 and Widget.Box(
                     css_classes = ["actions-box"],
                     child = [
-                        ActionButton(action) for action in n.actions
+                        ActionButton(a) for a in n.actions
                     ]
                 )
             ]

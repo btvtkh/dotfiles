@@ -46,7 +46,9 @@ class TrayWidget(Widget.Box):
         def on_click(x):
             nonlocal tray_visibile
             tray_visibile = not tray_visibile
-            self.get_first_child().get_child().set_image(tray_visibile and "pan-end-symbolic" or "pan-start-symbolic")
+            self.get_first_child().get_child().set_image(
+                tray_visibile and "pan-end-symbolic" or "pan-start-symbolic"
+            )
             self.get_last_child().set_reveal_child(tray_visibile)
 
         def on_added(x, y):

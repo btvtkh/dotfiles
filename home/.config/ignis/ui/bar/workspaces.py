@@ -34,13 +34,17 @@ class WorkspacesWidget(Widget.Box):
     def __init__(self):
 
         def on_workspaces(x, y):
-            self.set_child([WorkspaceButton(i) for i in x.get_workspaces()])
+            self.set_child([
+                WorkspaceButton(w) for w in x.get_workspaces()
+            ])
 
         def setup(x):
             hyprland.connect("notify::workspaces", on_workspaces)
 
         super().__init__(
             css_classes = ["workspaces-box"],
-            child = [WorkspaceButton(i) for i in hyprland.get_workspaces()],
+            child = [
+                WorkspaceButton(w) for w in hyprland.get_workspaces()
+            ],
             setup = setup
         )

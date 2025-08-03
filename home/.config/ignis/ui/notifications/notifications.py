@@ -74,9 +74,7 @@ class Notifications(Widget.Window):
         def setup(x):
             notifications.connect("notified", on_notified)
 
-            ns = notifications.get_notifications()
-            for i in range(len(ns)):
-                n = ns[i]
+            for n in notifications.get_notifications():
                 on_notified(notifications, n)
 
         super().__init__(
