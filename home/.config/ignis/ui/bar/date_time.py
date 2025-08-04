@@ -1,5 +1,5 @@
 import time as Time
-import datetime as DateTime
+from datetime import datetime as DateTime
 from ignis import utils as Utils
 from ignis import widgets as Widget
 
@@ -23,13 +23,13 @@ class DateTimeWidget(Widget.Box):
         self._time_label = Widget.Label()
 
         def on_time_poll_changed(x):
-            self._date_label.set_label(DateTime.datetime.now().strftime("%d %b, %a"))
-            self._time_label.set_label(DateTime.datetime.now().strftime("%H:%M"))
+            self._date_label.set_label(DateTime.now().strftime("%d %b, %a"))
+            self._time_label.set_label(DateTime.now().strftime("%H:%M"))
 
         def setup(x):
             time_poll.connect("changed", on_time_poll_changed)
-            self._date_label.set_label(DateTime.datetime.now().strftime("%d %b, %a"))
-            self._time_label.set_label(DateTime.datetime.now().strftime("%H:%M"))
+            self._date_label.set_label(DateTime.now().strftime("%d %b, %a"))
+            self._time_label.set_label(DateTime.now().strftime("%H:%M"))
 
         super().__init__(
             css_classes = ["date-time-box"],

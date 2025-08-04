@@ -6,5 +6,33 @@
     min-height: 450px;
     border-radius: 20px;
     padding: 10px;
+
+    .app-button {
+      all: unset;
+      transition: 200ms;
+      color: $fg;
+      background-color: $bg-alt;
+      padding: 10px;
+      border-radius: 10px;
+
+      &:focus {
+        color: $bg;
+        background-color: $ac;
+      }
+
+      &:hover:not(:focus) {
+        color: $fg;
+        background-color: $bg-urg;
+      }
+
+      .app-name-label {
+        font-size: 12pt;
+        font-weight: bold;
+      }
+
+      .app-description-label {
+        font-size: 10pt;
+      }
+    }
   }
 }

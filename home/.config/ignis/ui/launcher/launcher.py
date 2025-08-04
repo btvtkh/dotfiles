@@ -14,12 +14,12 @@ def launch_app(app):
 
     hyprland.send_command(f"dispatch exec {
         term_needed and
-            term and
-                f"{term.get_executable()} -e {app.get_executable()}"
-            or
-                re.search("^env", app.get_executable()) and re.sub("%a", "", app.get_commandline())
+            term and f"{term.get_executable()} -e {app.get_executable()}"
         or
-            app.get_executable()
+            re.search("^env", app.get_executable()) and
+                re.sub("%a", "", app.get_commandline())
+            or
+                app.get_executable()
     }")
 
 class AppButton(Widget.Button):
@@ -30,11 +30,12 @@ class AppButton(Widget.Button):
             window.set_visible(False)
 
         super().__init__(
+            css_classes = ["app-button"],
             child = Widget.Box(
-                css_classes = ["app-button"],
                 vertical = True,
                 child = [
                     Widget.Label(
+                        css_classes = ["app-name-label"],
                         halign = "start",
                         xalign = 0,
                         ellipsize = "end",
@@ -42,6 +43,7 @@ class AppButton(Widget.Button):
                         label = app.get_name()
                     ),
                     Widget.Label(
+                        css_classes = ["app-description-label"],
                         halign = "start",
                         xalign = 0,
                         ellipsize = "end",
@@ -78,7 +80,7 @@ class Launcher(Widget.Window):
             namespace = "Launcher",
             anchor = ["right", "left", "top", "bottom"],
             layer = "top",
-            kb_mode = "exclusive",
+            kb_mode = "on_demand",
             popup = True,
             css_classes = ["launcher-window"],
             visible = False,

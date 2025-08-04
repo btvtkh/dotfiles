@@ -70,7 +70,6 @@ class Notifications(Widget.Window):
             animate_outer()
 
         def setup(x):
-            self.set_child(self._notifications_box)
             notifications.connect("notified", on_notified)
 
             for n in notifications.get_notifications():
@@ -84,5 +83,6 @@ class Notifications(Widget.Window):
             dynamic_input_region = True,
             visible = False,
             css_classes = ["notifications-window"],
+            child = self._notifications_box,
             setup = setup
         )

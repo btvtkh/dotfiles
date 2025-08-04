@@ -1,4 +1,4 @@
-import time as Time
+from datetime import datetime as DateTime
 from ignis import widgets as Widget
 
 UrgencyMap = {
@@ -53,7 +53,7 @@ class NotificationWidget(Widget.Box):
                             css_classes = ["time-label"],
                             hexpand = True,
                             halign = "end",
-                            label = Time.strftime('%H:%M', Time.gmtime(n.time))
+                            label = DateTime.fromtimestamp(n.time).strftime("%H:%M")
                         ),
                         Widget.Button(
                             css_classes = ["close-button"],

@@ -20,7 +20,7 @@ local launcher = {}
 local function launch_app(app)
 	if not app then return end
 	local desktop_info = Gio.DesktopAppInfo.new(app:get_id())
-	local term_needed = desktop_info:get_string("Terminal") == "true" and true or false
+	local term_needed = desktop_info:get_string("Terminal") == "true"
 	local term = Gio.AppInfo.get_default_for_uri_scheme('terminal')
 
 	awful.spawn(
@@ -29,8 +29,8 @@ local function launch_app(app)
 		or
 			string.match(app:get_executable(), "^env") and
 				string.gsub(app:get_commandline(), "%%%a", "")
-		or
-			app:get_executable()
+			or
+				app:get_executable()
 	)
 end
 
