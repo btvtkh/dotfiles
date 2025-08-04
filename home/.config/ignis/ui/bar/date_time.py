@@ -19,23 +19,24 @@ time_poll = Utils.Poll(
 class DateTimeWidget(Widget.Box):
     def __init__(self):
 
+        self._date_label = Widget.Label()
+        self._time_label = Widget.Label()
+
         def on_time_poll_changed(x):
-            self.get_first_child().set_label(DateTime.datetime.now().strftime("%d %b, %a"))
-            self.get_last_child().set_label(DateTime.datetime.now().strftime("%H:%M"))
+            self._date_label.set_label(DateTime.datetime.now().strftime("%d %b, %a"))
+            self._time_label.set_label(DateTime.datetime.now().strftime("%H:%M"))
 
         def setup(x):
             time_poll.connect("changed", on_time_poll_changed)
+            self._date_label.set_label(DateTime.datetime.now().strftime("%d %b, %a"))
+            self._time_label.set_label(DateTime.datetime.now().strftime("%H:%M"))
 
         super().__init__(
             css_classes = ["date-time-box"],
             child = [
-                Widget.Label(
-                    label = DateTime.datetime.now().strftime("%d %b, %a")
-                ),
+                self._date_label,
                 Widget.Separator(),
-                Widget.Label(
-                    label = DateTime.datetime.now().strftime("%H:%M")
-                )
+                self._time_label
             ],
             setup = setup
         )

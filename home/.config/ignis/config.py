@@ -3,7 +3,8 @@ from ignis import utils as Utils
 from ignis.css_manager import CssManager, CssInfoPath
 from ui import (
     Bar,
-    Notifications
+    Notifications,
+    Launcher
 )
 
 css_manager = CssManager.get_default()
@@ -19,3 +20,5 @@ css_manager.apply_css(
 for monitor in range(Utils.get_n_monitors()):
     Bar(monitor)
     Notifications(monitor)
+
+Launcher()
