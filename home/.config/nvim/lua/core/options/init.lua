@@ -65,4 +65,4 @@ vim.diagnostic.config({
 })
 
 vim.opt.termguicolors = true
-vim.cmd.colorscheme("placid")
+vim.cmd.colorscheme("astel")
