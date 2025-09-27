@@ -1,18 +1,18 @@
 local P = {}
 
-P.red = "#D6686D"
-P.green = "#63C175"
-P.yellow = "#DEBC6D"
-P.blue = "#698FD3"
-P.magenta = "#BC7CCA"
-P.cyan = "#6DC0D1"
-P.orange = "#D88E61"
-P.bg = "#0F0F0F"
-P.bg_alt = "#1C1C1C"
-P.bg_urg = "#2F2F2F"
-P.fg_alt = "#5F5F5F"
-P.fg = "#CECECE"
-P.ac = P.cyan
+P.red = "#f27474"
+P.green = "#62e98f"
+P.yellow = "#ffea7f"
+P.blue = "#86b6ff"
+P.magenta = "#c77ed9"
+P.cyan = "#75ddeb"
+P.orange = "#f2a868"
+P.bg = "#121212"
+P.bg_alt = "#212121"
+P.bg_urg = "#414141"
+P.fg_alt = "#767676"
+P.fg = "#E6E6E6"
+P.ac = P.blue
 
 P.none = "NONE"
 

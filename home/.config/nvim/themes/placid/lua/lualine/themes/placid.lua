@@ -2,7 +2,7 @@ local p = require('placid.palette')
 
 return {
 	normal = {
-		a = { bg = p.bg_alt, fg = p.cyan },
+		a = { bg = p.bg_alt, fg = p.blue },
 		b = { bg = p.bg_alt, fg = p.fg },
 		c = { bg = p.bg_alt, fg = p.fg_alt },
 	},
@@ -12,7 +12,7 @@ return {
 		c = { bg = p.bg_alt, fg = p.fg_alt },
 	},
 	command = {
-		a = { bg = p.bg_alt, fg = p.blue },
+		a = { bg = p.bg_alt, fg = p.green },
 		b = { bg = p.bg_alt, fg = p.fg },
 		c = { bg = p.bg_alt, fg = p.fg_alt },
 	},

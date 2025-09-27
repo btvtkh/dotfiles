@@ -132,5 +132,5 @@ y = 9
 
 [general]
 import = [
-	"~/.config/alacritty/themes/astel.toml"
+	"~/.config/alacritty/themes/placid.toml"
 ]
